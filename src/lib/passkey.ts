@@ -1,0 +1,167 @@
+import {
+	generateRegistrationOptions,
+	verifyRegistrationResponse as verifyRegResponse,
+	generateAuthenticationOptions,
+	verifyAuthenticationResponse as verifyAuthResponse,
+} from '@simplewebauthn/server';
+import { randomUUID } from 'node:crypto';
+import type { AuthDB, ResolvedConfig } from './types.js';
+import type {
+	RegistrationResponseJSON,
+	AuthenticationResponseJSON,
+} from '@simplewebauthn/server';
+
+const CHALLENGE_EXPIRY_MS = 5 * 60 * 1000;
+
+export function getWebAuthnConfig(requestUrl: URL) {
+	const envOrigin = process.env.ORIGIN;
+	if (envOrigin) {
+		const url = new URL(envOrigin);
+		return { rpID: url.hostname, origin: url.origin };
+	}
+	return { rpID: requestUrl.hostname, origin: requestUrl.origin };
+}
+
+export async function generateRegistrationChallenge(
+	db: AuthDB,
+	user: { id: string; email: string },
+	requestUrl: URL,
+	config: ResolvedConfig,
+) {
+	const { rpID } = getWebAuthnConfig(requestUrl);
+	const existingPasskeys = await db.getUserPasskeys(user.id);
+	const excludeCredentials = existingPasskeys.map((pk) => ({
+		id: pk.credentialId,
+		transports: pk.transports
+			? (JSON.parse(pk.transports) as AuthenticatorTransport[])
+			: undefined,
+	}));
+
+	const options = await generateRegistrationOptions({
+		rpName: config.rpName,
+		rpID,
+		userName: user.email,
+		userID: new TextEncoder().encode(user.id),
+		authenticatorSelection: {
+			residentKey: 'required',
+			userVerification: 'preferred',
+		},
+		excludeCredentials,
+	});
+
+	await db.storeChallenge(options.challenge, user.id, Date.now() + CHALLENGE_EXPIRY_MS);
+
+	return options;
+}
+
+export async function verifyRegistrationResponse(
+	db: AuthDB,
+	userId: string,
+	response: RegistrationResponseJSON,
+	requestUrl: URL,
+): Promise<boolean> {
+	const { rpID, origin } = getWebAuthnConfig(requestUrl);
+	const challenge = JSON.parse(
+		Buffer.from(response.response.clientDataJSON, 'base64url').toString(),
+	).challenge;
+
+	const stored = await db.consumeChallenge(challenge);
+	if (!stored || stored.userId !== userId) return false;
+
+	try {
+		const verification = await verifyRegResponse({
+			response,
+			expectedChallenge: challenge,
+			expectedOrigin: origin,
+			expectedRPID: rpID,
+		});
+
+		if (!verification.verified || !verification.registrationInfo) return false;
+
+		const { credential } = verification.registrationInfo;
+
+		await db.storePasskey({
+			id: randomUUID(),
+			userId,
+			credentialId: credential.id,
+			publicKey: new Uint8Array(credential.publicKey),
+			counter: credential.counter,
+			transports: response.response.transports
+				? JSON.stringify(response.response.transports)
+				: null,
+		});
+
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+export async function generateAuthenticationChallenge(
+	db: AuthDB,
+	requestUrl: URL,
+) {
+	const { rpID } = getWebAuthnConfig(requestUrl);
+	const options = await generateAuthenticationOptions({
+		rpID,
+		allowCredentials: [],
+		userVerification: 'preferred',
+	});
+
+	await db.storeChallenge(options.challenge, 'anonymous', Date.now() + CHALLENGE_EXPIRY_MS);
+
+	return options;
+}
+
+export async function verifyAuthenticationResponse(
+	db: AuthDB,
+	response: AuthenticationResponseJSON,
+	requestUrl: URL,
+): Promise<{ user: { id: string; email: string } } | null> {
+	const { rpID, origin } = getWebAuthnConfig(requestUrl);
+	const passkey = await db.getPasskeyByCredentialId(response.id);
+
+	if (!passkey) return null;
+
+	const challenge = JSON.parse(
+		Buffer.from(response.response.clientDataJSON, 'base64url').toString(),
+	).challenge;
+
+	const stored = await db.consumeChallenge(challenge);
+	if (!stored) return null;
+
+	try {
+		const verification = await verifyAuthResponse({
+			response,
+			expectedChallenge: challenge,
+			expectedOrigin: origin,
+			expectedRPID: rpID,
+			credential: {
+				id: passkey.credentialId,
+				publicKey: new Uint8Array(passkey.publicKey),
+				counter: passkey.counter,
+				transports: passkey.transports
+					? (JSON.parse(passkey.transports) as AuthenticatorTransport[])
+					: undefined,
+			},
+		});
+
+		if (!verification.verified) return null;
+
+		await db.updatePasskeyCounter(passkey.id, verification.authenticationInfo.newCounter);
+
+		return {
+			user: { id: passkey.userId, email: passkey.email },
+		};
+	} catch {
+		return null;
+	}
+}
+
+export async function getUserPasskeys(db: AuthDB, userId: string) {
+	return db.getUserPasskeys(userId);
+}
+
+export async function removePasskey(db: AuthDB, passkeyId: string, userId: string) {
+	return db.deletePasskey(passkeyId, userId);
+}

@@ -1,0 +1,76 @@
+{
+	"name": "@mrgnw/anahtar",
+	"version": "0.0.1",
+	"description": "Opinionated, reusable auth for SvelteKit. Email+OTP + passkeys.",
+	"license": "MIT",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mrgnw/anahtar.git"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com",
+		"access": "public"
+	},
+	"scripts": {
+		"build": "svelte-package",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"prepublishOnly": "pnpm build"
+	},
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./sqlite": {
+			"types": "./dist/db/sqlite.d.ts",
+			"default": "./dist/db/sqlite.js"
+		},
+		"./postgres": {
+			"types": "./dist/db/postgres.d.ts",
+			"default": "./dist/db/postgres.js"
+		},
+		"./components": {
+			"types": "./dist/components/index.d.ts",
+			"svelte": "./dist/components/index.js",
+			"default": "./dist/components/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*"
+	],
+	"peerDependencies": {
+		"@simplewebauthn/browser": "^13.0.0",
+		"@sveltejs/kit": "^2.0.0",
+		"svelte": "^5.0.0"
+	},
+	"peerDependenciesMeta": {
+		"svelte": {
+			"optional": true
+		},
+		"@simplewebauthn/browser": {
+			"optional": true
+		}
+	},
+	"dependencies": {
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/encoding": "^1.1.0",
+		"@simplewebauthn/server": "^13.2.2"
+	},
+	"devDependencies": {
+		"@simplewebauthn/browser": "^13.2.2",
+		"@sveltejs/kit": "^2.31.1",
+		"@sveltejs/package": "^2.3.7",
+		"@types/better-sqlite3": "^7.6.13",
+		"svelte": "^5.38.1",
+		"svelte-check": "^4.3.1",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.1"
+	}
+}
