@@ -72,4 +72,5 @@ pnpm test
 
 ## Docs
 
-See [PLAN.md](PLAN.md) for full architecture, DB adapter interface, config options, and table schema.
+- [Integration guide](docs/integration.md) — install, config, theming, Postgres setup
+- [PLAN.md](PLAN.md) — architecture, DB adapter interface, test setup
