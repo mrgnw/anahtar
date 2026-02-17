@@ -14,6 +14,9 @@ Opinionated, reusable auth for SvelteKit. Email+OTP identification with optional
 ## Package structure
 
 ```
+vitest.unit.ts                # Unit test config (node env)
+vitest.browser.ts             # Component test config (happy-dom + svelte compiler)
+vitest-setup.ts               # @testing-library/jest-dom setup
 src/
 ├── index.ts                  # createAuth() entry point, re-exports
 ├── config.ts                 # AuthConfig type + defaults
@@ -224,7 +227,7 @@ declare global {
 
 ## Reference implementation
 
-The `auth-rework` branch of [anani](https://github.com/mrgnw/anani) contains the original implementation this package is extracted from. Key files:
+The `fresh-pineapple` branch of [anani](https://github.com/mrgnw/anani) contains the original implementation this package is extracted from. Key files:
 
 - `src/lib/server/auth.ts` — session + OTP logic
 - `src/lib/server/passkey.ts` — WebAuthn logic
@@ -232,6 +235,22 @@ The `auth-rework` branch of [anani](https://github.com/mrgnw/anani) contains the
 - `src/lib/server/db.ts` — SQLite setup + schema
 - `src/routes/auth/+page.svelte` — auth UI (email → OTP → passkey flow)
 - `src/routes/api/auth/` — all API route handlers
+
+## Testing
+
+68 tests: 46 unit + 22 component.
+
+```sh
+pnpm test:unit     # otp, session, sqlite adapter — node env
+pnpm test:browser  # AuthFlow, OtpInput, PasskeyPrompt — happy-dom
+pnpm test          # both
+```
+
+Tests use two separate vitest configs because `@sveltejs/vite-plugin-svelte` hangs vitest indefinitely in DOM environments (jsdom/happy-dom) on Node 25. The workaround is `vitest.browser.ts` which uses a minimal vite plugin that calls `svelte/compiler`'s `compile()` and `compileModule()` directly, avoiding the full plugin's file watchers and server hooks.
+
+The `svelteTesting()` plugin from `@testing-library/svelte/vite` handles DOM cleanup between tests and adds `@testing-library/svelte` to `ssr.noExternal` so its `.svelte.js` files get compiled.
+
+**Known issue:** vitest process doesn't exit cleanly on Node 25 — tests complete and print results, but the process hangs. This is a vitest/Node 25 compatibility issue, not specific to this project.
 
 ## Build / publish
 
