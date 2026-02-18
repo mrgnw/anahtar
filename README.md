@@ -1,5 +1,7 @@
 # @mrgnw/anahtar
 
+> **Pre-alpha.** API may change between releases.
+
 Auth for SvelteKit. Email+OTP + optional passkeys.
 
 "Anahtar" = key (Turkish)

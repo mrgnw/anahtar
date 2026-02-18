@@ -1,6 +1,6 @@
 {
 	"name": "@mrgnw/anahtar",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Opinionated, reusable auth for SvelteKit. Email+OTP + passkeys.",
 	"license": "MIT",
 	"type": "module",
@@ -9,7 +9,7 @@
 		"url": "https://github.com/mrgnw/anahtar.git"
 	},
 	"publishConfig": {
-		"registry": "https://npm.pkg.github.com",
+		"registry": "https://registry.npmjs.org/",
 		"access": "public"
 	},
 	"scripts": {
