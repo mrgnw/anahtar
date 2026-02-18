@@ -1,6 +1,6 @@
 {
 	"name": "@mrgnw/anahtar",
-	"version": "0.0.2",
+	"version": "0.0.5",
 	"description": "Opinionated, reusable auth for SvelteKit. Email+OTP + passkeys.",
 	"license": "MIT",
 	"type": "module",
@@ -35,6 +35,10 @@
 		"./postgres": {
 			"types": "./dist/db/postgres.d.ts",
 			"default": "./dist/db/postgres.js"
+		},
+		"./d1": {
+			"types": "./dist/db/d1.d.ts",
+			"default": "./dist/db/d1.js"
 		},
 		"./components": {
 			"types": "./dist/components/index.d.ts",
