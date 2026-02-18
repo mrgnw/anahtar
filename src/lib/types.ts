@@ -25,6 +25,7 @@ export interface PasskeyRecord {
 	publicKey: Uint8Array;
 	counter: number;
 	transports: string | null;
+	name: string | null;
 	createdAt: number;
 }
 
@@ -40,6 +41,7 @@ export interface NewPasskey {
 	publicKey: Uint8Array;
 	counter: number;
 	transports: string | null;
+	name: string | null;
 }
 
 export type OtpResult =

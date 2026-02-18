@@ -1,153 +1,157 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import OtpInput from './OtpInput.svelte';
-	import PasskeyPrompt from './PasskeyPrompt.svelte';
+import { onDestroy, onMount } from 'svelte';
+import { guessDeviceName } from '../device.js';
+import OtpInput from './OtpInput.svelte';
+import PasskeyPrompt from './PasskeyPrompt.svelte';
 
-	interface Props {
-		apiBase?: string;
-		onSuccess?: () => void;
-	}
+interface Props {
+	apiBase?: string;
+	onSuccess?: () => void;
+}
 
-	let { apiBase = '/api/auth', onSuccess }: Props = $props();
+let { apiBase = '/api/auth', onSuccess }: Props = $props();
 
-	let step = $state<1 | 2 | 3>(1);
-	let email = $state('');
-	let loading = $state(false);
-	let error = $state('');
-	let otpInput = $state<OtpInput>();
+let step = $state<1 | 2 | 3 | 4>(1);
+let congratsTimeout: ReturnType<typeof setTimeout> | null = null;
+let email = $state('');
+let loading = $state(false);
+let error = $state('');
+let otpInput = $state<OtpInput>();
 
-	let conditionalAbort: AbortController | null = null;
+let conditionalAbort: AbortController | null = null;
 
-	onMount(() => {
-		tryConditionalWebAuthn();
-	});
+onMount(() => {
+	tryConditionalWebAuthn();
+});
 
-	onDestroy(() => {
-		conditionalAbort?.abort();
-	});
+onDestroy(() => {
+	conditionalAbort?.abort();
+	if (congratsTimeout) clearTimeout(congratsTimeout);
+});
 
-	async function tryConditionalWebAuthn() {
-		try {
-			const { startAuthentication } = await import('@simplewebauthn/browser');
-			const res = await fetch(`${apiBase}/passkey/login-start`);
-			if (!res.ok) return;
-			const options = await res.json();
-			conditionalAbort = new AbortController();
-			const authResponse = await startAuthentication({
-				optionsJSON: options,
-				useBrowserAutofill: true,
-			});
-			const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(authResponse),
-			});
-			if (verifyRes.ok) {
-				onSuccess?.();
-			}
-		} catch {
-			// Passkey autofill not available or cancelled
-		}
-	}
-
-	async function handleEmailSubmit() {
-		error = '';
-		if (!email.includes('@')) {
-			error = 'Please enter a valid email address.';
-			return;
-		}
-		loading = true;
-		conditionalAbort?.abort();
-		conditionalAbort = null;
-		try {
-			const res = await fetch(`${apiBase}/start`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email }),
-			});
-			if (!res.ok) {
-				const data = await res.json().catch(() => null);
-				error = data?.error ?? `Request failed (${res.status})`;
-				return;
-			}
-			step = 2;
-		} catch {
-			error = 'Something went wrong. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	async function handleOtpComplete(code: string) {
-		error = '';
-		loading = true;
-		try {
-			const res = await fetch(`${apiBase}/verify`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, code }),
-			});
-			if (!res.ok) {
-				const data = await res.json().catch(() => null);
-				error = data?.error ?? 'Invalid code. Please try again.';
-				otpInput?.clear();
-				return;
-			}
-			const data = await res.json();
-			if (data.hasPasskey || data.skipPasskeyPrompt) {
-				onSuccess?.();
-			} else {
-				step = 3;
-			}
-		} catch {
-			error = 'Something went wrong. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	async function resendCode() {
-		error = '';
-		loading = true;
-		try {
-			const res = await fetch(`${apiBase}/start`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email }),
-			});
-			if (!res.ok) {
-				const data = await res.json().catch(() => null);
-				error = data?.error ?? 'Failed to resend code.';
-				return;
-			}
-			otpInput?.clear();
-		} catch {
-			error = 'Something went wrong. Please try again.';
-		} finally {
-			loading = false;
-		}
-	}
-
-	async function handlePasskeyRegister() {
-		const { startRegistration } = await import('@simplewebauthn/browser');
-		const optRes = await fetch(`${apiBase}/passkey/register-start`, { method: 'POST' });
-		if (!optRes.ok) throw new Error('Failed to get registration options');
-		const options = await optRes.json();
-
-		const regResponse = await startRegistration({ optionsJSON: options });
-		const res = await fetch(`${apiBase}/passkey/register-finish`, {
+async function tryConditionalWebAuthn() {
+	try {
+		const { startAuthentication } = await import('@simplewebauthn/browser');
+		const res = await fetch(`${apiBase}/passkey/login-start`);
+		if (!res.ok) return;
+		const options = await res.json();
+		conditionalAbort = new AbortController();
+		const authResponse = await startAuthentication({
+			optionsJSON: options,
+			useBrowserAutofill: true
+		});
+		const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(regResponse),
+			body: JSON.stringify(authResponse)
 		});
-		if (!res.ok) throw new Error('Registration failed');
-		onSuccess?.();
+		if (verifyRes.ok) {
+			onSuccess?.();
+		}
+	} catch {
+		// Passkey autofill not available or cancelled
 	}
+}
 
-	function handlePasskeySkip() {
-		fetch(`${apiBase}/skip-passkey`, { method: 'POST' });
-		onSuccess?.();
+async function handleEmailSubmit() {
+	error = '';
+	if (!email.includes('@')) {
+		error = 'Please enter a valid email address.';
+		return;
 	}
+	loading = true;
+	conditionalAbort?.abort();
+	conditionalAbort = null;
+	try {
+		const res = await fetch(`${apiBase}/start`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email })
+		});
+		if (!res.ok) {
+			const data = await res.json().catch(() => null);
+			error = data?.error ?? `Request failed (${res.status})`;
+			return;
+		}
+		step = 2;
+	} catch {
+		error = 'Something went wrong. Please try again.';
+	} finally {
+		loading = false;
+	}
+}
+
+async function handleOtpComplete(code: string) {
+	error = '';
+	loading = true;
+	try {
+		const res = await fetch(`${apiBase}/verify`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email, code })
+		});
+		if (!res.ok) {
+			const data = await res.json().catch(() => null);
+			error = data?.error ?? 'Invalid code. Please try again.';
+			otpInput?.clear();
+			return;
+		}
+		const data = await res.json();
+		if (data.hasPasskey || data.skipPasskeyPrompt) {
+			onSuccess?.();
+		} else {
+			step = 3;
+		}
+	} catch {
+		error = 'Something went wrong. Please try again.';
+	} finally {
+		loading = false;
+	}
+}
+
+async function resendCode() {
+	error = '';
+	loading = true;
+	try {
+		const res = await fetch(`${apiBase}/start`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email })
+		});
+		if (!res.ok) {
+			const data = await res.json().catch(() => null);
+			error = data?.error ?? 'Failed to resend code.';
+			return;
+		}
+		otpInput?.clear();
+	} catch {
+		error = 'Something went wrong. Please try again.';
+	} finally {
+		loading = false;
+	}
+}
+
+async function handlePasskeyRegister() {
+	const { startRegistration } = await import('@simplewebauthn/browser');
+	const optRes = await fetch(`${apiBase}/passkey/register-start`, { method: 'POST' });
+	if (!optRes.ok) throw new Error('Failed to get registration options');
+	const options = await optRes.json();
+
+	const regResponse = await startRegistration({ optionsJSON: options });
+	const res = await fetch(`${apiBase}/passkey/register-finish`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ ...regResponse, name: guessDeviceName() })
+	});
+	if (!res.ok) throw new Error('Registration failed');
+	step = 4;
+	congratsTimeout = setTimeout(() => onSuccess?.(), 3000);
+}
+
+function handlePasskeySkip() {
+	fetch(`${apiBase}/skip-passkey`, { method: 'POST' });
+	onSuccess?.();
+}
 </script>
 
 <div class="anahtar-auth">
@@ -208,6 +212,21 @@
 		</div>
 	{:else if step === 3}
 		<PasskeyPrompt onRegister={handlePasskeyRegister} onSkip={handlePasskeySkip} />
+	{:else if step === 4}
+		<div class="anahtar-congrats">
+			<div class="anahtar-congrats-icon">
+				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="7.5" cy="15.5" r="5.5"/>
+					<path d="m11.5 12 4-4"/>
+					<path d="m15 7 2 2"/>
+					<path d="m17.5 4.5 2 2"/>
+				</svg>
+			</div>
+			<p class="anahtar-congrats-title">You're a passkey!</p>
+			<button onclick={() => onSuccess?.()} class="anahtar-button">
+				Continue
+			</button>
+		</div>
 	{/if}
 </div>
 
@@ -304,5 +323,29 @@
 
 	.anahtar-link:disabled {
 		opacity: 0.3;
+	}
+
+	.anahtar-congrats {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.anahtar-congrats-icon {
+		width: 4rem;
+		height: 4rem;
+		border-radius: 50%;
+		background: var(--anahtar-primary, #3b82f6);
+		color: var(--anahtar-primary-fg, #fff);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.anahtar-congrats-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		margin-bottom: 0.5rem;
 	}
 </style>

@@ -1,15 +1,12 @@
-import {
-	generateRegistrationOptions,
-	verifyRegistrationResponse as verifyRegResponse,
-	generateAuthenticationOptions,
-	verifyAuthenticationResponse as verifyAuthResponse,
-} from '@simplewebauthn/server';
 import { randomUUID } from 'node:crypto';
-import type { AuthDB, ResolvedConfig } from './types.js';
-import type {
-	RegistrationResponseJSON,
-	AuthenticationResponseJSON,
+import type { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
+import {
+	generateAuthenticationOptions,
+	generateRegistrationOptions,
+	verifyAuthenticationResponse as verifyAuthResponse,
+	verifyRegistrationResponse as verifyRegResponse
 } from '@simplewebauthn/server';
+import type { AuthDB, ResolvedConfig } from './types.js';
 
 const CHALLENGE_EXPIRY_MS = 5 * 60 * 1000;
 
@@ -26,15 +23,13 @@ export async function generateRegistrationChallenge(
 	db: AuthDB,
 	user: { id: string; email: string },
 	requestUrl: URL,
-	config: ResolvedConfig,
+	config: ResolvedConfig
 ) {
 	const { rpID } = getWebAuthnConfig(requestUrl);
 	const existingPasskeys = await db.getUserPasskeys(user.id);
 	const excludeCredentials = existingPasskeys.map((pk) => ({
 		id: pk.credentialId,
-		transports: pk.transports
-			? (JSON.parse(pk.transports) as AuthenticatorTransport[])
-			: undefined,
+		transports: pk.transports ? (JSON.parse(pk.transports) as AuthenticatorTransport[]) : undefined
 	}));
 
 	const options = await generateRegistrationOptions({
@@ -44,9 +39,9 @@ export async function generateRegistrationChallenge(
 		userID: new TextEncoder().encode(user.id),
 		authenticatorSelection: {
 			residentKey: 'required',
-			userVerification: 'preferred',
+			userVerification: 'preferred'
 		},
-		excludeCredentials,
+		excludeCredentials
 	});
 
 	await db.storeChallenge(options.challenge, user.id, Date.now() + CHALLENGE_EXPIRY_MS);
@@ -59,11 +54,10 @@ export async function verifyRegistrationResponse(
 	userId: string,
 	response: RegistrationResponseJSON,
 	requestUrl: URL,
+	name: string | null = null
 ): Promise<boolean> {
 	const { rpID, origin } = getWebAuthnConfig(requestUrl);
-	const challenge = JSON.parse(
-		Buffer.from(response.response.clientDataJSON, 'base64url').toString(),
-	).challenge;
+	const challenge = JSON.parse(Buffer.from(response.response.clientDataJSON, 'base64url').toString()).challenge;
 
 	const stored = await db.consumeChallenge(challenge);
 	if (!stored || stored.userId !== userId) return false;
@@ -73,7 +67,7 @@ export async function verifyRegistrationResponse(
 			response,
 			expectedChallenge: challenge,
 			expectedOrigin: origin,
-			expectedRPID: rpID,
+			expectedRPID: rpID
 		});
 
 		if (!verification.verified || !verification.registrationInfo) return false;
@@ -86,9 +80,8 @@ export async function verifyRegistrationResponse(
 			credentialId: credential.id,
 			publicKey: new Uint8Array(credential.publicKey),
 			counter: credential.counter,
-			transports: response.response.transports
-				? JSON.stringify(response.response.transports)
-				: null,
+			transports: response.response.transports ? JSON.stringify(response.response.transports) : null,
+			name
 		});
 
 		return true;
@@ -97,15 +90,12 @@ export async function verifyRegistrationResponse(
 	}
 }
 
-export async function generateAuthenticationChallenge(
-	db: AuthDB,
-	requestUrl: URL,
-) {
+export async function generateAuthenticationChallenge(db: AuthDB, requestUrl: URL) {
 	const { rpID } = getWebAuthnConfig(requestUrl);
 	const options = await generateAuthenticationOptions({
 		rpID,
 		allowCredentials: [],
-		userVerification: 'preferred',
+		userVerification: 'preferred'
 	});
 
 	await db.storeChallenge(options.challenge, 'anonymous', Date.now() + CHALLENGE_EXPIRY_MS);
@@ -116,16 +106,14 @@ export async function generateAuthenticationChallenge(
 export async function verifyAuthenticationResponse(
 	db: AuthDB,
 	response: AuthenticationResponseJSON,
-	requestUrl: URL,
+	requestUrl: URL
 ): Promise<{ user: { id: string; email: string } } | null> {
 	const { rpID, origin } = getWebAuthnConfig(requestUrl);
 	const passkey = await db.getPasskeyByCredentialId(response.id);
 
 	if (!passkey) return null;
 
-	const challenge = JSON.parse(
-		Buffer.from(response.response.clientDataJSON, 'base64url').toString(),
-	).challenge;
+	const challenge = JSON.parse(Buffer.from(response.response.clientDataJSON, 'base64url').toString()).challenge;
 
 	const stored = await db.consumeChallenge(challenge);
 	if (!stored) return null;
@@ -140,10 +128,8 @@ export async function verifyAuthenticationResponse(
 				id: passkey.credentialId,
 				publicKey: new Uint8Array(passkey.publicKey),
 				counter: passkey.counter,
-				transports: passkey.transports
-					? (JSON.parse(passkey.transports) as AuthenticatorTransport[])
-					: undefined,
-			},
+				transports: passkey.transports ? (JSON.parse(passkey.transports) as AuthenticatorTransport[]) : undefined
+			}
 		});
 
 		if (!verification.verified) return null;
@@ -151,7 +137,7 @@ export async function verifyAuthenticationResponse(
 		await db.updatePasskeyCounter(passkey.id, verification.authenticationInfo.newCounter);
 
 		return {
-			user: { id: passkey.userId, email: passkey.email },
+			user: { id: passkey.userId, email: passkey.email }
 		};
 	} catch {
 		return null;

@@ -1,23 +1,23 @@
-import type { AuthConfig } from './types.js';
 import { resolveConfig } from './config.js';
 import { createHandle } from './kit/handle.js';
 import { createHandlers } from './kit/handlers.js';
-
-export type {
-	AuthUser,
-	AuthDB,
-	AuthConfig,
-	ResolvedConfig,
-	SessionRecord,
-	OTPRecord,
-	PasskeyRecord,
-	FullPasskeyRecord,
-	NewPasskey,
-	OtpResult,
-	MaybePromise,
-} from './types.js';
+import type { AuthConfig } from './types.js';
 
 export { resolveConfig } from './config.js';
+export { guessDeviceName } from './device.js';
+export type {
+	AuthConfig,
+	AuthDB,
+	AuthUser,
+	FullPasskeyRecord,
+	MaybePromise,
+	NewPasskey,
+	OTPRecord,
+	OtpResult,
+	PasskeyRecord,
+	ResolvedConfig,
+	SessionRecord
+} from './types.js';
 
 export async function createAuth(config: AuthConfig) {
 	const resolved = resolveConfig(config);
@@ -26,6 +26,6 @@ export async function createAuth(config: AuthConfig) {
 	return {
 		handle: createHandle(resolved),
 		handlers: createHandlers(resolved),
-		config: resolved,
+		config: resolved
 	};
 }

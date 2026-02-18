@@ -2,11 +2,11 @@ import { randomUUID } from 'node:crypto';
 import type {
 	AuthDB,
 	AuthUser,
-	OTPRecord,
-	SessionRecord,
-	PasskeyRecord,
 	FullPasskeyRecord,
 	NewPasskey,
+	OTPRecord,
+	PasskeyRecord,
+	SessionRecord
 } from '../types.js';
 
 interface PgPool {
@@ -17,17 +17,14 @@ interface PostgresAdapterOptions {
 	tablePrefix?: string;
 }
 
-export function postgresAdapter(
-	pool: PgPool,
-	options: PostgresAdapterOptions = {},
-): AuthDB {
+export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = {}): AuthDB {
 	const p = options.tablePrefix ?? 'auth_';
 	const t = {
 		users: `${p}users`,
 		sessions: `${p}sessions`,
 		otpCodes: `${p}otp_codes`,
 		passkeys: `${p}passkeys`,
-		challenges: `${p}challenges`,
+		challenges: `${p}challenges`
 	};
 
 	async function queryOne<T>(text: string, values?: unknown[]): Promise<T | undefined> {
@@ -70,6 +67,7 @@ export function postgresAdapter(
 					public_key BYTEA NOT NULL,
 					counter INTEGER NOT NULL DEFAULT 0,
 					transports TEXT,
+					name TEXT,
 					created_at TIMESTAMPTZ DEFAULT NOW()
 				);
 				CREATE TABLE IF NOT EXISTS ${t.challenges} (
@@ -84,43 +82,38 @@ export function postgresAdapter(
 		async getUserByEmail(email: string): Promise<AuthUser | null> {
 			const row = await queryOne<{ id: string; email: string; skip_passkey_prompt: boolean; created_at: string }>(
 				`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE email = $1`,
-				[email],
+				[email]
 			);
 			if (!row) return null;
 			return {
 				id: row.id,
 				email: row.email,
 				skipPasskeyPrompt: row.skip_passkey_prompt,
-				createdAt: new Date(row.created_at).getTime(),
+				createdAt: new Date(row.created_at).getTime()
 			};
 		},
 
 		async createUser(email: string): Promise<AuthUser> {
 			const id = randomUUID();
-			await pool.query(
-				`INSERT INTO ${t.users} (id, email) VALUES ($1, $2)`,
-				[id, email],
-			);
+			await pool.query(`INSERT INTO ${t.users} (id, email) VALUES ($1, $2)`, [id, email]);
 			return {
 				id,
 				email,
 				skipPasskeyPrompt: false,
-				createdAt: Date.now(),
+				createdAt: Date.now()
 			};
 		},
 
 		async setSkipPasskeyPrompt(userId: string, skip: boolean) {
-			await pool.query(
-				`UPDATE ${t.users} SET skip_passkey_prompt = $1 WHERE id = $2`,
-				[skip, userId],
-			);
+			await pool.query(`UPDATE ${t.users} SET skip_passkey_prompt = $1 WHERE id = $2`, [skip, userId]);
 		},
 
 		async createSession(tokenHash: string, userId: string, expiresAt: number) {
-			await pool.query(
-				`INSERT INTO ${t.sessions} (id, user_id, expires_at) VALUES ($1, $2, $3)`,
-				[tokenHash, userId, expiresAt],
-			);
+			await pool.query(`INSERT INTO ${t.sessions} (id, user_id, expires_at) VALUES ($1, $2, $3)`, [
+				tokenHash,
+				userId,
+				expiresAt
+			]);
 		},
 
 		async getSession(tokenHash: string): Promise<(SessionRecord & { email: string }) | null> {
@@ -129,14 +122,14 @@ export function postgresAdapter(
 				FROM ${t.sessions} s
 				JOIN ${t.users} u ON u.id = s.user_id
 				WHERE s.id = $1`,
-				[tokenHash],
+				[tokenHash]
 			);
 			if (!row) return null;
 			return {
 				id: row.id,
 				userId: row.user_id,
 				expiresAt: Number(row.expires_at),
-				email: row.email,
+				email: row.email
 			};
 		},
 
@@ -145,16 +138,18 @@ export function postgresAdapter(
 		},
 
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
-			await pool.query(
-				`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES ($1, $2, $3, $4)`,
-				[id, email, code, expiresAt],
-			);
+			await pool.query(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES ($1, $2, $3, $4)`, [
+				id,
+				email,
+				code,
+				expiresAt
+			]);
 		},
 
 		async getLatestOTP(email: string): Promise<OTPRecord | null> {
 			const row = await queryOne<{ id: string; email: string; code: string; attempts: number; expires_at: string }>(
 				`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE email = $1 ORDER BY created_at DESC LIMIT 1`,
-				[email],
+				[email]
 			);
 			if (!row) return null;
 			return {
@@ -162,7 +157,7 @@ export function postgresAdapter(
 				email: row.email,
 				code: row.code,
 				attempts: row.attempts,
-				expiresAt: Number(row.expires_at),
+				expiresAt: Number(row.expires_at)
 			};
 		},
 
@@ -180,16 +175,17 @@ export function postgresAdapter(
 
 		async storeChallenge(challenge: string, userId: string, expiresAt: number) {
 			await pool.query(`DELETE FROM ${t.challenges} WHERE expires_at < $1`, [Date.now()]);
-			await pool.query(
-				`INSERT INTO ${t.challenges} (challenge, user_id, expires_at) VALUES ($1, $2, $3)`,
-				[challenge, userId, expiresAt],
-			);
+			await pool.query(`INSERT INTO ${t.challenges} (challenge, user_id, expires_at) VALUES ($1, $2, $3)`, [
+				challenge,
+				userId,
+				expiresAt
+			]);
 		},
 
 		async consumeChallenge(challenge: string): Promise<{ userId: string } | null> {
 			const row = await queryOne<{ user_id: string; expires_at: string }>(
 				`SELECT user_id, expires_at FROM ${t.challenges} WHERE challenge = $1`,
-				[challenge],
+				[challenge]
 			);
 			if (!row) return null;
 			await pool.query(`DELETE FROM ${t.challenges} WHERE challenge = $1`, [challenge]);
@@ -205,14 +201,15 @@ export function postgresAdapter(
 				public_key: Buffer;
 				counter: number;
 				transports: string | null;
+				name: string | null;
 				created_at: string;
 				email: string;
 			}>(
-				`SELECT p.id, p.user_id, p.credential_id, p.public_key, p.counter, p.transports, p.created_at, u.email
+				`SELECT p.id, p.user_id, p.credential_id, p.public_key, p.counter, p.transports, p.name, p.created_at, u.email
 				FROM ${t.passkeys} p
 				JOIN ${t.users} u ON u.id = p.user_id
 				WHERE p.credential_id = $1`,
-				[credentialId],
+				[credentialId]
 			);
 			if (!row) return null;
 			return {
@@ -222,8 +219,9 @@ export function postgresAdapter(
 				publicKey: new Uint8Array(row.public_key),
 				counter: row.counter,
 				transports: row.transports,
+				name: row.name,
 				createdAt: new Date(row.created_at).getTime(),
-				email: row.email,
+				email: row.email
 			};
 		},
 
@@ -234,10 +232,11 @@ export function postgresAdapter(
 				public_key: Buffer;
 				counter: number;
 				transports: string | null;
+				name: string | null;
 				created_at: string;
 			}>(
-				`SELECT id, credential_id, public_key, counter, transports, created_at FROM ${t.passkeys} WHERE user_id = $1`,
-				[userId],
+				`SELECT id, credential_id, public_key, counter, transports, name, created_at FROM ${t.passkeys} WHERE user_id = $1`,
+				[userId]
 			);
 			return rows.map((row) => ({
 				id: row.id,
@@ -245,14 +244,23 @@ export function postgresAdapter(
 				publicKey: new Uint8Array(row.public_key),
 				counter: row.counter,
 				transports: row.transports,
-				createdAt: new Date(row.created_at).getTime(),
+				name: row.name,
+				createdAt: new Date(row.created_at).getTime()
 			}));
 		},
 
 		async storePasskey(passkey: NewPasskey) {
 			await pool.query(
-				`INSERT INTO ${t.passkeys} (id, user_id, credential_id, public_key, counter, transports) VALUES ($1, $2, $3, $4, $5, $6)`,
-				[passkey.id, passkey.userId, passkey.credentialId, Buffer.from(passkey.publicKey), passkey.counter, passkey.transports],
+				`INSERT INTO ${t.passkeys} (id, user_id, credential_id, public_key, counter, transports, name) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+				[
+					passkey.id,
+					passkey.userId,
+					passkey.credentialId,
+					Buffer.from(passkey.publicKey),
+					passkey.counter,
+					passkey.transports,
+					passkey.name
+				]
 			);
 		},
 
@@ -261,11 +269,8 @@ export function postgresAdapter(
 		},
 
 		async deletePasskey(id: string, userId: string): Promise<boolean> {
-			const result = await pool.query(
-				`DELETE FROM ${t.passkeys} WHERE id = $1 AND user_id = $2`,
-				[id, userId],
-			);
+			const result = await pool.query(`DELETE FROM ${t.passkeys} WHERE id = $1 AND user_id = $2`, [id, userId]);
 			return (result.rowCount ?? 0) > 0;
-		},
+		}
 	};
 }

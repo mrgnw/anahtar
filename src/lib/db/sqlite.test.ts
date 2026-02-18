@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
-import { sqliteAdapter } from './sqlite.js';
+import { beforeEach, describe, expect, it } from 'vitest';
 import type { AuthDB } from '../types.js';
+import { sqliteAdapter } from './sqlite.js';
 
 let db: AuthDB;
 let rawDb: InstanceType<typeof Database>;
@@ -14,9 +14,9 @@ beforeEach(() => {
 
 describe('init', () => {
 	it('creates all tables', () => {
-		const tables = rawDb
-			.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
-			.all() as { name: string }[];
+		const tables = rawDb.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all() as {
+			name: string;
+		}[];
 		const names = tables.map((t) => t.name);
 		expect(names).toContain('auth_users');
 		expect(names).toContain('auth_sessions');
@@ -29,9 +29,9 @@ describe('init', () => {
 		const customRaw = new Database(':memory:');
 		const customDb = sqliteAdapter(customRaw, { tablePrefix: 'myapp_' });
 		customDb.init();
-		const tables = customRaw
-			.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
-			.all() as { name: string }[];
+		const tables = customRaw.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").all() as {
+			name: string;
+		}[];
 		const names = tables.map((t) => t.name);
 		expect(names).toContain('myapp_users');
 		expect(names).toContain('myapp_sessions');
@@ -163,9 +163,7 @@ describe('challenges', () => {
 		db.storeChallenge('old-challenge', 'user-1', Date.now() - 1000);
 		db.storeChallenge('new-challenge', 'user-2', Date.now() + 60000);
 
-		const count = rawDb
-			.prepare("SELECT COUNT(*) as c FROM auth_challenges")
-			.get() as { c: number };
+		const count = rawDb.prepare('SELECT COUNT(*) as c FROM auth_challenges').get() as { c: number };
 		expect(count.c).toBe(1);
 	});
 });
@@ -180,6 +178,7 @@ describe('passkeys', () => {
 			publicKey: new Uint8Array([1, 2, 3, 4]),
 			counter: 0,
 			transports: '["internal"]',
+			name: null
 		});
 
 		const passkeys = db.getUserPasskeys(user.id);
@@ -200,6 +199,7 @@ describe('passkeys', () => {
 			publicKey: new Uint8Array([5, 6]),
 			counter: 10,
 			transports: null,
+			name: null
 		});
 
 		const pk = db.getPasskeyByCredentialId('cred-full');
@@ -222,6 +222,7 @@ describe('passkeys', () => {
 			publicKey: new Uint8Array([7]),
 			counter: 0,
 			transports: null,
+			name: null
 		});
 
 		db.updatePasskeyCounter('pk-cnt', 42);
@@ -238,6 +239,7 @@ describe('passkeys', () => {
 			publicKey: new Uint8Array([8]),
 			counter: 0,
 			transports: null,
+			name: null
 		});
 
 		const result = db.deletePasskey('pk-del', user.id);
@@ -254,6 +256,7 @@ describe('passkeys', () => {
 			publicKey: new Uint8Array([9]),
 			counter: 0,
 			transports: null,
+			name: null
 		});
 
 		expect(db.deletePasskey('pk-wrong', 'different-user')).toBe(false);

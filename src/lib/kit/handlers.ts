@@ -1,15 +1,15 @@
-import { json } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import type { ResolvedConfig } from '../types.js';
+import { json } from '@sveltejs/kit';
 import { generateOTP, verifyOTP } from '../otp.js';
-import { createSession, invalidateSession, validateSession } from '../session.js';
 import {
-	generateRegistrationChallenge,
-	verifyRegistrationResponse,
 	generateAuthenticationChallenge,
-	verifyAuthenticationResponse,
+	generateRegistrationChallenge,
 	removePasskey,
+	verifyAuthenticationResponse,
+	verifyRegistrationResponse
 } from '../passkey.js';
+import { createSession, invalidateSession, validateSession } from '../session.js';
+import type { ResolvedConfig } from '../types.js';
 
 const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
@@ -30,7 +30,7 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 			secure: event.url.protocol === 'https:',
 			sameSite: 'lax' as const,
 			path: '/',
-			maxAge,
+			maxAge
 		};
 	}
 
@@ -47,7 +47,7 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				await config.onSendOTP(body.email, code);
 
 				return json({ success: true });
-			},
+			}
 		},
 
 		verify: {
@@ -58,17 +58,14 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 					return json({ error: 'Invalid input' }, { status: 400 });
 				}
 
-			const otp = await verifyOTP(config.db, body.email, body.code, config);
+				const otp = await verifyOTP(config.db, body.email, body.code, config);
 				if (!otp.ok) {
 					const messages = {
 						invalid: 'Invalid code. Please try again.',
 						expired: 'Code expired. Please request a new one.',
-						rate_limited: 'Too many attempts. Please request a new code.',
+						rate_limited: 'Too many attempts. Please request a new code.'
 					};
-					return json(
-						{ error: messages[otp.error] },
-						{ status: otp.error === 'rate_limited' ? 429 : 400 },
-					);
+					return json({ error: messages[otp.error] }, { status: otp.error === 'rate_limited' ? 429 : 400 });
 				}
 
 				let user = await config.db.getUserByEmail(body.email);
@@ -84,9 +81,9 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				return json({
 					user: { id: user.id, email: user.email },
 					hasPasskey: passkeys.length > 0,
-					skipPasskeyPrompt: user.skipPasskeyPrompt,
+					skipPasskeyPrompt: user.skipPasskeyPrompt
 				});
-			},
+			}
 		},
 
 		logout: {
@@ -94,14 +91,14 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 			handler: async (event) => {
 				const token = event.cookies.get(config.cookie);
 				if (token) {
-				const result = await validateSession(config.db, token);
-				if (result) {
+					const result = await validateSession(config.db, token);
+					if (result) {
 						await invalidateSession(config.db, result.session.id);
 					}
 					event.cookies.delete(config.cookie, { path: '/' });
 				}
 				return json({ ok: true });
-			},
+			}
 		},
 
 		'passkey/login-start': {
@@ -109,7 +106,7 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 			handler: async (event) => {
 				const options = await generateAuthenticationChallenge(config.db, event.url);
 				return json(options);
-			},
+			}
 		},
 
 		'passkey/login-finish': {
@@ -125,7 +122,7 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				event.cookies.set(config.cookie, session.sessionToken, cookieOpts(event));
 
 				return json({ user: result.user });
-			},
+			}
 		},
 
 		'passkey/register-start': {
@@ -134,14 +131,9 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				const user = requireAuth(event);
 				if (user instanceof Response) return user;
 
-				const options = await generateRegistrationChallenge(
-					config.db,
-					user,
-					event.url,
-					config,
-				);
+				const options = await generateRegistrationChallenge(config.db, user, event.url, config);
 				return json(options);
-			},
+			}
 		},
 
 		'passkey/register-finish': {
@@ -153,16 +145,14 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				const body = await event.request.json().catch(() => null);
 				if (!body) return json({ error: 'Invalid input' }, { status: 400 });
 
-				const success = await verifyRegistrationResponse(
-					config.db,
-					user.id,
-					body,
-					event.url,
-				);
+				const { name, ...response } = body;
+				const passkeyName = typeof name === 'string' && name.trim() ? name.trim() : null;
+
+				const success = await verifyRegistrationResponse(config.db, user.id, response, event.url, passkeyName);
 				if (!success) return json({ error: 'Passkey registration failed' }, { status: 400 });
 
 				return json({ success: true });
-			},
+			}
 		},
 
 		'passkey/remove': {
@@ -180,7 +170,7 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				if (!success) return json({ error: 'Passkey not found' }, { status: 404 });
 
 				return json({ success: true });
-			},
+			}
 		},
 
 		'skip-passkey': {
@@ -191,8 +181,8 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 
 				await config.db.setSkipPasskeyPrompt(user.id, true);
 				return json({ success: true });
-			},
-		},
+			}
+		}
 	};
 
 	function getRoute(event: RequestEvent): string | null {
@@ -222,6 +212,6 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				return json({ error: 'Not found' }, { status: 404 });
 			}
 			return route.handler(event);
-		},
+		}
 	};
 }

@@ -1,49 +1,49 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+import { onDestroy } from 'svelte';
 
-	interface Props {
-		countdownSeconds?: number;
-		onRegister: () => Promise<void>;
-		onSkip: () => void;
+interface Props {
+	countdownSeconds?: number;
+	onRegister: () => Promise<void>;
+	onSkip: () => void;
+}
+
+let { countdownSeconds = 3, onRegister, onSkip }: Props = $props();
+
+let countdown = $state(countdownSeconds);
+let failed = $state(false);
+let registering = $state(false);
+
+let interval = setInterval(() => {
+	countdown -= 1;
+	if (countdown <= 0) {
+		clearInterval(interval);
+		triggerRegistration();
 	}
+}, 1000);
 
-	let { countdownSeconds = 3, onRegister, onSkip }: Props = $props();
+onDestroy(() => {
+	if (interval) clearInterval(interval);
+});
 
-	let countdown = $state(countdownSeconds);
-	let failed = $state(false);
-	let registering = $state(false);
-
-	let interval = setInterval(() => {
-		countdown -= 1;
-		if (countdown <= 0) {
-			clearInterval(interval);
-			triggerRegistration();
-		}
-	}, 1000);
-
-	onDestroy(() => {
-		if (interval) clearInterval(interval);
-	});
-
-	async function triggerRegistration() {
-		if (registering) return;
-		registering = true;
-		try {
-			await onRegister();
-		} catch {
-			failed = true;
-		} finally {
-			registering = false;
-		}
+async function triggerRegistration() {
+	if (registering) return;
+	registering = true;
+	try {
+		await onRegister();
+	} catch {
+		failed = true;
+	} finally {
+		registering = false;
 	}
+}
 
-	let circumference = 2 * Math.PI * 40;
-	let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
+let circumference = 2 * Math.PI * 40;
+let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 </script>
 
 <div class="anahtar-passkey-prompt">
 	<div class="anahtar-passkey-ring">
-		<svg viewBox="0 0 100 100">
+		<svg viewBox="0 0 100 100" class="anahtar-passkey-ring-svg">
 			<circle cx="50" cy="50" r="40" fill="none" stroke="var(--anahtar-border, #d1d5db)" stroke-width="4" />
 			<circle
 				cx="50" cy="50" r="40"
@@ -57,10 +57,11 @@
 			/>
 		</svg>
 		<div class="anahtar-passkey-icon">
-			<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-				<path d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z"/>
-				<path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8"/>
-				<path d="M15 2v5h5"/>
+			<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="anahtar-key-pulse">
+				<circle cx="7.5" cy="15.5" r="5.5"/>
+				<path d="m11.5 12 4-4"/>
+				<path d="m15 7 2 2"/>
+				<path d="m17.5 4.5 2 2"/>
 			</svg>
 		</div>
 	</div>
@@ -92,7 +93,7 @@
 		margin-bottom: 1.5rem;
 	}
 
-	.anahtar-passkey-ring svg {
+	.anahtar-passkey-ring-svg {
 		width: 100%;
 		height: 100%;
 		transform: rotate(-90deg);
@@ -108,6 +109,15 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	@keyframes key-pulse {
+		0%, 100% { filter: drop-shadow(0 0 0 transparent); opacity: 0.8; }
+		50% { filter: drop-shadow(0 0 8px var(--anahtar-primary, #3b82f6)); opacity: 1; }
+	}
+
+	.anahtar-key-pulse {
+		animation: key-pulse 2s ease-in-out infinite;
 	}
 
 	.anahtar-passkey-title {
