@@ -55,22 +55,33 @@ export async function verifyRegistrationResponse(
 	response: RegistrationResponseJSON,
 	requestUrl: URL,
 	name: string | null = null
-): Promise<boolean> {
+): Promise<{ ok: true } | { ok: false; reason: string }> {
 	const { rpID, origin } = getWebAuthnConfig(requestUrl);
-	const challenge = JSON.parse(Buffer.from(response.response.clientDataJSON, 'base64url').toString()).challenge;
+
+	let challenge: string;
+	try {
+		const clientData = JSON.parse(Buffer.from(response.response.clientDataJSON, 'base64url').toString());
+		challenge = clientData.challenge;
+	} catch (e) {
+		return { ok: false, reason: `clientDataJSON parse failed: ${e}` };
+	}
 
 	const stored = await db.consumeChallenge(challenge);
-	if (!stored || stored.userId !== userId) return false;
+	if (!stored) return { ok: false, reason: 'challenge not found or expired' };
+	if (stored.userId !== userId)
+		return { ok: false, reason: `userId mismatch: challenge=${stored.userId} session=${userId}` };
 
 	try {
 		const verification = await verifyRegResponse({
 			response,
 			expectedChallenge: challenge,
 			expectedOrigin: origin,
-			expectedRPID: rpID
+			expectedRPID: rpID,
+			requireUserVerification: false
 		});
 
-		if (!verification.verified || !verification.registrationInfo) return false;
+		if (!verification.verified) return { ok: false, reason: 'verification not verified' };
+		if (!verification.registrationInfo) return { ok: false, reason: 'no registrationInfo' };
 
 		const { credential } = verification.registrationInfo;
 
@@ -84,9 +95,9 @@ export async function verifyRegistrationResponse(
 			name
 		});
 
-		return true;
-	} catch {
-		return false;
+		return { ok: true };
+	} catch (e) {
+		return { ok: false, reason: `verification threw: ${e}` };
 	}
 }
 
@@ -124,6 +135,7 @@ export async function verifyAuthenticationResponse(
 			expectedChallenge: challenge,
 			expectedOrigin: origin,
 			expectedRPID: rpID,
+			requireUserVerification: false,
 			credential: {
 				id: passkey.credentialId,
 				publicKey: new Uint8Array(passkey.publicKey),

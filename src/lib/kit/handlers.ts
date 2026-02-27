@@ -148,8 +148,11 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				const { name, ...response } = body;
 				const passkeyName = typeof name === 'string' && name.trim() ? name.trim() : null;
 
-				const success = await verifyRegistrationResponse(config.db, user.id, response, event.url, passkeyName);
-				if (!success) return json({ error: 'Passkey registration failed' }, { status: 400 });
+				const result = await verifyRegistrationResponse(config.db, user.id, response, event.url, passkeyName);
+				if (!result.ok) {
+					console.error('register-finish failed:', result.reason);
+					return json({ error: 'Passkey registration failed', reason: result.reason }, { status: 400 });
+				}
 
 				return json({ success: true });
 			}
