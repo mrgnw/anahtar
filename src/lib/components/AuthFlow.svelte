@@ -1,5 +1,4 @@
 <script lang="ts">
-import { onDestroy, onMount } from 'svelte';
 import { guessDeviceName } from '../device.js';
 import OtpInput from './OtpInput.svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
@@ -16,17 +15,16 @@ let congratsTimeout: ReturnType<typeof setTimeout> | null = null;
 let email = $state('');
 let loading = $state(false);
 let error = $state('');
-let otpInput = $state<OtpInput>();
+let otpInput = $state<{ clear: () => void; focus: () => void }>();
 
 let conditionalAbort: AbortController | null = null;
 
-onMount(() => {
+$effect(() => {
 	tryConditionalWebAuthn();
-});
-
-onDestroy(() => {
-	conditionalAbort?.abort();
-	if (congratsTimeout) clearTimeout(congratsTimeout);
+	return () => {
+		conditionalAbort?.abort();
+		if (congratsTimeout) clearTimeout(congratsTimeout);
+	};
 });
 
 async function tryConditionalWebAuthn() {

@@ -1,6 +1,4 @@
 <script lang="ts">
-import { onDestroy } from 'svelte';
-
 interface Props {
 	countdownSeconds?: number;
 	onRegister: () => Promise<void>;
@@ -13,16 +11,21 @@ let countdown = $state(countdownSeconds);
 let failed = $state(false);
 let registering = $state(false);
 
-let interval = setInterval(() => {
-	countdown -= 1;
-	if (countdown <= 0) {
-		clearInterval(interval);
-		triggerRegistration();
-	}
-}, 1000);
+let interval: ReturnType<typeof setInterval> | null = null;
 
-onDestroy(() => {
-	if (interval) clearInterval(interval);
+$effect(() => {
+	interval = setInterval(() => {
+		countdown -= 1;
+		if (countdown <= 0) {
+			clearInterval(interval!);
+			interval = null;
+			triggerRegistration();
+		}
+	}, 1000);
+
+	return () => {
+		if (interval) clearInterval(interval);
+	};
 });
 
 async function triggerRegistration() {
