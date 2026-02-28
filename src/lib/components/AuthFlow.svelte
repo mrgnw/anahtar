@@ -66,9 +66,43 @@ async function handleEmailSubmit() {
 		error = m.errorInvalidEmail;
 		return;
 	}
-	loading = true;
 	conditionalAbort?.abort();
 	conditionalAbort = null;
+
+	try {
+		const { startAuthentication } = await import('@simplewebauthn/browser');
+		const checkRes = await fetch(`${apiBase}/passkey/check-email`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email })
+		});
+		if (checkRes.ok) {
+			const options = await checkRes.json();
+			if (options.allowCredentials?.length > 0) {
+				loading = true;
+				try {
+					const authResponse = await startAuthentication({ optionsJSON: options });
+					const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(authResponse)
+					});
+					if (verifyRes.ok) {
+						onSuccess?.();
+						return;
+					}
+				} catch {
+					// cancelled — fall through to OTP
+				} finally {
+					loading = false;
+				}
+			}
+		}
+	} catch {
+		// passkey check failed — proceed with OTP
+	}
+
+	loading = true;
 	try {
 		const res = await fetch(`${apiBase}/start`, {
 			method: 'POST',

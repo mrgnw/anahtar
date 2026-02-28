@@ -22,6 +22,20 @@
 	function handleInput(index: number, e: Event) {
 		const input = e.target as HTMLInputElement;
 		const val = input.value.replace(/\D/g, '');
+
+		if (val.length > 1) {
+			for (let i = 0; i < length; i++) {
+				digits[i] = val[i] ?? '';
+			}
+			const nextEmpty = digits.findIndex((d) => !d);
+			const focusIdx = nextEmpty === -1 ? length - 1 : nextEmpty;
+			inputs[focusIdx]?.focus();
+			if (digits.every((d) => d.length === 1)) {
+				onComplete?.(digits.join(''));
+			}
+			return;
+		}
+
 		digits[index] = val.slice(0, 1);
 		input.value = digits[index];
 
@@ -61,8 +75,8 @@
 		<input
 			bind:this={inputs[i]}
 			type="text"
-			maxlength="1"
 			inputmode="numeric"
+			autocomplete={i === 0 ? 'one-time-code' : 'off'}
 			value={digits[i]}
 			{disabled}
 			oninput={(e) => handleInput(i, e)}
