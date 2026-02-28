@@ -9,15 +9,21 @@ import {
 	verifyRegistrationResponse
 } from '../passkey.js';
 import { createSession, invalidateSession, validateSession } from '../session.js';
+import { resolveMessages, detectLocaleServer, type AuthMessages } from '../i18n/index.js';
 import type { ResolvedConfig } from '../types.js';
 
 const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
 type RouteHandler = (event: RequestEvent) => Promise<Response>;
 
-function requireAuth(event: RequestEvent): { id: string; email: string } | Response {
+function getMessages(event: RequestEvent, config: ResolvedConfig): AuthMessages {
+	const locale = config.locale ?? detectLocaleServer(event.request);
+	return resolveMessages(locale, config.messages);
+}
+
+function requireAuth(event: RequestEvent, m: AuthMessages): { id: string; email: string } | Response {
 	const user = event.locals.user;
-	if (!user) return json({ error: 'Not authenticated' }, { status: 401 });
+	if (!user) return json({ error: m.errorNotAuthenticated }, { status: 401 });
 	return user;
 }
 
@@ -38,9 +44,10 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		start: {
 			method: 'POST',
 			handler: async (event) => {
+				const m = getMessages(event, config);
 				const body = await event.request.json().catch(() => null);
 				if (!body || typeof body.email !== 'string' || !body.email.includes('@')) {
-					return json({ error: 'Invalid email' }, { status: 400 });
+					return json({ error: m.errorInvalidEmail }, { status: 400 });
 				}
 
 				const { code } = await generateOTP(config.db, body.email, config);
@@ -53,17 +60,18 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		verify: {
 			method: 'POST',
 			handler: async (event) => {
+				const m = getMessages(event, config);
 				const body = await event.request.json().catch(() => null);
 				if (!body || typeof body.email !== 'string' || typeof body.code !== 'string') {
-					return json({ error: 'Invalid input' }, { status: 400 });
+					return json({ error: m.errorInvalidInput }, { status: 400 });
 				}
 
 				const otp = await verifyOTP(config.db, body.email, body.code, config);
 				if (!otp.ok) {
 					const messages = {
-						invalid: 'Invalid code. Please try again.',
-						expired: 'Code expired. Please request a new one.',
-						rate_limited: 'Too many attempts. Please request a new code.'
+						invalid: m.errorInvalidCode,
+						expired: m.errorCodeExpired,
+						rate_limited: m.errorTooManyAttempts,
 					};
 					return json({ error: messages[otp.error] }, { status: otp.error === 'rate_limited' ? 429 : 400 });
 				}
@@ -112,11 +120,12 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		'passkey/login-finish': {
 			method: 'POST',
 			handler: async (event) => {
+				const m = getMessages(event, config);
 				const body = await event.request.json().catch(() => null);
-				if (!body) return json({ error: 'Invalid input' }, { status: 400 });
+				if (!body) return json({ error: m.errorInvalidInput }, { status: 400 });
 
 				const result = await verifyAuthenticationResponse(config.db, body, event.url);
-				if (!result) return json({ error: 'Authentication failed' }, { status: 401 });
+				if (!result) return json({ error: m.errorAuthFailed }, { status: 401 });
 
 				const session = await createSession(config.db, result.user.id, config);
 				event.cookies.set(config.cookie, session.sessionToken, cookieOpts(event));
@@ -128,7 +137,8 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		'passkey/register-start': {
 			method: 'POST',
 			handler: async (event) => {
-				const user = requireAuth(event);
+				const m = getMessages(event, config);
+				const user = requireAuth(event, m);
 				if (user instanceof Response) return user;
 
 				const options = await generateRegistrationChallenge(config.db, user, event.url, config);
@@ -139,11 +149,12 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		'passkey/register-finish': {
 			method: 'POST',
 			handler: async (event) => {
-				const user = requireAuth(event);
+				const m = getMessages(event, config);
+				const user = requireAuth(event, m);
 				if (user instanceof Response) return user;
 
 				const body = await event.request.json().catch(() => null);
-				if (!body) return json({ error: 'Invalid input' }, { status: 400 });
+				if (!body) return json({ error: m.errorInvalidInput }, { status: 400 });
 
 				const { name, ...response } = body;
 				const passkeyName = typeof name === 'string' && name.trim() ? name.trim() : null;
@@ -151,7 +162,7 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 				const result = await verifyRegistrationResponse(config.db, user.id, response, event.url, passkeyName);
 				if (!result.ok) {
 					console.error('register-finish failed:', result.reason);
-					return json({ error: 'Passkey registration failed', reason: result.reason }, { status: 400 });
+					return json({ error: m.errorPasskeyRegFailed, reason: result.reason }, { status: 400 });
 				}
 
 				return json({ success: true });
@@ -161,16 +172,17 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		'passkey/remove': {
 			method: 'POST',
 			handler: async (event) => {
-				const user = requireAuth(event);
+				const m = getMessages(event, config);
+				const user = requireAuth(event, m);
 				if (user instanceof Response) return user;
 
 				const body = await event.request.json().catch(() => null);
 				if (!body || typeof body.passkeyId !== 'string') {
-					return json({ error: 'Invalid input' }, { status: 400 });
+					return json({ error: m.errorInvalidInput }, { status: 400 });
 				}
 
 				const success = await removePasskey(config.db, body.passkeyId, user.id);
-				if (!success) return json({ error: 'Passkey not found' }, { status: 404 });
+				if (!success) return json({ error: m.errorPasskeyNotFound }, { status: 404 });
 
 				return json({ success: true });
 			}
@@ -179,7 +191,8 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 		'skip-passkey': {
 			method: 'POST',
 			handler: async (event) => {
-				const user = requireAuth(event);
+				const m = getMessages(event, config);
+				const user = requireAuth(event, m);
 				if (user instanceof Response) return user;
 
 				await config.db.setSkipPasskeyPrompt(user.id, true);
@@ -196,23 +209,25 @@ export function createHandlers(config: ResolvedConfig): { GET: RouteHandler; POS
 
 	return {
 		GET: async (event) => {
+			const m = getMessages(event, config);
 			const path = getRoute(event);
-			if (!path) return json({ error: 'Not found' }, { status: 404 });
+			if (!path) return json({ error: m.errorNotFound }, { status: 404 });
 
 			const route = routes[path];
 			if (!route || route.method !== 'GET') {
-				return json({ error: 'Not found' }, { status: 404 });
+				return json({ error: m.errorNotFound }, { status: 404 });
 			}
 			return route.handler(event);
 		},
 
 		POST: async (event) => {
+			const m = getMessages(event, config);
 			const path = getRoute(event);
-			if (!path) return json({ error: 'Not found' }, { status: 404 });
+			if (!path) return json({ error: m.errorNotFound }, { status: 404 });
 
 			const route = routes[path];
 			if (!route || route.method !== 'POST') {
-				return json({ error: 'Not found' }, { status: 404 });
+				return json({ error: m.errorNotFound }, { status: 404 });
 			}
 			return route.handler(event);
 		}

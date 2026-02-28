@@ -1,14 +1,19 @@
 <script lang="ts">
 import { guessDeviceName } from '../device.js';
+import { resolveMessages, detectLocaleClient, type AuthMessages } from '../i18n/index.js';
 import OtpInput from './OtpInput.svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
 
 interface Props {
 	apiBase?: string;
+	locale?: string;
+	messages?: Partial<AuthMessages>;
 	onSuccess?: () => void;
 }
 
-let { apiBase = '/api/auth', onSuccess }: Props = $props();
+let { apiBase = '/api/auth', locale, messages: messageOverrides, onSuccess }: Props = $props();
+
+let m = $derived(resolveMessages(locale ?? detectLocaleClient(), messageOverrides));
 
 let step = $state<1 | 2 | 3 | 4>(1);
 let congratsTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -38,6 +43,8 @@ async function tryConditionalWebAuthn() {
 			optionsJSON: options,
 			useBrowserAutofill: true
 		});
+		// User selected a passkey — show loading while we verify
+		loading = true;
 		const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -48,13 +55,15 @@ async function tryConditionalWebAuthn() {
 		}
 	} catch {
 		// Passkey autofill not available or cancelled
+	} finally {
+		loading = false;
 	}
 }
 
 async function handleEmailSubmit() {
 	error = '';
 	if (!email.includes('@')) {
-		error = 'Please enter a valid email address.';
+		error = m.errorInvalidEmail;
 		return;
 	}
 	loading = true;
@@ -73,7 +82,7 @@ async function handleEmailSubmit() {
 		}
 		step = 2;
 	} catch {
-		error = 'Something went wrong. Please try again.';
+		error = m.errorGeneric;
 	} finally {
 		loading = false;
 	}
@@ -90,7 +99,7 @@ async function handleOtpComplete(code: string) {
 		});
 		if (!res.ok) {
 			const data = await res.json().catch(() => null);
-			error = data?.error ?? 'Invalid code. Please try again.';
+			error = data?.error ?? m.errorInvalidCode;
 			otpInput?.clear();
 			return;
 		}
@@ -101,7 +110,7 @@ async function handleOtpComplete(code: string) {
 			step = 3;
 		}
 	} catch {
-		error = 'Something went wrong. Please try again.';
+		error = m.errorGeneric;
 	} finally {
 		loading = false;
 	}
@@ -118,12 +127,12 @@ async function resendCode() {
 		});
 		if (!res.ok) {
 			const data = await res.json().catch(() => null);
-			error = data?.error ?? 'Failed to resend code.';
+			error = data?.error ?? m.errorResendFailed;
 			return;
 		}
 		otpInput?.clear();
 	} catch {
-		error = 'Something went wrong. Please try again.';
+		error = m.errorGeneric;
 	} finally {
 		loading = false;
 	}
@@ -166,7 +175,7 @@ function handlePasskeySkip() {
 				bind:value={email}
 				required
 				autocomplete="username webauthn"
-				placeholder="you@example.com"
+				placeholder={m.emailPlaceholder}
 				class="anahtar-input"
 			/>
 
@@ -175,12 +184,12 @@ function handlePasskeySkip() {
 			{/if}
 
 			<button type="submit" disabled={loading} class="anahtar-button">
-				{loading ? '...' : 'Continue'}
+				{loading ? '...' : m.continue}
 			</button>
 		</form>
 	{:else if step === 2}
 		<div class="anahtar-otp-step">
-			<p class="anahtar-subtitle">We sent a code to</p>
+			<p class="anahtar-subtitle">{m.codeSentTo}</p>
 			<p class="anahtar-email">{email}</p>
 
 			<OtpInput bind:this={otpInput} onComplete={handleOtpComplete} disabled={loading} />
@@ -190,12 +199,12 @@ function handlePasskeySkip() {
 			{/if}
 
 			{#if loading}
-				<p class="anahtar-subtitle">Verifying...</p>
+				<p class="anahtar-subtitle">{m.verifying}</p>
 			{/if}
 
 			<div class="anahtar-links">
 				<button onclick={resendCode} disabled={loading} class="anahtar-link">
-					Didn't get it? Resend
+					{m.resend}
 				</button>
 				<button
 					onclick={() => {
@@ -204,12 +213,12 @@ function handlePasskeySkip() {
 					}}
 					class="anahtar-link"
 				>
-					Use a different email
+					{m.differentEmail}
 				</button>
 			</div>
 		</div>
 	{:else if step === 3}
-		<PasskeyPrompt onRegister={handlePasskeyRegister} onSkip={handlePasskeySkip} />
+		<PasskeyPrompt {m} onRegister={handlePasskeyRegister} onSkip={handlePasskeySkip} />
 	{:else if step === 4}
 		<div class="anahtar-congrats">
 			<div class="anahtar-congrats-icon">
@@ -220,9 +229,9 @@ function handlePasskeySkip() {
 					<path d="m17.5 4.5 2 2"/>
 				</svg>
 			</div>
-			<p class="anahtar-congrats-title">You're a passkey!</p>
+			<p class="anahtar-congrats-title">{m.passkeySuccess}</p>
 			<button onclick={() => onSuccess?.()} class="anahtar-button">
-				Continue
+				{m.continue}
 			</button>
 		</div>
 	{/if}

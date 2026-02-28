@@ -18,6 +18,8 @@ export type {
 	ResolvedConfig,
 	SessionRecord
 } from './types.js';
+export type { AuthMessages } from './i18n/types.js';
+export { resolveMessages, detectLocaleClient, detectLocaleServer, locales } from './i18n/index.js';
 
 export async function createAuth(config: AuthConfig) {
 	const resolved = resolveConfig(config);

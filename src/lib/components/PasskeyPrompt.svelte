@@ -1,11 +1,14 @@
 <script lang="ts">
+import type { AuthMessages } from '../i18n/types.js';
+
 interface Props {
+	m: AuthMessages;
 	countdownSeconds?: number;
 	onRegister: () => Promise<void>;
 	onSkip: () => void;
 }
 
-let { countdownSeconds = 3, onRegister, onSkip }: Props = $props();
+let { m, countdownSeconds = 3, onRegister, onSkip }: Props = $props();
 
 let countdown = $state(countdownSeconds);
 let failed = $state(false);
@@ -70,15 +73,15 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 	</div>
 
 	{#if !failed}
-		<p class="anahtar-passkey-title">Making you a passkey</p>
-		<p class="anahtar-passkey-subtitle">for easier login</p>
-		<button onclick={onSkip} class="anahtar-passkey-skip">Skip</button>
+		<p class="anahtar-passkey-title">{m.passkeyCreating}</p>
+		<p class="anahtar-passkey-subtitle">{m.passkeySubtitle}</p>
+		<button onclick={onSkip} class="anahtar-passkey-skip">{m.passkeySkip}</button>
 	{:else}
-		<p class="anahtar-passkey-title">Set up a passkey?</p>
+		<p class="anahtar-passkey-title">{m.passkeySetup}</p>
 		<button onclick={triggerRegistration} class="anahtar-passkey-add" disabled={registering}>
-			Add passkey
+			{m.passkeyAdd}
 		</button>
-		<button onclick={onSkip} class="anahtar-passkey-skip">Maybe later</button>
+		<button onclick={onSkip} class="anahtar-passkey-skip">{m.passkeyMaybeLater}</button>
 	{/if}
 </div>
 

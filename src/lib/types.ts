@@ -87,9 +87,13 @@ export interface AuthConfig {
 	otpLength?: number;
 	otpMaxAttempts?: number;
 	rpName?: string;
+	locale?: string;
+	messages?: Partial<import('./i18n/types.js').AuthMessages>;
 	onSendOTP: (email: string, code: string) => Promise<void>;
 }
 
-export interface ResolvedConfig extends Required<Omit<AuthConfig, 'onSendOTP'>> {
+export interface ResolvedConfig extends Required<Omit<AuthConfig, 'onSendOTP' | 'locale' | 'messages'>> {
+	locale?: string;
+	messages?: Partial<import('./i18n/types.js').AuthMessages>;
 	onSendOTP: (email: string, code: string) => Promise<void>;
 }
