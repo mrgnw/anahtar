@@ -8,7 +8,7 @@ interface Props {
 	onSkip: () => void;
 }
 
-let { m, countdownSeconds = 3, onRegister, onSkip }: Props = $props();
+let { m, countdownSeconds = 5, onRegister, onSkip }: Props = $props();
 
 let countdown = $state(countdownSeconds);
 let failed = $state(false);
@@ -48,7 +48,12 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 </script>
 
 <div class="anahtar-passkey-prompt">
-	<div class="anahtar-passkey-ring">
+	<button
+		class="anahtar-passkey-ring"
+		onclick={() => { if (interval) { clearInterval(interval); interval = null; } triggerRegistration(); }}
+		disabled={registering}
+		title="Set up now"
+	>
 		<svg viewBox="0 0 100 100" class="anahtar-passkey-ring-svg">
 			<circle cx="50" cy="50" r="40" fill="none" stroke="var(--anahtar-border, #d1d5db)" stroke-width="4" />
 			<circle
@@ -70,7 +75,7 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 				<path d="m17.5 4.5 2 2"/>
 			</svg>
 		</div>
-	</div>
+	</button>
 
 	{#if !failed}
 		<p class="anahtar-passkey-title">{m.passkeyCreating}</p>
@@ -97,6 +102,19 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 		width: 7rem;
 		height: 7rem;
 		margin-bottom: 1.5rem;
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		transition: transform 0.15s;
+	}
+
+	.anahtar-passkey-ring:hover:not(:disabled) {
+		transform: scale(1.05);
+	}
+
+	.anahtar-passkey-ring:disabled {
+		cursor: default;
 	}
 
 	.anahtar-passkey-ring-svg {
