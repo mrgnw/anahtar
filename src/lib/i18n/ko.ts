@@ -1,7 +1,7 @@
 import type { AuthMessages } from './types.js';
 
 const ko: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.co.kr',
 	continue: '계속',
 
 	codeSentTo: '인증 코드를 보냈습니다:',

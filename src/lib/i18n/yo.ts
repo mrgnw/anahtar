@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const yo: AuthMessages = {
-	emailPlaceholder: 'iwọ@apẹẹrẹ.com',
+	emailPlaceholder: 'emi@apere.com.ng',
 	continue: 'Tẹ̀síwájú',
 
 	codeSentTo: 'A ti fi kóòdù ránṣẹ́ sí',

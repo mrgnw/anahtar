@@ -1,7 +1,7 @@
 import type { AuthMessages } from './types.js';
 
 const tr: AuthMessages = {
-	emailPlaceholder: 'sen@ornek.com',
+	emailPlaceholder: 'sen@ornek.com.tr',
 	continue: 'Devam',
 
 	codeSentTo: 'Kod gonderildi:',

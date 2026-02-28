@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const sq: AuthMessages = {
-	emailPlaceholder: 'ti@shembull.com',
+	emailPlaceholder: 'ti@shembull.al',
 	continue: 'Vazhdo',
 
 	codeSentTo: 'Dërguam një kod te',

@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const pa: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.in',
 	continue: 'ਅੱਗੇ ਵਧੋ',
 
 	codeSentTo: 'ਅਸੀਂ ਇੱਕ ਕੋਡ ਭੇਜਿਆ ਹੈ',

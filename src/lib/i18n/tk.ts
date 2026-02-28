@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const tk: AuthMessages = {
-	emailPlaceholder: 'siz@mysal.com',
+	emailPlaceholder: 'siz@mysal.tm',
 	continue: 'Dowam et',
 
 	codeSentTo: 'Kod iberildi:',

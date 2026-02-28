@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const mg: AuthMessages = {
-	emailPlaceholder: 'ianao@ohatra.com',
+	emailPlaceholder: 'ianao@ohatra.mg',
 	continue: 'Tohizo',
 
 	codeSentTo: 'Nandefa kaody izahay tany amin\'ny',

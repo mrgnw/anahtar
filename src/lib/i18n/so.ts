@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const so: AuthMessages = {
-	emailPlaceholder: 'adiga@tusaale.com',
+	emailPlaceholder: 'adiga@tusaale.so',
 	continue: 'Sii wad',
 
 	codeSentTo: 'Kood baan u dirnay',

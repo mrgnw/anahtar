@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ro: AuthMessages = {
-	emailPlaceholder: 'tu@exemplu.com',
+	emailPlaceholder: 'tu@exemplu.ro',
 	continue: 'Continuă',
 
 	codeSentTo: 'Am trimis un cod la',

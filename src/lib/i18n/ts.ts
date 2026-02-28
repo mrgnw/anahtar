@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ts: AuthMessages = {
-	emailPlaceholder: 'wena@xikombiso.com',
+	emailPlaceholder: 'wena@xikombiso.co.za',
 	continue: 'Ya emahlweni',
 
 	codeSentTo: 'Hi rhumele khodi eka',

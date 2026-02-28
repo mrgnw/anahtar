@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const hy: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.am',
 	continue: 'Շարունակել',
 
 	codeSentTo: 'Մենք կոդ ուղարկեցինք',

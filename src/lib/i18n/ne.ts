@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ne: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.com.np',
 	continue: 'जारी राख्नुहोस्',
 
 	codeSentTo: 'कोड पठाइयो:',

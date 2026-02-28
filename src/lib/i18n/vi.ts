@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const vi: AuthMessages = {
-	emailPlaceholder: 'ban@example.com',
+	emailPlaceholder: 'ban@example.vn',
 	continue: 'Tiếp tục',
 
 	codeSentTo: 'Mã đã được gửi tới',

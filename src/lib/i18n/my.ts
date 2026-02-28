@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const my: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.com.mm',
 	continue: 'ဆက်လက်ရန်',
 
 	codeSentTo: 'ကုဒ်တစ်ခု ပို့ပြီးပါပြီ',

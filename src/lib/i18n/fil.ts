@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const fil: AuthMessages = {
-	emailPlaceholder: 'ikaw@halimbawa.com',
+	emailPlaceholder: 'ikaw@halimbawa.ph',
 	continue: 'Magpatuloy',
 
 	codeSentTo: 'Nagpadala kami ng code sa',

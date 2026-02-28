@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const el: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.gr',
 	continue: 'Συνέχεια',
 
 	codeSentTo: 'Στείλαμε κωδικό στο',

@@ -1,7 +1,7 @@
 import type { AuthMessages } from './types.js';
 
 const zh: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.cn',
 	continue: '继续',
 
 	codeSentTo: '验证码已发送至',

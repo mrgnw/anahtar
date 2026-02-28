@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const jv: AuthMessages = {
-	emailPlaceholder: 'kowe@conto.com',
+	emailPlaceholder: 'kowe@conto.co.id',
 	continue: 'Lanjutna',
 
 	codeSentTo: 'Kode wis dikirim menyang',

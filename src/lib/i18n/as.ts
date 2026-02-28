@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const assamese: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.in',
 	continue: 'আগবাঢ়ক',
 
 	codeSentTo: 'কোড পঠোৱা হৈছে:',

@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const rw: AuthMessages = {
-	emailPlaceholder: 'wewe@urugero.com',
+	emailPlaceholder: 'wewe@urugero.rw',
 	continue: 'Komeza',
 
 	codeSentTo: 'Twakwohereje kode kuri',

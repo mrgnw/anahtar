@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const zu: AuthMessages = {
-	emailPlaceholder: 'wena@isibonelo.com',
+	emailPlaceholder: 'wena@isibonelo.co.za',
 	continue: 'Qhubeka',
 
 	codeSentTo: 'Sithumele ikhodi ku-',

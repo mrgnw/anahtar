@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ug: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.cn',
 	continue: 'داۋاملاشتۇرۇش',
 
 	codeSentTo: 'كود ئەۋەتىلدى',

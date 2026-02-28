@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const af: AuthMessages = {
-	emailPlaceholder: 'jy@voorbeeld.com',
+	emailPlaceholder: 'jy@voorbeeld.co.za',
 	continue: 'Gaan voort',
 
 	codeSentTo: 'Ons het \'n kode gestuur na',

@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ig: AuthMessages = {
-	emailPlaceholder: 'gi@ọmụmaatụ.com',
+	emailPlaceholder: 'gi@example.com.ng',
 	continue: 'Gaa nʼihu',
 
 	codeSentTo: 'Anyị zigara gị koodu na',

@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ha: AuthMessages = {
-	emailPlaceholder: 'kai@misali.com',
+	emailPlaceholder: 'kai@misali.com.ng',
 	continue: 'Ci gaba',
 
 	codeSentTo: 'Mun aika lambar zuwa',

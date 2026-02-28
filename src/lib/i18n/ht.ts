@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ht: AuthMessages = {
-	emailPlaceholder: 'ou@egzanp.com',
+	emailPlaceholder: 'ou@egzanp.ht',
 	continue: 'Kontinye',
 
 	codeSentTo: 'Nou voye yon kòd bay',

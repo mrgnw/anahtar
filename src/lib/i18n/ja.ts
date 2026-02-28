@@ -1,7 +1,7 @@
 import type { AuthMessages } from './types.js';
 
 const ja: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.co.jp',
 	continue: '続ける',
 
 	codeSentTo: '確認コードを送信しました：',

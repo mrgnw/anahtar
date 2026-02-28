@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const uz: AuthMessages = {
-	emailPlaceholder: 'siz@misol.com',
+	emailPlaceholder: 'siz@misol.uz',
 	continue: 'Davom etish',
 
 	codeSentTo: 'Biz kod yubordik:',

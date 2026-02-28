@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const si: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.lk',
 	continue: 'ඉදිරියට',
 
 	codeSentTo: 'කේතය යැවුවා:',

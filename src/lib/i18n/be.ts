@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const be: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.by',
 	continue: 'Працягнуць',
 
 	codeSentTo: 'Мы адправілі код на',

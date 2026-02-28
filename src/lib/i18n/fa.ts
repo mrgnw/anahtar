@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const fa: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.ir',
 	continue: 'ادامه',
 
 	codeSentTo: 'کد تأیید ارسال شد به',

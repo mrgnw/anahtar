@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ml: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.in',
 	continue: 'തുടരുക',
 
 	codeSentTo: 'ഞങ്ങൾ ഒരു കോഡ് അയച്ചു',

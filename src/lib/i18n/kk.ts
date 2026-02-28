@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const kk: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.kz',
 	continue: 'Жалғастыру',
 
 	codeSentTo: 'Код жіберілді:',

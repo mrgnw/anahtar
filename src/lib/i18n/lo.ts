@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const lo: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.la',
 	continue: 'ດຳເນີນຕໍ່',
 
 	codeSentTo: 'ພວກເຮົາໄດ້ສົ່ງລະຫັດໄປຫາ',

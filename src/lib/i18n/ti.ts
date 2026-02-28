@@ -2,7 +2,7 @@
 import type { AuthMessages } from './types.js';
 
 const ti: AuthMessages = {
-	emailPlaceholder: 'you@example.com',
+	emailPlaceholder: 'you@example.com.er',
 	continue: 'ቀጽል',
 
 	codeSentTo: 'ኮድ ልኢኽናልካ ናብ',
