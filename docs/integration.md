@@ -42,32 +42,31 @@ For Cloudflare Workers + D1:
 // src/lib/server/auth.ts
 import { createAuth } from "@mrgnw/anahtar";
 import { d1Adapter } from "@mrgnw/anahtar/d1";
-import type { D1Database } from "@cloudflare/workers-types";
 
-let _auth: ReturnType<typeof createAuth> | null = null;
+type Auth = Awaited<ReturnType<typeof createAuth>>;
 
-export function getAuth(db: D1Database) {
-  if (!_auth) {
-    _auth = createAuth({
-      db: d1Adapter(db),
-      onSendOTP: async (email, code) => {
-        // use your email provider — example: Lettermint
-        await fetch("https://app.lettermint.co/api/transactional", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.LETTERMINT_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            to: email,
-            from: "noreply@example.com",
-            template_id: "YOUR_TEMPLATE_ID",
-            variables: { code },
-          }),
-        });
-      },
-    });
-  }
+let _auth: Auth | null = null;
+let _initPromise: Promise<Auth> | null = null;
+
+export async function getAuth(env: App.Platform["env"]): Promise<Auth> {
+  if (_auth) return _auth;
+  if (_initPromise) return _initPromise;
+
+  _initPromise = createAuth({
+    db: d1Adapter(env.DB),
+    rpName: "myapp",
+    cookie: "myapp_session",
+    onSendOTP: async (email, code) => {
+      const apiKey = env.EMAIL_API_KEY;
+      if (!apiKey) {
+        console.log(`[dev] OTP for ${email}: ${code}`);
+        return;
+      }
+      // send via your email provider in prod
+      await sendEmail(email, code, apiKey);
+    },
+  });
+  _auth = await _initPromise;
   return _auth;
 }
 ```
@@ -77,7 +76,7 @@ export function getAuth(db: D1Database) {
 import { getAuth } from "$lib/server/auth";
 
 export const handle = async ({ event, resolve }) => {
-  const auth = getAuth(event.platform!.env.DB);
+  const auth = await getAuth(event.platform!.env);
   return auth.handle({ event, resolve });
 };
 ```
@@ -85,15 +84,15 @@ export const handle = async ({ event, resolve }) => {
 ```ts
 // src/routes/api/auth/[...path]/+server.ts
 import { getAuth } from "$lib/server/auth";
-import type { RequestHandler } from "./$types";
+import { json, type RequestHandler } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async (event) => {
-  const auth = getAuth(event.platform!.env.DB);
+  const auth = await getAuth(event.platform!.env);
   return auth.handlers.GET(event);
 };
 
 export const POST: RequestHandler = async (event) => {
-  const auth = getAuth(event.platform!.env.DB);
+  const auth = await getAuth(event.platform!.env);
   return auth.handlers.POST(event);
 };
 ```
@@ -108,8 +107,6 @@ export const POST: RequestHandler = async (event) => {
   ],
 }
 ```
-
-> **D1 gotcha**: if you previously had an `auth_challenges` table with a different schema (e.g. a `challenge_type` column), `CREATE TABLE IF NOT EXISTS` will silently no-op and use the stale schema. Drop and recreate it.
 
 For Postgres:
 
@@ -151,20 +148,40 @@ export const { GET, POST } = auth.handlers;
 
 This provides:
 
-| Method | Route                               | Purpose                       |
-| ------ | ----------------------------------- | ----------------------------- |
-| POST   | `/api/auth/start`                   | Send OTP                      |
-| POST   | `/api/auth/verify`                  | Verify OTP, create session    |
-| POST   | `/api/auth/logout`                  | Destroy session               |
-| GET    | `/api/auth/passkey/login-start`     | Begin passkey login           |
-| POST   | `/api/auth/passkey/login-finish`    | Complete passkey login        |
-| POST   | `/api/auth/passkey/register-start`  | Begin passkey registration    |
-| POST   | `/api/auth/passkey/register-finish` | Complete passkey registration |
-| POST   | `/api/auth/skip-passkey`            | Skip passkey prompt           |
+| Method | Route                               | Purpose                         |
+| ------ | ----------------------------------- | ------------------------------- |
+| POST   | `/api/auth/start`                   | Send OTP                        |
+| POST   | `/api/auth/verify`                  | Verify OTP, create session      |
+| POST   | `/api/auth/logout`                  | Destroy session                 |
+| POST   | `/api/auth/passkey/check-email`     | Check if email has passkeys     |
+| GET    | `/api/auth/passkey/login-start`     | Begin passkey login             |
+| POST   | `/api/auth/passkey/login-finish`    | Complete passkey login          |
+| POST   | `/api/auth/passkey/register-start`  | Begin passkey registration      |
+| POST   | `/api/auth/passkey/register-finish` | Complete passkey registration   |
+| POST   | `/api/auth/passkey/remove`          | Remove a passkey                |
+| POST   | `/api/auth/skip-passkey`            | Skip passkey prompt permanently |
+
+### Verify response
+
+`POST /api/auth/verify` returns:
+
+```json
+{
+  "user": { "id": "...", "email": "..." },
+  "hasPasskey": false,
+  "skipPasskeyPrompt": false
+}
+```
+
+Use `hasPasskey` and `skipPasskeyPrompt` to decide whether to show the passkey onboarding prompt after login.
 
 ## UI components (optional)
 
-Drop in the full auth flow:
+Anahtar ships three Svelte components. All are optional — you can build your own UI and call the API routes directly.
+
+### AuthFlow — full-page auth
+
+The complete email → OTP → passkey onboarding → success flow:
 
 ```svelte
 <script>
@@ -175,7 +192,126 @@ Drop in the full auth flow:
 <AuthFlow onSuccess={() => goto('/')} />
 ```
 
-Or build your own UI and call the API routes directly.
+AuthFlow handles everything: email input with conditional WebAuthn (passkey autofill), OTP verification with resend, passkey registration countdown, and success confirmation.
+
+### PasskeyPrompt — passkey onboarding
+
+Standalone passkey registration prompt with animated countdown ring:
+
+```svelte
+<script>
+  import { PasskeyPrompt, resolveMessages } from '@mrgnw/anahtar/components';
+  const m = resolveMessages('en');
+</script>
+
+<PasskeyPrompt
+  {m}
+  onRegister={async () => {
+    // call passkey/register-start + register-finish
+  }}
+  onSkip={() => {
+    fetch('/api/auth/skip-passkey', { method: 'POST' });
+  }}
+/>
+```
+
+- 5-second countdown with radial progress ring, then auto-triggers registration
+- Click the ring to register immediately (skips timer)
+- Falls back to manual "Add passkey" / "Maybe later" on failure
+- `countdownSeconds` prop to customize timing
+
+### OtpInput — OTP digit boxes
+
+Standalone OTP input with auto-advance, backspace navigation, and paste support:
+
+```svelte
+<script>
+  import { OtpInput } from '@mrgnw/anahtar/components';
+</script>
+
+<OtpInput
+  length={5}
+  onComplete={(code) => verifyOtp(code)}
+/>
+```
+
+### Building your own UI
+
+For a compact/inline auth UI (e.g. a pill in a floating island), call the API routes directly:
+
+```ts
+// Send OTP
+const res = await fetch("/api/auth/start", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email }),
+});
+
+// Verify OTP
+const res = await fetch("/api/auth/verify", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, code }),
+});
+const { hasPasskey, skipPasskeyPrompt } = await res.json();
+
+// Logout
+await fetch("/api/auth/logout", { method: "POST" });
+```
+
+#### Conditional WebAuthn (passkey autofill)
+
+To offer instant passkey login when the page loads (before the user types anything):
+
+```ts
+import { startAuthentication } from "@simplewebauthn/browser";
+
+async function tryConditionalWebAuthn() {
+  const res = await fetch("/api/auth/passkey/login-start");
+  if (!res.ok) return;
+  const options = await res.json();
+  const abort = new AbortController();
+
+  const authResponse = await startAuthentication({
+    optionsJSON: options,
+    useBrowserAutofill: true, // enables conditional mediation
+  });
+
+  const verifyRes = await fetch("/api/auth/passkey/login-finish", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(authResponse),
+  });
+  if (verifyRes.ok) {
+    // user is logged in
+  }
+}
+```
+
+This requires `autocomplete="username webauthn"` on your email input. The browser will show saved passkeys in the autofill dropdown.
+
+#### Passkey-first login (check before OTP)
+
+When a user submits their email, check for existing passkeys first:
+
+```ts
+const checkRes = await fetch("/api/auth/passkey/check-email", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email }),
+});
+
+if (checkRes.ok) {
+  const opts = await checkRes.json();
+  if (opts.allowCredentials?.length > 0) {
+    // user has passkeys — try passkey auth first
+    const authResp = await startAuthentication({ optionsJSON: opts });
+    // ... verify with passkey/login-finish
+  }
+}
+
+// fall through to OTP if no passkeys or user cancelled
+```
 
 ### Theming
 
@@ -206,6 +342,8 @@ declare global {
     }
   }
 }
+
+export {};
 ```
 
 ## Configuration
@@ -213,7 +351,8 @@ declare global {
 ```ts
 interface AuthConfig {
   db: AuthDB;
-  tablePrefix?: string; // default: 'auth_'
+  rpName?: string; // WebAuthn relying party name (default: 'App')
+  tablePrefix?: string; // default: 'auth_' — set to '' for no prefix
   cookie?: string; // default: 'session'
   sessionDuration?: number; // default: 30 days (ms)
   otpExpiry?: number; // default: 30 min (ms)
@@ -235,9 +374,35 @@ All tables use the prefix (default `auth_`):
 | `auth_passkeys`   | `myapp_passkeys`             |
 | `auth_challenges` | `myapp_challenges`           |
 
+If you set `tablePrefix: ''`, tables are `users`, `sessions`, etc.
+
 ### WebAuthn origin
 
 `rpID` and `origin` are derived from the request URL at runtime. Override for production with the `ORIGIN` env var. No hardcoded hostnames — works on any port in dev.
+
+**Important**: Passkeys are bound to the `rpID` (hostname). A passkey created on `preview.example.com` will not work on `example.com`. Use a consistent domain for production.
+
+## Database migrations
+
+Tables are created with `CREATE TABLE IF NOT EXISTS` on first `db.init()` call. This means:
+
+**If the schema changes between anahtar versions, existing tables keep the old schema.** `CREATE TABLE IF NOT EXISTS` is a no-op when the table already exists.
+
+Check the changelog when upgrading. If a column was added (e.g. `skip_passkey_prompt` in v0.0.14), you need to add it manually:
+
+```sql
+-- D1 / SQLite
+ALTER TABLE auth_users ADD COLUMN skip_passkey_prompt INTEGER DEFAULT 0;
+
+-- Postgres
+ALTER TABLE auth_users ADD COLUMN skip_passkey_prompt INTEGER DEFAULT 0;
+```
+
+For D1 specifically, run:
+
+```sh
+npx wrangler d1 execute my-db --remote --command "ALTER TABLE auth_users ADD COLUMN skip_passkey_prompt INTEGER DEFAULT 0"
+```
 
 ## Project-specific user data
 
@@ -265,3 +430,4 @@ const profile = db
 - **Manage DB connections** — you pass in your own driver instance
 - **Own project-specific user data** — only `id`, `email`, `created_at`
 - **Handle OAuth** — email+OTP and passkeys only
+- **Run database migrations** — see [Database migrations](#database-migrations)
