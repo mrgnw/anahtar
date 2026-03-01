@@ -51,9 +51,10 @@ import { auth } from "$lib/server/auth";
 export const { GET, POST } = auth.handlers;
 ```
 
-Optional UI component:
+Optional UI components:
 
 ```svelte
+<!-- Full-page auth flow -->
 <script>
   import { AuthFlow } from '@mrgnw/anahtar/components';
   import { goto } from '$app/navigation';
@@ -61,6 +62,20 @@ Optional UI component:
 
 <AuthFlow onSuccess={() => goto('/')} />
 ```
+
+```svelte
+<!-- Compact inline pill (for headers, floating islands) -->
+<script>
+  import { AuthPill } from '@mrgnw/anahtar/components';
+  import { invalidateAll } from '$app/navigation';
+  import { page } from '$app/stores';
+  let user = $derived($page.data.user);
+</script>
+
+<AuthPill {user} onSuccess={() => invalidateAll()} />
+```
+
+All components auto-detect locale (88 languages). Override with `locale="fr"` or `messages={{ continue: 'Go' }}`.
 
 ## Tests
 
@@ -74,5 +89,5 @@ pnpm test
 
 ## Docs
 
-- [Integration guide](docs/integration.md) — install, config, theming, Postgres setup
+- [Integration guide](docs/integration.md) — install, config, components, i18n, theming, DB adapters
 - [PLAN.md](PLAN.md) — architecture, DB adapter interface, test setup

@@ -267,6 +267,25 @@ export function createHandlers(config: ResolvedConfig): {
       },
     },
 
+    "passkey/list": {
+      method: "GET",
+      handler: async (event) => {
+        const m = getMessages(event, config);
+        const user = requireAuth(event, m);
+        if (user instanceof Response) return user;
+
+        const passkeys = await config.db.getUserPasskeys(user.id);
+        return json(
+          passkeys.map((p) => ({
+            id: p.id,
+            credentialId: p.credentialId,
+            name: p.name,
+            createdAt: p.createdAt,
+          })),
+        );
+      },
+    },
+
     "skip-passkey": {
       method: "POST",
       handler: async (event) => {

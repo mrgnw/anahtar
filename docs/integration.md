@@ -177,7 +177,7 @@ Use `hasPasskey` and `skipPasskeyPrompt` to decide whether to show the passkey o
 
 ## UI components (optional)
 
-Anahtar ships three Svelte components. All are optional — you can build your own UI and call the API routes directly.
+Anahtar ships four Svelte components. All are optional — you can build your own UI and call the API routes directly.
 
 ### AuthFlow — full-page auth
 
@@ -193,6 +193,70 @@ The complete email → OTP → passkey onboarding → success flow:
 ```
 
 AuthFlow handles everything: email input with conditional WebAuthn (passkey autofill), OTP verification with resend, passkey registration countdown, and success confirmation.
+
+Props:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `apiBase` | `string` | `'/api/auth'` | Base path for auth API routes |
+| `locale` | `string` | auto-detected | Language code (e.g. `'fr'`, `'ja'`) |
+| `messages` | `Partial<AuthMessages>` | — | Override specific UI strings |
+| `onSuccess` | `() => void` | — | Called after successful login |
+
+### AuthPill — compact inline auth
+
+A pill-shaped auth component for floating islands, headers, or inline placement. Handles sign-in, OTP, passkey onboarding, passkey management, and sign-out in a compact form factor.
+
+```svelte
+<script>
+  import { AuthPill } from '@mrgnw/anahtar/components';
+  import { invalidateAll } from '$app/navigation';
+  import { page } from '$app/stores';
+
+  let user = $derived($page.data.user);
+</script>
+
+<AuthPill
+  {user}
+  onSuccess={() => invalidateAll()}
+  onSignOut={async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    invalidateAll();
+  }}
+/>
+```
+
+With passkey management (lets the user view, add, and remove passkeys):
+
+```svelte
+<AuthPill
+  {user}
+  onSuccess={() => invalidateAll()}
+  onSignOut={async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    invalidateAll();
+  }}
+  getPasskeys={async () => {
+    const res = await fetch('/api/passkeys');
+    return res.json();
+  }}
+/>
+```
+
+Props:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `apiBase` | `string` | `'/api/auth'` | Base path for auth API routes |
+| `user` | `{ email: string } \| null` | `null` | Current user — controls signed-in vs signed-out state |
+| `locale` | `string` | auto-detected | Language code (e.g. `'es'`, `'de'`) |
+| `messages` | `Partial<AuthMessages>` | — | Override specific UI strings |
+| `onSuccess` | `() => void` | — | Called after successful sign-in |
+| `onSignOut` | `() => void` | — | Called when user clicks sign out (you handle the fetch) |
+| `onPasskeysChange` | `() => void` | — | Called after a passkey is added or removed |
+| `getPasskeys` | `() => Promise<PasskeyInfo[]>` | — | If provided, enables passkey management panel |
+
+`PasskeyInfo` shape: `{ id: string; credentialId?: string; name?: string | null; createdAt?: number }`
 
 ### PasskeyPrompt — passkey onboarding
 
@@ -237,7 +301,7 @@ Standalone OTP input with auto-advance, backspace navigation, and paste support:
 
 ### Building your own UI
 
-For a compact/inline auth UI (e.g. a pill in a floating island), call the API routes directly:
+If you prefer full control, call the API routes directly:
 
 ```ts
 // Send OTP
@@ -315,10 +379,11 @@ if (checkRes.ok) {
 
 ### Theming
 
-Components use CSS custom properties:
+Components use CSS custom properties. AuthFlow uses the base set, AuthPill has additional pill-specific vars:
 
 ```css
 :root {
+  /* Shared (AuthFlow, OtpInput, PasskeyPrompt) */
   --anahtar-bg: transparent;
   --anahtar-fg: inherit;
   --anahtar-border: #d1d5db;
@@ -326,8 +391,83 @@ Components use CSS custom properties:
   --anahtar-primary: #3b82f6;
   --anahtar-primary-fg: #fff;
   --anahtar-error: #ef4444;
+
+  /* AuthPill-specific */
+  --anahtar-pill-bg: rgba(255, 255, 255, 0.9);
+  --anahtar-pill-fg: #374151;
+  --anahtar-pill-border: rgba(0, 0, 0, 0.06);
+  --anahtar-pill-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --anahtar-pill-icon: #6b7280;
+  --anahtar-pill-sep: rgba(0, 0, 0, 0.2);
+  --anahtar-pill-placeholder: #9ca3af;
 }
 ```
+
+## Localization (optional)
+
+All components auto-detect the browser locale and show UI strings in the user's language. 88 locales are bundled (every language with 5M+ speakers).
+
+Default behavior (no config needed):
+
+```svelte
+<!-- Automatically uses navigator.language -->
+<AuthFlow onSuccess={() => goto('/')} />
+```
+
+Force a specific locale:
+
+```svelte
+<AuthFlow locale="fr" onSuccess={() => goto('/')} />
+<AuthPill locale="ja" {user} onSuccess={() => invalidateAll()} />
+```
+
+Override specific strings:
+
+```svelte
+<AuthFlow
+  messages={{ continue: 'Sign in', emailPlaceholder: 'you@company.com' }}
+  onSuccess={() => goto('/')}
+/>
+```
+
+### Using i18n in your own UI
+
+```ts
+import { resolveMessages, detectLocaleClient, locales } from '@mrgnw/anahtar/components';
+
+// Auto-detect + resolve
+const m = resolveMessages(detectLocaleClient());
+// → m.continue, m.emailPlaceholder, m.errorInvalidCode, etc.
+
+// Specific locale with overrides
+const m = resolveMessages('de', { continue: 'Anmelden' });
+
+// Server-side detection (in +page.server.ts or hooks)
+import { detectLocaleServer } from '@mrgnw/anahtar';
+const locale = detectLocaleServer(event.request); // reads Accept-Language header
+
+// List all available locale codes
+Object.keys(locales); // ['af', 'ak', 'am', 'ar', ..., 'zh', 'zu']
+```
+
+The `AuthMessages` type defines all 34 translatable strings — see `src/lib/i18n/types.ts` for the full interface.
+
+## Utilities (optional)
+
+### guessDeviceName
+
+Generates a human-readable name for a passkey from the user agent string:
+
+```ts
+import { guessDeviceName } from '@mrgnw/anahtar/components';
+// or
+import { guessDeviceName } from '@mrgnw/anahtar';
+
+guessDeviceName(); // "Chrome on macOS"
+guessDeviceName(customUA); // pass a UA string directly
+```
+
+The built-in components use this automatically when registering passkeys.
 
 ## TypeScript
 
