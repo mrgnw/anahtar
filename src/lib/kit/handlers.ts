@@ -76,7 +76,14 @@ export function createHandlers(config: ResolvedConfig): {
         }
 
         const { code } = await generateOTP(config.db, body.email, config);
-        await config.onSendOTP(body.email, code);
+
+        try {
+          await config.onSendOTP(body.email, code);
+        } catch (err) {
+          const message =
+            err instanceof Error ? err.message : m.errorGeneric;
+          return json({ error: message }, { status: 400 });
+        }
 
         return json({ success: true });
       },
