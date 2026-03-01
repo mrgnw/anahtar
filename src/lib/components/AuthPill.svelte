@@ -43,17 +43,26 @@ let otpStep = $state(false);
 let otpDigits = $state<string[]>(['', '', '', '', '']);
 let otpInputs = $state<HTMLInputElement[]>([]);
 let showPasskeys = $state(false);
+let isTouch = $state(false);
 let hoveredKey = $state<string | null>(null);
 let passkeyRefresh = $state(0);
 let passkeyOnboarding = $state(false);
 let conditionalAbort: AbortController | null = null;
 
 const isAuthenticated = $derived(!!user);
+
+function shortDate(ts?: number): string {
+	if (!ts) return '';
+	const d = new Date(ts);
+	const mon = d.toLocaleDateString(undefined, { month: 'short' });
+	return `${mon} ${d.getFullYear()}`;
+}
 const passkeyPromise = $derived(
 	isAuthenticated && getPasskeys && passkeyRefresh >= 0 ? getPasskeys() : null
 );
 
 onMount(() => {
+	isTouch = matchMedia('(pointer: coarse)').matches;
 	if (!isAuthenticated) tryConditionalWebAuthn();
 	return () => conditionalAbort?.abort();
 });
@@ -390,7 +399,7 @@ async function removePasskey(id: string) {
 				{#await passkeyPromise then keys}
 					{#each keys as key}
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<div
+						<div
 							class="anahtar-pill-key-row"
 							onmouseenter={() => (hoveredKey = key.id)}
 							onmouseleave={() => (hoveredKey = null)}
@@ -399,7 +408,10 @@ async function removePasskey(id: string) {
 								<circle cx="7.5" cy="15.5" r="5.5"/><path d="m11.5 12 4-4"/><path d="m15 7 2 2"/><path d="m17.5 4.5 2 2"/>
 							</svg>
 							<span class="anahtar-pill-key-name">{key.name ?? 'Passkey'}</span>
-							{#if hoveredKey === key.id}
+							{#if key.createdAt}
+								<span class="anahtar-pill-key-date">{shortDate(key.createdAt)}</span>
+							{/if}
+							{#if isTouch || hoveredKey === key.id}
 								<button
 									class="anahtar-pill-key-remove"
 									onclick={() => removePasskey(key.id)}
@@ -414,7 +426,7 @@ async function removePasskey(id: string) {
 				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 					<line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/>
 				</svg>
-				Add passkey
+				Add
 			</button>
 		</div>
 	{/if}
@@ -588,21 +600,21 @@ async function removePasskey(id: string) {
 		backdrop-filter: blur(8px);
 		border: 1px solid var(--anahtar-pill-border, rgba(0,0,0,0.06));
 		border-radius: 0.75rem;
-		padding: 0.5rem 0.75rem;
+		padding: 0.375rem 0.625rem;
 		box-shadow: var(--anahtar-pill-shadow, 0 2px 12px rgba(0,0,0,0.08));
 		display: flex;
 		flex-direction: column;
-		gap: 0.25rem;
-		min-width: 180px;
+		gap: 0.125rem;
+		min-width: 160px;
 	}
 
 	.anahtar-pill-key-row {
 		display: flex;
 		align-items: center;
-		gap: 0.375rem;
-		font-size: 0.8125rem;
+		gap: 0.3rem;
+		font-size: 0.75rem;
 		color: var(--anahtar-pill-fg, #374151);
-		padding: 0.2rem 0;
+		padding: 0.15rem 0;
 	}
 
 	.anahtar-pill-key-name {
@@ -612,12 +624,18 @@ async function removePasskey(id: string) {
 		white-space: nowrap;
 	}
 
+	.anahtar-pill-key-date {
+		font-size: 0.6875rem;
+		color: var(--anahtar-pill-icon, #9ca3af);
+		white-space: nowrap;
+	}
+
 	.anahtar-pill-key-remove {
 		background: none;
 		border: none;
 		color: var(--anahtar-pill-icon, #9ca3af);
 		cursor: pointer;
-		font-size: 1rem;
+		font-size: 0.875rem;
 		line-height: 1;
 		padding: 0 0.125rem;
 		transition: color 0.15s;
@@ -628,15 +646,14 @@ async function removePasskey(id: string) {
 	.anahtar-pill-key-add {
 		display: flex;
 		align-items: center;
-		gap: 0.3rem;
-		font-size: 0.75rem;
+		gap: 0.25rem;
+		font-size: 0.6875rem;
 		color: var(--anahtar-pill-icon, #6b7280);
 		background: none;
 		border: none;
 		cursor: pointer;
-		padding: 0.2rem 0;
+		padding: 0.15rem 0;
 		transition: color 0.15s;
-		margin-top: 0.125rem;
 	}
 	.anahtar-pill-key-add:hover:not(:disabled) { color: var(--anahtar-primary, #3730a3); }
 	.anahtar-pill-key-add:disabled { opacity: 0.4; cursor: not-allowed; }
