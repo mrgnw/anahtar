@@ -204,22 +204,27 @@ function handlePasskeySkip() {
 			}}
 			class="anahtar-auth-form"
 		>
-			<input
-				type="email"
-				bind:value={email}
-				required
-				autocomplete="username webauthn"
-				placeholder={m.emailPlaceholder}
-				class="anahtar-input"
-			/>
+			<div class="anahtar-input-row">
+				<input
+					type="email"
+					bind:value={email}
+					required
+					autocomplete="username webauthn"
+					placeholder={m.emailPlaceholder}
+					class="anahtar-input"
+				/>
+				<button type="submit" disabled={loading} class="anahtar-submit-icon" aria-label={m.continue}>
+					{#if loading}
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="anahtar-spinner"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+					{:else}
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+					{/if}
+				</button>
+			</div>
 
 			{#if error}
 				<p class="anahtar-error">{error}</p>
 			{/if}
-
-			<button type="submit" disabled={loading} class="anahtar-button">
-				{loading ? '...' : m.continue}
-			</button>
 		</form>
 	{:else if step === 2}
 		<div class="anahtar-otp-step">
@@ -280,22 +285,64 @@ function handlePasskeySkip() {
 	.anahtar-auth-form {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 0.75rem;
+	}
+
+	.anahtar-input-row {
+		display: flex;
+		align-items: center;
+		border: 1px solid var(--anahtar-border, #d1d5db);
+		border-radius: 0.5rem;
+		overflow: hidden;
+		transition: box-shadow 0.15s;
+	}
+
+	.anahtar-input-row:focus-within {
+		box-shadow: 0 0 0 2px var(--anahtar-ring, #3b82f6);
 	}
 
 	.anahtar-input {
-		width: 100%;
-		padding: 0.5rem 0.75rem;
+		flex: 1;
+		min-width: 0;
+		padding: 0.625rem 0.75rem;
 		font-size: 0.875rem;
-		border: 1px solid var(--anahtar-border, #d1d5db);
-		border-radius: 0.375rem;
+		border: none;
 		background: var(--anahtar-bg, transparent);
 		color: var(--anahtar-fg, inherit);
 	}
 
 	.anahtar-input:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px var(--anahtar-ring, #3b82f6);
+	}
+
+	.anahtar-submit-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		flex-shrink: 0;
+		background: var(--anahtar-primary, #3b82f6);
+		color: var(--anahtar-primary-fg, #fff);
+		border: none;
+		cursor: pointer;
+		transition: opacity 0.15s;
+	}
+
+	.anahtar-submit-icon:hover {
+		opacity: 0.85;
+	}
+
+	.anahtar-submit-icon:disabled {
+		opacity: 0.5;
+	}
+
+	@keyframes anahtar-spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.anahtar-spinner {
+		animation: anahtar-spin 0.8s linear infinite;
 	}
 
 	.anahtar-button {

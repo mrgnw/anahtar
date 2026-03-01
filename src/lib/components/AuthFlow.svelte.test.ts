@@ -32,7 +32,7 @@ describe('AuthFlow', () => {
 	it('renders email input at step 1', () => {
 		render(AuthFlow);
 		expect(screen.getByPlaceholderText('you@example.com')).toBeInTheDocument();
-		expect(screen.getByText('Continue')).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
 	});
 
 	it('shows error for invalid email', async () => {
@@ -53,7 +53,7 @@ describe('AuthFlow', () => {
 		render(AuthFlow);
 		const input = screen.getByPlaceholderText('you@example.com');
 		await fireEvent.input(input, { target: { value: 'test@example.com' } });
-		await fireEvent.click(screen.getByText('Continue'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
 		await waitFor(() => {
 			expect(screen.getByText('We sent a code to')).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe('AuthFlow', () => {
 		render(AuthFlow);
 		const input = screen.getByPlaceholderText('you@example.com');
 		await fireEvent.input(input, { target: { value: 'test@example.com' } });
-		await fireEvent.click(screen.getByText('Continue'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
 		await waitFor(() => {
 			const otpInputs = screen.getAllByRole('textbox');
@@ -91,7 +91,7 @@ describe('AuthFlow', () => {
 		// Step 1: email
 		const emailInput = screen.getByPlaceholderText('you@example.com');
 		await fireEvent.input(emailInput, { target: { value: 'test@example.com' } });
-		await fireEvent.click(screen.getByText('Continue'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
 		// Step 2: OTP - fill all digits
 		await waitFor(() => {
@@ -117,7 +117,7 @@ describe('AuthFlow', () => {
 		render(AuthFlow);
 		const input = screen.getByPlaceholderText('you@example.com');
 		await fireEvent.input(input, { target: { value: 'bad@example.com' } });
-		await fireEvent.click(screen.getByText('Continue'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
 		await waitFor(() => {
 			expect(screen.getByText('Invalid email')).toBeInTheDocument();
@@ -133,7 +133,7 @@ describe('AuthFlow', () => {
 		render(AuthFlow);
 		const input = screen.getByPlaceholderText('you@example.com');
 		await fireEvent.input(input, { target: { value: 'test@example.com' } });
-		await fireEvent.click(screen.getByText('Continue'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
 		await waitFor(() => {
 			expect(screen.getByText('Use a different email')).toBeInTheDocument();
@@ -153,7 +153,7 @@ describe('AuthFlow', () => {
 		render(AuthFlow);
 		const input = screen.getByPlaceholderText('you@example.com');
 		await fireEvent.input(input, { target: { value: 'test@example.com' } });
-		await fireEvent.click(screen.getByText('Continue'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
 		await waitFor(() => {
 			expect(screen.getByText("Didn't get it? Resend")).toBeInTheDocument();
