@@ -15,6 +15,7 @@ interface PasskeyInfo {
 interface Props {
 	apiBase?: string;
 	user?: { email: string } | null;
+	compact?: boolean;
 	locale?: string;
 	messages?: Partial<AuthMessages>;
 	onSuccess?: () => void | Promise<void>;
@@ -26,6 +27,7 @@ interface Props {
 let {
 	apiBase = '/api/auth',
 	user = null,
+	compact = false,
 	locale,
 	messages: messageOverrides,
 	onSuccess,
@@ -33,6 +35,8 @@ let {
 	onPasskeysChange,
 	getPasskeys,
 }: Props = $props();
+
+let expanded = $state(false);
 
 let m = $derived(resolveMessages(locale ?? detectLocaleClient(), messageOverrides));
 
@@ -72,6 +76,7 @@ async function handleSignOut() {
 	otpStep = false;
 	passkeyOnboarding = false;
 	showPasskeys = false;
+	expanded = false;
 	error = '';
 	await onSignOut?.();
 }
@@ -313,7 +318,13 @@ async function removePasskey(id: string) {
 
 <div class="anahtar-pill-island" class:anahtar-pill-loading={loading}>
 	<div class="anahtar-pill">
-		{#if isAuthenticated}
+		{#if isAuthenticated && compact && !expanded}
+			<button class="anahtar-pill-icon" onclick={() => (expanded = true)} title={user?.email}>
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>
+				</svg>
+			</button>
+		{:else if isAuthenticated}
 			<span class="anahtar-pill-email">{user?.email}</span>
 			<span class="anahtar-pill-sep">&middot;</span>
 			{#if getPasskeys}
@@ -335,6 +346,14 @@ async function removePasskey(id: string) {
 					<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
 				</svg>
 			</button>
+			{#if compact}
+				<span class="anahtar-pill-sep">&middot;</span>
+				<button class="anahtar-pill-icon" onclick={() => { expanded = false; showPasskeys = false; }} title="Collapse">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/>
+					</svg>
+				</button>
+			{/if}
 
 		{:else if otpStep}
 			<span class="anahtar-pill-otp-label">{email}</span>
