@@ -385,9 +385,15 @@ async function removePasskey(id: string) {
 					autocomplete="username webauthn"
 					disabled={loading}
 				/>
-				<button type="submit" class="anahtar-pill-go" disabled={loading || !email.includes('@')}>
-					{loading ? '...' : m.continue}
-				</button>
+			<button type="submit" class="anahtar-pill-go" disabled={loading || !email.includes('@')}>
+				{#if loading}
+					...
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+					</svg>
+				{/if}
+			</button>
 			</form>
 		{/if}
 	</div>
@@ -475,6 +481,7 @@ async function removePasskey(id: string) {
 		white-space: nowrap;
 		height: 2.25rem;
 		box-sizing: border-box;
+		overflow: hidden;
 	}
 
 	.anahtar-pill-sep {
@@ -515,6 +522,9 @@ async function removePasskey(id: string) {
 		display: flex;
 		align-items: center;
 		gap: 0.375rem;
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
 	}
 
 	.anahtar-pill-email-input {
@@ -523,7 +533,8 @@ async function removePasskey(id: string) {
 		outline: none;
 		font-size: 0.875rem;
 		color: var(--anahtar-pill-fg, #111827);
-		width: 190px;
+		flex: 1;
+		min-width: 0;
 		padding: 0.125rem 0;
 	}
 	.anahtar-pill-email-input::placeholder { color: var(--anahtar-pill-placeholder, #9ca3af); }
@@ -533,12 +544,14 @@ async function removePasskey(id: string) {
 		color: var(--anahtar-primary-fg, #fff);
 		border: none;
 		border-radius: 9999px;
-		padding: 0.25rem 0.75rem;
-		font-size: 0.8125rem;
-		font-weight: 500;
+		padding: 0.3rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
 		cursor: pointer;
 		transition: opacity 0.15s;
-		white-space: nowrap;
+		line-height: 1;
 	}
 	.anahtar-pill-go:disabled { opacity: 0.4; cursor: not-allowed; }
 	.anahtar-pill-go:hover:not(:disabled) { opacity: 0.85; }
