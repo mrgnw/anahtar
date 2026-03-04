@@ -22,6 +22,7 @@ interface Props {
 	onSignOut?: () => void | Promise<void>;
 	onPasskeysChange?: () => void | Promise<void>;
 	getPasskeys?: () => Promise<PasskeyInfo[]>;
+	onStepChange?: (step: 'email' | 'otp' | 'authenticated') => void;
 }
 
 let {
@@ -34,6 +35,7 @@ let {
 	onSignOut,
 	onPasskeysChange,
 	getPasskeys,
+	onStepChange,
 }: Props = $props();
 
 let expanded = $state(false);
@@ -47,6 +49,7 @@ let otpStep = $state(false);
 let otpDigits = $state<string[]>(['', '', '', '', '']);
 let otpInputs = $state<HTMLInputElement[]>([]);
 let showPasskeys = $state(false);
+let pendingSuccess = $state(false);
 let isTouch = $state(false);
 let hoveredKey = $state<string | null>(null);
 let passkeyRefresh = $state(0);
@@ -75,9 +78,11 @@ async function handleSignOut() {
 	email = '';
 	otpStep = false;
 	passkeyOnboarding = false;
+	pendingSuccess = false;
 	showPasskeys = false;
 	expanded = false;
 	error = '';
+	onStepChange?.('email');
 	await onSignOut?.();
 }
 
@@ -158,6 +163,7 @@ async function handleEmailSubmit(e: SubmitEvent) {
 		const data = ((await res.json().catch(() => ({}))) as any);
 		otpDigits = ['', '', '', '', ''];
 		otpStep = true;
+		onStepChange?.('otp');
 		if (data?.devCode) {
 			const code = String(data.devCode);
 			for (let i = 0; i < 5; i++) otpDigits[i] = code[i] ?? '';
@@ -217,10 +223,13 @@ async function verifyOtp(code: string) {
 			return;
 		}
 		const data = ((await res.json().catch(() => ({}))) as any);
-		await onSuccess?.();
 		otpStep = false;
 		if (!data.hasPasskey && !data.skipPasskeyPrompt) {
+			pendingSuccess = true;
 			passkeyOnboarding = true;
+		} else {
+			await onSuccess?.();
+			onStepChange?.('authenticated');
 		}
 	} catch {
 		error = m.errorGeneric;
@@ -261,11 +270,21 @@ async function handlePasskeyRegister() {
 	passkeyOnboarding = false;
 	passkeyRefresh++;
 	await onPasskeysChange?.();
+	if (pendingSuccess) {
+		pendingSuccess = false;
+		await onSuccess?.();
+		onStepChange?.('authenticated');
+	}
 }
 
-function handlePasskeySkip() {
+async function handlePasskeySkip() {
 	fetch(`${apiBase}/skip-passkey`, { method: 'POST' });
 	passkeyOnboarding = false;
+	if (pendingSuccess) {
+		pendingSuccess = false;
+		await onSuccess?.();
+		onStepChange?.('authenticated');
+	}
 }
 
 async function addPasskey() {
@@ -402,7 +421,7 @@ async function removePasskey(id: string) {
 		<div class="anahtar-pill-otp-help" transition:slide={{ duration: 150 }}>
 			<span class="anahtar-pill-otp-help-text">{m.codeSentTo}</span>
 			<span class="anahtar-pill-otp-help-sep">&middot;</span>
-			<button class="anahtar-pill-otp-help-link" onclick={() => { otpStep = false; error = ''; }}>{m.differentEmail}</button>
+			<button class="anahtar-pill-otp-help-link" onclick={() => { otpStep = false; error = ''; onStepChange?.('email'); }}>{m.differentEmail}</button>
 			<span class="anahtar-pill-otp-help-sep">&middot;</span>
 			<button class="anahtar-pill-otp-help-link" onclick={resend} disabled={loading}>{m.resend}</button>
 		</div>
@@ -412,7 +431,7 @@ async function removePasskey(id: string) {
 		<p class="anahtar-pill-error" transition:slide={{ duration: 150 }}>{error}</p>
 	{/if}
 
-	{#if passkeyOnboarding && isAuthenticated}
+	{#if passkeyOnboarding}
 		<div class="anahtar-pill-onboarding" transition:slide={{ duration: 200 }}>
 			<PasskeyPrompt {m} onRegister={handlePasskeyRegister} onSkip={handlePasskeySkip} />
 		</div>
