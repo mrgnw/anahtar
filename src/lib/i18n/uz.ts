@@ -1,33 +1,33 @@
 // Initial translation — review for accuracy
-import type { AuthMessages } from './types.js';
+import type { AuthMessages } from "./types.js";
 
 const uz: AuthMessages = {
-	emailPlaceholder: 'siz@misol.uz',
-	continue: 'Davom etish',
+  emailPlaceholder: "siz@misol.uz",
+  continue: "Davom etish",
 
-	codeSentTo: 'Biz kod yubordik:',
-	verifying: 'Tekshirilmoqda...',
-	resend: 'Kelmadimi? Qayta yuborish',
-	differentEmail: 'Boshqa email ishlatish',
+  codeSentTo: "Biz kod yubordik:",
+  verifying: "Tekshirilmoqda...",
+  resend: "Kelmadimi? Qayta yuborish",
+  differentEmail: "Boshqa email ishlatish",
 
-	passkeyCreating: 'Sizga passkey yaratilmoqda',
-	passkeySubtitle: 'tezroq, osonroq va xavfsizroq kirish uchun',
-	passkeyAdd: 'Hozir passkey qo'shing',
-	passkeyMaybeLater: 'Keyinroq',
-	passkeySuccess: 'Passkey tayyor!',
+  passkeyCreating: "Sizga passkey yaratilmoqda",
+  passkeySubtitle: "tezroq, osonroq va xavfsizroq kirish uchun",
+  passkeyAdd: "Hozir passkey qo'shing",
+  passkeyMaybeLater: "Keyinroq",
+  passkeySuccess: "Passkey tayyor!",
 
-	errorInvalidEmail: 'Iltimos, toʻgʻri email manzilini kiriting.',
-	errorGeneric: 'Xatolik yuz berdi. Iltimos, qayta urinib koʻring.',
-	errorResendFailed: 'Kodni qayta yuborib boʻlmadi.',
-	errorInvalidCode: 'Kod notoʻgʻri. Iltimos, qayta urinib koʻring.',
-	errorCodeExpired: 'Kod muddati tugadi. Iltimos, yangi kod soʻrang.',
-	errorTooManyAttempts: 'Juda koʻp urinish. Iltimos, yangi kod soʻrang.',
-	errorInvalidInput: 'Notoʻgʻri kiritish',
-	errorNotAuthenticated: 'Autentifikatsiya qilinmagan',
-	errorNotFound: 'Topilmadi',
-	errorAuthFailed: 'Autentifikatsiya amalga oshmadi',
-	errorPasskeyRegFailed: 'Passkey roʻyxatdan oʻtkazish amalga oshmadi',
-	errorPasskeyNotFound: 'Passkey topilmadi',
+  errorInvalidEmail: "Iltimos, toʻgʻri email manzilini kiriting.",
+  errorGeneric: "Xatolik yuz berdi. Iltimos, qayta urinib koʻring.",
+  errorResendFailed: "Kodni qayta yuborib boʻlmadi.",
+  errorInvalidCode: "Kod notoʻgʻri. Iltimos, qayta urinib koʻring.",
+  errorCodeExpired: "Kod muddati tugadi. Iltimos, yangi kod soʻrang.",
+  errorTooManyAttempts: "Juda koʻp urinish. Iltimos, yangi kod soʻrang.",
+  errorInvalidInput: "Notoʻgʻri kiritish",
+  errorNotAuthenticated: "Autentifikatsiya qilinmagan",
+  errorNotFound: "Topilmadi",
+  errorAuthFailed: "Autentifikatsiya amalga oshmadi",
+  errorPasskeyRegFailed: "Passkey roʻyxatdan oʻtkazish amalga oshmadi",
+  errorPasskeyNotFound: "Passkey topilmadi",
 };
 
 export default uz;
