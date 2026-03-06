@@ -11,10 +11,8 @@ const fa: AuthMessages = {
 	differentEmail: 'استفاده از ایمیل دیگر',
 
 	passkeyCreating: 'در حال ساخت passkey',
-	passkeySubtitle: 'برای ورود آسان‌تر',
-	passkeySkip: 'رد شدن',
-	passkeySetup: 'ساخت passkey؟',
-	passkeyAdd: 'افزودن passkey',
+	passkeySubtitle: 'برای ورود سریع‌تر، آسان‌تر و امن‌تر',
+	passkeyAdd: 'اکنون کلید عبور اضافه کنید',
 	passkeyMaybeLater: 'شاید بعداً',
 	passkeySuccess: 'passkey شما آماده است!',
 

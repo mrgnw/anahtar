@@ -10,10 +10,8 @@ const es: AuthMessages = {
 	differentEmail: 'Usar otro correo',
 
 	passkeyCreating: 'Creando tu passkey',
-	passkeySubtitle: 'para iniciar sesion mas facil',
-	passkeySkip: 'Omitir',
-	passkeySetup: 'Configurar passkey?',
-	passkeyAdd: 'Agregar passkey',
+	passkeySubtitle: 'para iniciar sesion mas rapido, facil y seguro',
+	passkeyAdd: 'Agregar passkey ahora',
 	passkeyMaybeLater: 'Quiza despues',
 	passkeySuccess: 'Ya tienes tu passkey!',
 

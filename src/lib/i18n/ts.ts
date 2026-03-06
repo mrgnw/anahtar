@@ -11,10 +11,8 @@ const ts: AuthMessages = {
 	differentEmail: 'Tirhisa imeyili yin\'wana',
 
 	passkeyCreating: 'Ya endla passkey',
-	passkeySubtitle: 'ku nghena hi ku olova',
-	passkeySkip: 'Hundza',
-	passkeySetup: 'Veka passkey?',
-	passkeyAdd: 'Engetela passkey',
+	passkeySubtitle: 'ku nghena hi ku hatlisa, ku olova, ni ku hlayiseka',
+	passkeyAdd: 'Engetela passkey sweswi',
 	passkeyMaybeLater: 'Kumbexana endzhaku',
 	passkeySuccess: 'U na passkey!',
 

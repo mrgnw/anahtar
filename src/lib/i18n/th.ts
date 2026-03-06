@@ -11,10 +11,8 @@ const th: AuthMessages = {
 	differentEmail: 'ใช้อีเมลอื่น',
 
 	passkeyCreating: 'กำลังสร้าง passkey',
-	passkeySubtitle: 'เพื่อการเข้าสู่ระบบที่ง่ายขึ้น',
-	passkeySkip: 'ข้าม',
-	passkeySetup: 'ตั้งค่า passkey?',
-	passkeyAdd: 'เพิ่ม passkey',
+	passkeySubtitle: 'สำหรับการเข้าสู่ระบบที่เร็ว ง่าย และปลอดภัยยิ่งขึ้น',
+	passkeyAdd: 'เพิ่ม passkey ตอนนี้',
 	passkeyMaybeLater: 'ไว้ทีหลัง',
 	passkeySuccess: 'สร้าง passkey เรียบร้อยแล้ว!',
 

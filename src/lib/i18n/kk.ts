@@ -11,10 +11,8 @@ const kk: AuthMessages = {
 	differentEmail: 'Басқа электрондық пошта',
 
 	passkeyCreating: 'Passkey жасалуда',
-	passkeySubtitle: 'оңай кіру үшін',
-	passkeySkip: 'Өткізу',
-	passkeySetup: 'Passkey орнату керек пе?',
-	passkeyAdd: 'Passkey қосу',
+	passkeySubtitle: 'тезірек, оңайырақ, қауіпсіздеу кіру үшін',
+	passkeyAdd: 'Қазір passkey қосу',
 	passkeyMaybeLater: 'Кейінірек',
 	passkeySuccess: 'Passkey дайын!',
 

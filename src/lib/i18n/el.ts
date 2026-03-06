@@ -11,10 +11,8 @@ const el: AuthMessages = {
 	differentEmail: 'Χρήση διαφορετικού email',
 
 	passkeyCreating: 'Δημιουργία passkey',
-	passkeySubtitle: 'για ευκολότερη σύνδεση',
-	passkeySkip: 'Παράλειψη',
-	passkeySetup: 'Ρύθμιση passkey;',
-	passkeyAdd: 'Προσθήκη passkey',
+	passkeySubtitle: 'για γρηγοτερη, ευκολοτερη, ασφαλεστερη συνδεση',
+	passkeyAdd: 'Προσθηκη passkey τωρα',
 	passkeyMaybeLater: 'Ίσως αργότερα',
 	passkeySuccess: 'Το passkey σου είναι έτοιμο!',
 

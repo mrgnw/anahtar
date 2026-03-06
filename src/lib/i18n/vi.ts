@@ -11,10 +11,8 @@ const vi: AuthMessages = {
 	differentEmail: 'Dùng email khác',
 
 	passkeyCreating: 'Đang tạo passkey cho bạn',
-	passkeySubtitle: 'để đăng nhập dễ hơn',
-	passkeySkip: 'Bỏ qua',
-	passkeySetup: 'Thiết lập passkey?',
-	passkeyAdd: 'Thêm passkey',
+	passkeySubtitle: 'de dang nhap nhanh hon, de hon va an toan hon',
+	passkeyAdd: 'Them passkey ngay',
 	passkeyMaybeLater: 'Để sau',
 	passkeySuccess: 'Bạn đã có passkey!',
 

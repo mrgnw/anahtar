@@ -11,10 +11,8 @@ const ta: AuthMessages = {
 	differentEmail: 'வேறு மின்னஞ்சலைப் பயன்படுத்து',
 
 	passkeyCreating: 'உங்களுக்கு passkey உருவாக்கப்படுகிறது',
-	passkeySubtitle: 'எளிதாக உள்நுழைய',
-	passkeySkip: 'தவிர்',
-	passkeySetup: 'Passkey அமைக்கவா?',
-	passkeyAdd: 'Passkey சேர்',
+	passkeySubtitle: 'விரைவான, எளிதான, பாதுகாப்பான உள்நுழைவுக்கு',
+	passkeyAdd: 'இப்போது பாஸ்கீ சேர்க்கவும்',
 	passkeyMaybeLater: 'பிறகு பார்க்கலாம்',
 	passkeySuccess: 'உங்கள் passkey தயார்!',
 

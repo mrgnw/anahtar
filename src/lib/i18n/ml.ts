@@ -11,10 +11,8 @@ const ml: AuthMessages = {
 	differentEmail: 'മറ്റൊരു ഇമെയിൽ ഉപയോഗിക്കുക',
 
 	passkeyCreating: 'നിങ്ങൾക്കായി ഒരു passkey ഉണ്ടാക്കുന്നു',
-	passkeySubtitle: 'എളുപ്പത്തിൽ ലോഗിൻ ചെയ്യാൻ',
-	passkeySkip: 'ഒഴിവാക്കുക',
-	passkeySetup: 'Passkey സജ്ജീകരിക്കണോ?',
-	passkeyAdd: 'Passkey ചേർക്കുക',
+	passkeySubtitle: 'വേഗത്തിലും എളുപ്പത്തിലും സുരക്ഷിതമായും ലോഗിൻ ചെയ്യാൻ',
+	passkeyAdd: 'ഇപ്പോൾ പാസ്‌കീ ചേർക്കുക',
 	passkeyMaybeLater: 'പിന്നീടാകാം',
 	passkeySuccess: 'നിങ്ങളുടെ passkey തയ്യാറാണ്!',
 

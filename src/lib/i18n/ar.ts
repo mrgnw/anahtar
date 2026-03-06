@@ -10,10 +10,8 @@ const ar: AuthMessages = {
 	differentEmail: 'استخدام بريد إلكتروني آخر',
 
 	passkeyCreating: 'جارٍ إنشاء مفتاح المرور',
-	passkeySubtitle: 'لتسجيل دخول أسهل',
-	passkeySkip: 'تخطي',
-	passkeySetup: 'إعداد مفتاح مرور؟',
-	passkeyAdd: 'إضافة مفتاح مرور',
+	passkeySubtitle: 'لتسجيل دخول اسرع واسهل واكثر امانا',
+	passkeyAdd: 'اضف مفتاح مرور الان',
 	passkeyMaybeLater: 'ربما لاحقًا',
 	passkeySuccess: 'مفتاح المرور جاهز!',
 

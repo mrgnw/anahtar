@@ -11,10 +11,8 @@ const ne: AuthMessages = {
 	differentEmail: 'अर्को इमेल प्रयोग गर्नुहोस्',
 
 	passkeyCreating: 'Passkey बनाइँदैछ',
-	passkeySubtitle: 'सजिलो लगइनका लागि',
-	passkeySkip: 'छोड्नुहोस्',
-	passkeySetup: 'Passkey सेटअप गर्ने?',
-	passkeyAdd: 'Passkey थप्नुहोस्',
+	passkeySubtitle: 'छिटो, सजिलो, सुरक्षित लगइनको लागि',
+	passkeyAdd: 'अहिले पासकी थप्नुहोस्',
 	passkeyMaybeLater: 'पछि हुन्छ',
 	passkeySuccess: 'तपाईंको passkey तयार छ!',
 

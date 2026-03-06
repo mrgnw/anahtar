@@ -11,10 +11,8 @@ const he: AuthMessages = {
 	differentEmail: 'שימוש בכתובת אחרת',
 
 	passkeyCreating: 'יוצר לך passkey',
-	passkeySubtitle: 'להתחברות קלה יותר',
-	passkeySkip: 'דלג',
-	passkeySetup: 'להגדיר passkey?',
-	passkeyAdd: 'הוסף passkey',
+	passkeySubtitle: 'להתחברות מהירה, קלה ובטוחה יותר',
+	passkeyAdd: 'הוסף passkey עכשיו',
 	passkeyMaybeLater: 'אולי אחר כך',
 	passkeySuccess: 'יש לך passkey!',
 

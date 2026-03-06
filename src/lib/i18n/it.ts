@@ -11,10 +11,8 @@ const it: AuthMessages = {
 	differentEmail: "Usa un'altra email",
 
 	passkeyCreating: 'Creazione della passkey',
-	passkeySubtitle: 'per accedere più facilmente',
-	passkeySkip: 'Salta',
-	passkeySetup: 'Configurare una passkey?',
-	passkeyAdd: 'Aggiungi passkey',
+	passkeySubtitle: 'per un accesso piu veloce, facile e sicuro',
+	passkeyAdd: 'Aggiungi passkey ora',
 	passkeyMaybeLater: 'Forse più tardi',
 	passkeySuccess: 'Passkey configurata!',
 

@@ -11,10 +11,8 @@ const fi: AuthMessages = {
 	differentEmail: 'Käytä toista sähköpostia',
 
 	passkeyCreating: 'Luodaan sinulle passkey',
-	passkeySubtitle: 'helpompaa kirjautumista varten',
-	passkeySkip: 'Ohita',
-	passkeySetup: 'Otetaanko passkey käyttöön?',
-	passkeyAdd: 'Lisää passkey',
+	passkeySubtitle: 'nopeampaan, helpompaan ja turvallisempaan kirjautumiseen',
+	passkeyAdd: 'Lisaa passkey nyt',
 	passkeyMaybeLater: 'Ehkä myöhemmin',
 	passkeySuccess: 'Passkey on valmis!',
 

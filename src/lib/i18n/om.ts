@@ -11,10 +11,8 @@ const om: AuthMessages = {
 	differentEmail: 'Email biraa fayyadami',
 
 	passkeyCreating: 'Passkey siif uumaa jira',
-	passkeySubtitle: 'seensa salphaa taʼuuf',
-	passkeySkip: 'Irra darbi',
-	passkeySetup: 'Passkey qopheessuu?',
-	passkeyAdd: 'Passkey itti dabali',
+	passkeySubtitle: 'seensa saffisaa, salphaa fi nageenya qabuuf',
+	passkeyAdd: 'Passkey amma dabalaa',
 	passkeyMaybeLater: 'Tarii booda',
 	passkeySuccess: 'Passkey qabda!',
 

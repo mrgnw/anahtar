@@ -11,10 +11,8 @@ const ku: AuthMessages = {
 	differentEmail: 'E-nameyek din bi kar bîne',
 
 	passkeyCreating: 'Em ji te re passkey çêdikin',
-	passkeySubtitle: 'ji bo têketineke hêsantir',
-	passkeySkip: 'Derbas bike',
-	passkeySetup: 'Passkey saz bikî?',
-	passkeyAdd: 'Passkey zêde bike',
+	passkeySubtitle: 'bo chunine xweratir, asantir u ewletir',
+	passkeyAdd: 'Niha passkey zede bike',
 	passkeyMaybeLater: 'Belkî paşê',
 	passkeySuccess: 'Passkey-a te amade ye!',
 

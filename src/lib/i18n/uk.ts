@@ -11,10 +11,8 @@ const uk: AuthMessages = {
 	differentEmail: 'Використати іншу пошту',
 
 	passkeyCreating: 'Створюємо passkey',
-	passkeySubtitle: 'для зручнішого входу',
-	passkeySkip: 'Пропустити',
-	passkeySetup: 'Налаштувати passkey?',
-	passkeyAdd: 'Додати passkey',
+	passkeySubtitle: 'для швидшого, легшого та безпечнішого входу',
+	passkeyAdd: 'Додати passkey зараз',
 	passkeyMaybeLater: 'Можливо, пізніше',
 	passkeySuccess: 'Passkey готовий!',
 

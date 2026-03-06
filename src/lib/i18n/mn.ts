@@ -11,10 +11,8 @@ const mn: AuthMessages = {
 	differentEmail: 'Өөр имэйл ашиглах',
 
 	passkeyCreating: 'Passkey үүсгэж байна',
-	passkeySubtitle: 'нэвтрэхэд хялбар болгоно',
-	passkeySkip: 'Алгасах',
-	passkeySetup: 'Passkey тохируулах уу?',
-	passkeyAdd: 'Passkey нэмэх',
+	passkeySubtitle: 'илүү хурдан, хялбар, аюулгүй нэвтрэхийн тулд',
+	passkeyAdd: 'Passkey одоо нэмэх',
 	passkeyMaybeLater: 'Дараа болох',
 	passkeySuccess: 'Passkey бэлэн боллоо!',
 

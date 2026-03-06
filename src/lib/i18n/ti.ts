@@ -11,10 +11,8 @@ const ti: AuthMessages = {
 	differentEmail: 'ካልእ ኢመይል ተጠቐም',
 
 	passkeyCreating: 'Passkey ንሰርሓልካ ኣለና',
-	passkeySubtitle: 'ንቐሊል ምእታው',
-	passkeySkip: 'ስገር',
-	passkeySetup: 'Passkey ተዋድድ?',
-	passkeyAdd: 'Passkey ወስኽ',
+	passkeySubtitle: 'ንቕልጡፍ፣ ቀሊል፣ ውሑስ ምእታው',
+	passkeyAdd: 'ሕጂ passkey ወስኹ',
 	passkeyMaybeLater: 'ድሒሩ ይኸውን',
 	passkeySuccess: 'Passkey ኣለካ!',
 

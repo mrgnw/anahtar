@@ -11,10 +11,8 @@ const ur: AuthMessages = {
 	differentEmail: 'دوسرا ای میل استعمال کریں',
 
 	passkeyCreating: 'آپ کے لیے passkey بنائی جا رہی ہے',
-	passkeySubtitle: 'آسان لاگ ان کے لیے',
-	passkeySkip: 'چھوڑیں',
-	passkeySetup: 'Passkey بنائیں؟',
-	passkeyAdd: 'Passkey شامل کریں',
+	passkeySubtitle: 'تیز، آسان، محفوظ لاگ ان کے لیے',
+	passkeyAdd: 'ابھی پاس کی شامل کریں',
 	passkeyMaybeLater: 'شاید بعد میں',
 	passkeySuccess: 'آپ کی passkey تیار ہے!',
 

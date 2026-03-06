@@ -11,10 +11,8 @@ const ak: AuthMessages = {
 	differentEmail: 'Fa email foforɔ',
 
 	passkeyCreating: 'Yɛreyɛ wo passkey',
-	passkeySubtitle: 'na woabɛn mu ntɛm',
-	passkeySkip: 'Twa mu',
-	passkeySetup: 'Siesie passkey?',
-	passkeyAdd: 'Fa passkey ka ho',
+	passkeySubtitle: 'fun ntemi, mmer, ahobammoden mu log in',
+	passkeyAdd: 'Fa passkey afiri seisei',
 	passkeyMaybeLater: 'Ebia akyire yi',
 	passkeySuccess: 'Wowɔ passkey!',
 

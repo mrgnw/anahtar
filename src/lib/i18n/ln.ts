@@ -11,10 +11,8 @@ const ln: AuthMessages = {
 	differentEmail: 'Salelá e-mail mosusu',
 
 	passkeyCreating: 'Tozali kosalela yo passkey',
-	passkeySubtitle: 'mpo na kokɔta pete',
-	passkeySkip: 'Longwa',
-	passkeySetup: 'Obɔngi kobongisa passkey?',
-	passkeyAdd: 'Bakisa passkey',
+	passkeySubtitle: 'mpo na kokota noki, pasi, mpe na bosikisiki',
+	passkeyAdd: 'Bakisa passkey sik'oyo',
 	passkeyMaybeLater: 'Mbala mosusu',
 	passkeySuccess: 'Ozwi passkey!',
 

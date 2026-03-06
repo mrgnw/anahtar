@@ -10,10 +10,8 @@ const zh: AuthMessages = {
 	differentEmail: '使用其他邮箱',
 
 	passkeyCreating: '正在创建通行密钥',
-	passkeySubtitle: '更便捷的登录方式',
-	passkeySkip: '跳过',
-	passkeySetup: '设置通行密钥？',
-	passkeyAdd: '添加通行密钥',
+	passkeySubtitle: '更快、更简单、更安全地登录',
+	passkeyAdd: '立即添加通行密钥',
 	passkeyMaybeLater: '以后再说',
 	passkeySuccess: '通行密钥已就绪！',
 

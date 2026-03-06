@@ -11,10 +11,8 @@ const so: AuthMessages = {
 	differentEmail: 'Isticmaal iimeel kale',
 
 	passkeyCreating: 'Passkey baan kuu samaynayaa',
-	passkeySubtitle: 'si aad u gasho si fudud',
-	passkeySkip: 'Ka bood',
-	passkeySetup: 'Passkey ma diyaarinaysaa?',
-	passkeyAdd: 'Ku dar passkey',
+	passkeySubtitle: 'gelitaanka degdegga ah, fududda, amaanka',
+	passkeyAdd: 'Ku dar passkey hadda',
 	passkeyMaybeLater: 'Waqti dambe',
 	passkeySuccess: 'Passkey baad haysataa!',
 

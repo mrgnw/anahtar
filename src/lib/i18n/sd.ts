@@ -11,10 +11,8 @@ const sd: AuthMessages = {
 	differentEmail: 'ٻيو اي ميل استعمال ڪريو',
 
 	passkeyCreating: 'توهان لاءِ passkey ٺاهي رهيا آهيون',
-	passkeySubtitle: 'آسان لاگ اِن لاءِ',
-	passkeySkip: 'ڇڏيو',
-	passkeySetup: 'Passkey سيٽ ڪريو؟',
-	passkeyAdd: 'Passkey شامل ڪريو',
+	passkeySubtitle: 'تيز، آسان، محفوظ لاگ ان لاءِ',
+	passkeyAdd: 'هاڻي پاسڪي شامل ڪريو',
 	passkeyMaybeLater: 'ٿي سگهي ٿو بعد ۾',
 	passkeySuccess: 'توهان وٽ passkey آهي!',
 

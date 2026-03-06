@@ -11,10 +11,8 @@ const sr: AuthMessages = {
 	differentEmail: 'Користи другу е-пошту',
 
 	passkeyCreating: 'Правимо вам passkey',
-	passkeySubtitle: 'за лакшу пријаву',
-	passkeySkip: 'Прескочи',
-	passkeySetup: 'Подесити passkey?',
-	passkeyAdd: 'Додај passkey',
+	passkeySubtitle: 'za brze, lakse i bezbednije prijavljivanje',
+	passkeyAdd: 'Dodaj passkey sada',
 	passkeyMaybeLater: 'Можда касније',
 	passkeySuccess: 'Имате passkey!',
 

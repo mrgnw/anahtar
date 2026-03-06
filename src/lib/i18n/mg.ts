@@ -11,10 +11,8 @@ const mg: AuthMessages = {
 	differentEmail: 'Mampiasà mailaka hafa',
 
 	passkeyCreating: 'Mamorona passkey ho anao',
-	passkeySubtitle: 'mba hidirana mora kokoa',
-	passkeySkip: 'Adino',
-	passkeySetup: 'Hametraka passkey ve?',
-	passkeyAdd: 'Ampio passkey',
+	passkeySubtitle: 'ho fidirana haingana, mora, ary azo antoka kokoa',
+	passkeyAdd: 'Ampio passkey izao',
 	passkeyMaybeLater: 'Angamba aoriana',
 	passkeySuccess: 'Manana passkey ianao!',
 

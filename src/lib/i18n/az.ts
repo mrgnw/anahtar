@@ -11,10 +11,8 @@ const az: AuthMessages = {
 	differentEmail: 'Başqa email istifadə et',
 
 	passkeyCreating: 'Sizin üçün passkey yaradılır',
-	passkeySubtitle: 'asan giriş üçün',
-	passkeySkip: 'Keç',
-	passkeySetup: 'Passkey qurmaq istəyirsiniz?',
-	passkeyAdd: 'Passkey əlavə et',
+	passkeySubtitle: 'daha sureli, asan ve tehlukesiz giris ucun',
+	passkeyAdd: 'Indi passkey elave et',
 	passkeyMaybeLater: 'Bəlkə sonra',
 	passkeySuccess: 'Passkey hazırdır!',
 

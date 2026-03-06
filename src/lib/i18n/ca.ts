@@ -11,10 +11,8 @@ const ca: AuthMessages = {
 	differentEmail: 'Usa un altre correu',
 
 	passkeyCreating: 'Creant el teu passkey',
-	passkeySubtitle: 'per iniciar sessió més fàcilment',
-	passkeySkip: 'Omet',
-	passkeySetup: 'Configurar un passkey?',
-	passkeyAdd: 'Afegir passkey',
+	passkeySubtitle: 'per a un inici de sessio mes rapid, facil i segur',
+	passkeyAdd: 'Afegeix passkey ara',
 	passkeyMaybeLater: 'Potser més tard',
 	passkeySuccess: 'Ja tens un passkey!',
 

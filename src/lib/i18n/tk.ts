@@ -11,10 +11,8 @@ const tk: AuthMessages = {
 	differentEmail: 'Başga e-poçta ulan',
 
 	passkeyCreating: 'Passkey döredilýär',
-	passkeySubtitle: 'aňsat girmek üçin',
-	passkeySkip: 'Geç',
-	passkeySetup: 'Passkey gurasaňyz?',
-	passkeyAdd: 'Passkey goş',
+	passkeySubtitle: 'has calt, ansat we howpsuz giris ucin',
+	passkeyAdd: 'Hadzir passkey gos',
 	passkeyMaybeLater: 'Belki soň',
 	passkeySuccess: 'Passkey taýýar!',
 

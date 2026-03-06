@@ -11,10 +11,8 @@ const mr: AuthMessages = {
 	differentEmail: 'वेगळा ईमेल वापरा',
 
 	passkeyCreating: 'तुमच्यासाठी passkey तयार करत आहोत',
-	passkeySubtitle: 'सोप्या लॉगिनसाठी',
-	passkeySkip: 'वगळा',
-	passkeySetup: 'Passkey तयार करायची?',
-	passkeyAdd: 'Passkey जोडा',
+	passkeySubtitle: 'जलद, सोपे, सुरक्षित लॉगिनसाठी',
+	passkeyAdd: 'आत्ता पासकी जोडा',
 	passkeyMaybeLater: 'नंतर कदाचित',
 	passkeySuccess: 'तुमची passkey तयार आहे!',
 

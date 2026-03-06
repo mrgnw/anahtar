@@ -11,10 +11,8 @@ const sq: AuthMessages = {
 	differentEmail: 'Përdor një email tjetër',
 
 	passkeyCreating: 'Po krijojmë një passkey për ty',
-	passkeySubtitle: 'për hyrje më të lehtë',
-	passkeySkip: 'Kapërce',
-	passkeySetup: 'Konfiguro një passkey?',
-	passkeyAdd: 'Shto passkey',
+	passkeySubtitle: 'per hyrje me te shpejte, me te lehte dhe me te sigurt',
+	passkeyAdd: 'Shto passkey tani',
 	passkeyMaybeLater: 'Ndoshta më vonë',
 	passkeySuccess: 'Ke një passkey!',
 

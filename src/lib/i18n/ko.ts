@@ -10,10 +10,8 @@ const ko: AuthMessages = {
 	differentEmail: '다른 이메일 사용',
 
 	passkeyCreating: '패스키 생성 중',
-	passkeySubtitle: '더 쉬운 로그인을 위해',
-	passkeySkip: '건너뛰기',
-	passkeySetup: '패스키를 설정할까요?',
-	passkeyAdd: '패스키 추가',
+	passkeySubtitle: '더 빠르고, 쉽고, 안전한 로그인을 위해',
+	passkeyAdd: '지금 패스키 추가',
 	passkeyMaybeLater: '나중에',
 	passkeySuccess: '패스키가 준비되었습니다!',
 

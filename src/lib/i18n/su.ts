@@ -11,10 +11,8 @@ const su: AuthMessages = {
 	differentEmail: 'Paké email séjén',
 
 	passkeyCreating: 'Nuju nyieun passkey pikeun anjeun',
-	passkeySubtitle: 'sangkan leuwih gampang asup',
-	passkeySkip: 'Liwat',
-	passkeySetup: 'Setel passkey?',
-	passkeyAdd: 'Tambahkeun passkey',
+	passkeySubtitle: 'pikeun asup langkung gancang, gampang, sareng aman',
+	passkeyAdd: 'Tambahkeun passkey ayeuna',
 	passkeyMaybeLater: 'Engké waé',
 	passkeySuccess: 'Anjeun geus boga passkey!',
 

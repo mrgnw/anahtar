@@ -10,10 +10,8 @@ const de: AuthMessages = {
 	differentEmail: 'Andere E-Mail verwenden',
 
 	passkeyCreating: 'Passkey wird erstellt',
-	passkeySubtitle: 'fur einfacheres Anmelden',
-	passkeySkip: 'Uberspringen',
-	passkeySetup: 'Passkey einrichten?',
-	passkeyAdd: 'Passkey hinzufugen',
+	passkeySubtitle: 'fur schnelleres, einfacheres, sichereres Anmelden',
+	passkeyAdd: 'Passkey jetzt hinzufugen',
 	passkeyMaybeLater: 'Vielleicht spater',
 	passkeySuccess: 'Dein Passkey ist bereit!',
 

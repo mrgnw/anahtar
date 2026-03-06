@@ -10,10 +10,8 @@ const tr: AuthMessages = {
 	differentEmail: 'Baska e-posta kullan',
 
 	passkeyCreating: 'Anahtar olusturuluyor',
-	passkeySubtitle: 'daha kolay giris icin',
-	passkeySkip: 'Atla',
-	passkeySetup: 'Anahtar olustur?',
-	passkeyAdd: 'Anahtar ekle',
+	passkeySubtitle: 'daha hizli, kolay ve guvenli giris icin',
+	passkeyAdd: 'Simdi passkey ekle',
 	passkeyMaybeLater: 'Belki sonra',
 	passkeySuccess: 'Anahtarın hazır!',
 

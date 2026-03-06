@@ -11,10 +11,8 @@ const bn: AuthMessages = {
 	differentEmail: 'অন্য ইমেইল ব্যবহার করুন',
 
 	passkeyCreating: 'আপনার জন্য passkey তৈরি হচ্ছে',
-	passkeySubtitle: 'সহজে লগইনের জন্য',
-	passkeySkip: 'এড়িয়ে যান',
-	passkeySetup: 'Passkey তৈরি করবেন?',
-	passkeyAdd: 'Passkey যোগ করুন',
+	passkeySubtitle: 'দ্রুত, সহজ, নিরাপদ লগইনের জন্য',
+	passkeyAdd: 'এখনই পাসকি যোগ করুন',
 	passkeyMaybeLater: 'পরে হবে',
 	passkeySuccess: 'আপনার passkey তৈরি হয়ে গেছে!',
 

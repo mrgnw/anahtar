@@ -11,10 +11,8 @@ const ru: AuthMessages = {
 	differentEmail: 'Использовать другой email',
 
 	passkeyCreating: 'Создаём passkey',
-	passkeySubtitle: 'для быстрого входа',
-	passkeySkip: 'Пропустить',
-	passkeySetup: 'Создать passkey?',
-	passkeyAdd: 'Добавить passkey',
+	passkeySubtitle: 'для более быстрого, простого и безопасного входа',
+	passkeyAdd: 'Добавить passkey сейчас',
 	passkeyMaybeLater: 'Позже',
 	passkeySuccess: 'Passkey готов!',
 

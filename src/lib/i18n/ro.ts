@@ -11,10 +11,8 @@ const ro: AuthMessages = {
 	differentEmail: 'Folosește alt email',
 
 	passkeyCreating: 'Se creează un passkey',
-	passkeySubtitle: 'pentru autentificare mai ușoară',
-	passkeySkip: 'Omite',
-	passkeySetup: 'Configurezi un passkey?',
-	passkeyAdd: 'Adaugă passkey',
+	passkeySubtitle: 'pentru autentificare mai rapida, usoara si sigura',
+	passkeyAdd: 'Adauga passkey acum',
 	passkeyMaybeLater: 'Poate mai târziu',
 	passkeySuccess: 'Ai un passkey!',
 

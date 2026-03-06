@@ -11,10 +11,8 @@ const sw: AuthMessages = {
 	differentEmail: 'Tumia barua pepe nyingine',
 
 	passkeyCreating: 'Tunakutengenezea passkey',
-	passkeySubtitle: 'kwa kuingia kwa urahisi',
-	passkeySkip: 'Ruka',
-	passkeySetup: 'Weka passkey?',
-	passkeyAdd: 'Ongeza passkey',
+	passkeySubtitle: 'kwa kuingia kwa haraka, rahisi na salama zaidi',
+	passkeyAdd: 'Ongeza passkey sasa',
 	passkeyMaybeLater: 'Labda baadaye',
 	passkeySuccess: 'Una passkey!',
 

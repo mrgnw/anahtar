@@ -11,10 +11,8 @@ const jv: AuthMessages = {
 	differentEmail: 'Nganggo email liya',
 
 	passkeyCreating: 'Nggawekna passkey kanggo sampeyan',
-	passkeySubtitle: 'supaya login luwih gampang',
-	passkeySkip: 'Lewati',
-	passkeySetup: 'Setel passkey?',
-	passkeyAdd: 'Tambah passkey',
+	passkeySubtitle: 'kanggo login luwih cepet, gampang, lan aman',
+	passkeyAdd: 'Tambah passkey saiki',
 	passkeyMaybeLater: 'Mengko wae',
 	passkeySuccess: 'Passkey sampeyan wis siyap!',
 

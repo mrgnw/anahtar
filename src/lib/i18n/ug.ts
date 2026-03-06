@@ -11,10 +11,8 @@ const ug: AuthMessages = {
 	differentEmail: 'باشقا ئېلخەت ئىشلىتىش',
 
 	passkeyCreating: 'passkey ھاسىل قىلىنىۋاتىدۇ',
-	passkeySubtitle: 'تېخىمۇ ئاسان كىرىش ئۈچۈن',
-	passkeySkip: 'ئاتلاش',
-	passkeySetup: 'Passkey تەڭشەمسىز؟',
-	passkeyAdd: 'Passkey قوشۇش',
+	passkeySubtitle: 'تېزرەك، ئاسانراق، بىخەتەررەك كىرىش ئۈچۈن',
+	passkeyAdd: 'ھازىر passkey قوشۇڭ',
 	passkeyMaybeLater: 'كېيىن بولسىمۇ بولىدۇ',
 	passkeySuccess: 'Passkey ھاسىل بولدى!',
 

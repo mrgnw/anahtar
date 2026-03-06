@@ -11,10 +11,8 @@ const assamese: AuthMessages = {
 	differentEmail: 'বেলেগ ইমেইল ব্যৱহাৰ কৰক',
 
 	passkeyCreating: 'Passkey তৈয়াৰ কৰি আছে',
-	passkeySubtitle: 'সহজে লগ ইনৰ বাবে',
-	passkeySkip: 'এৰক',
-	passkeySetup: 'Passkey ছেট আপ কৰিবনে?',
-	passkeyAdd: 'Passkey যোগ কৰক',
+	passkeySubtitle: 'দ্ৰুত, সহজ, নিৰাপদ লগইনৰ বাবে',
+	passkeyAdd: 'এতিয়াই পাছকি যোগ কৰক',
 	passkeyMaybeLater: 'পিছত হ\'ব',
 	passkeySuccess: 'আপোনাৰ passkey সাজু!',
 

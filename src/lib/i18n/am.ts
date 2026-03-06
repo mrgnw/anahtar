@@ -11,10 +11,8 @@ const am: AuthMessages = {
 	differentEmail: 'ሌላ ኢሜይል ተጠቀም',
 
 	passkeyCreating: 'Passkey እየሠራንልህ ነው',
-	passkeySubtitle: 'ለቀላል መግቢያ',
-	passkeySkip: 'ዝለል',
-	passkeySetup: 'Passkey ማዘጋጀት ትፈልጋለህ?',
-	passkeyAdd: 'Passkey ጨምር',
+	passkeySubtitle: 'ፈጣን፣ ቀላል፣ ደህንነቱ የተጠበቀ ግባ',
+	passkeyAdd: 'አሁን passkey ጨምር',
 	passkeyMaybeLater: 'ሌላ ጊዜ',
 	passkeySuccess: 'Passkey አለህ!',
 

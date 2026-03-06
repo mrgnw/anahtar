@@ -11,10 +11,8 @@ const gu: AuthMessages = {
 	differentEmail: 'બીજો ઈમેલ વાપરો',
 
 	passkeyCreating: 'તમારા માટે passkey બનાવી રહ્યા છીએ',
-	passkeySubtitle: 'સરળ લૉગિન માટે',
-	passkeySkip: 'છોડો',
-	passkeySetup: 'Passkey સેટ કરવી છે?',
-	passkeyAdd: 'Passkey ઉમેરો',
+	passkeySubtitle: 'ઝડપી, સરળ, સુરક્ષિત લૉગિન માટે',
+	passkeyAdd: 'હમણાં પાસકી ઉમેરો',
 	passkeyMaybeLater: 'કદાચ પછી',
 	passkeySuccess: 'તમારી passkey તૈયાર છે!',
 

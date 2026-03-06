@@ -11,10 +11,8 @@ const st: AuthMessages = {
 	differentEmail: 'Sebelisa imeile e fapaneng',
 
 	passkeyCreating: 'Re o etsetsa passkey',
-	passkeySubtitle: 'bakeng sa ho kena ha bonolo',
-	passkeySkip: 'Tlola',
-	passkeySetup: 'Beha passkey?',
-	passkeyAdd: 'Kenya passkey',
+	passkeySubtitle: 'bakeng sa ho kena ka potlako, bonolo le polokeho',
+	passkeyAdd: 'Kenya passkey hona joale',
 	passkeyMaybeLater: 'Mohlomong hamorao',
 	passkeySuccess: 'O na le passkey!',
 

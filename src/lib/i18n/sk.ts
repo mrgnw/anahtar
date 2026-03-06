@@ -11,10 +11,8 @@ const sk: AuthMessages = {
 	differentEmail: 'Pouzit iny e-mail',
 
 	passkeyCreating: 'Vytvarame vam passkey',
-	passkeySubtitle: 'pre jednoduchsie prihlasenie',
-	passkeySkip: 'Preskocit',
-	passkeySetup: 'Nastavit passkey?',
-	passkeyAdd: 'Pridat passkey',
+	passkeySubtitle: 'pre rychlejsie, jednoduchsie a bezpecnejsie prihlasenie',
+	passkeyAdd: 'Pridat passkey teraz',
 	passkeyMaybeLater: 'Mozno neskor',
 	passkeySuccess: 'Vas passkey je pripraveny!',
 

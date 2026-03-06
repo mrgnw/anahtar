@@ -11,10 +11,8 @@ const ff: AuthMessages = {
 	differentEmail: 'Huutoro email goɗɗo',
 
 	passkeyCreating: 'Miɗen waɗana passkey',
-	passkeySubtitle: 'ngam naatugol newungol',
-	passkeySkip: 'Dunnu',
-	passkeySetup: 'Waɗu passkey?',
-	passkeyAdd: 'Ɓeydu passkey',
+	passkeySubtitle: 'ngam seŗtaade ɓurɗo, newaare, ɓurɗo hisde',
+	passkeyAdd: 'Ɓeydu passkey jooni',
 	passkeyMaybeLater: 'Batte hande',
 	passkeySuccess: 'A heɓii passkey!',
 

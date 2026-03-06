@@ -11,10 +11,8 @@ const bg: AuthMessages = {
 	differentEmail: 'Използвай друг имейл',
 
 	passkeyCreating: 'Създаваме ви passkey',
-	passkeySubtitle: 'за по-лесно влизане',
-	passkeySkip: 'Пропусни',
-	passkeySetup: 'Да настроим passkey?',
-	passkeyAdd: 'Добави passkey',
+	passkeySubtitle: 'за по-бързо, по-лесно, по-сигурно влизане',
+	passkeyAdd: 'Добави passkey сега',
 	passkeyMaybeLater: 'По-късно',
 	passkeySuccess: 'Вашият passkey е готов!',
 

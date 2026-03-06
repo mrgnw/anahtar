@@ -11,10 +11,8 @@ const si: AuthMessages = {
 	differentEmail: 'වෙනත් ඊමේල් එකක් භාවිතා කරන්න',
 
 	passkeyCreating: 'Passkey එකක් සාදමින්',
-	passkeySubtitle: 'පහසු පිවිසුම සඳහා',
-	passkeySkip: 'මඟහරින්න',
-	passkeySetup: 'Passkey එකක් සකසන්නද?',
-	passkeyAdd: 'Passkey එකක් එකතු කරන්න',
+	passkeySubtitle: 'වේගවත්, පහසු, ආරක්ෂිත පුරනය සඳහා',
+	passkeyAdd: 'දැන් passkey එකතු කරන්න',
 	passkeyMaybeLater: 'පසුව සමහරවිට',
 	passkeySuccess: 'ඔබට passkey එකක් තිබේ!',
 

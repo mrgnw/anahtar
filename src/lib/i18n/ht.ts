@@ -11,10 +11,8 @@ const ht: AuthMessages = {
 	differentEmail: 'Itilize yon lòt imèl',
 
 	passkeyCreating: 'N ap kreye yon passkey pou ou',
-	passkeySubtitle: 'pou konekte pi fasil',
-	passkeySkip: 'Pase',
-	passkeySetup: 'Konfigire yon passkey?',
-	passkeyAdd: 'Ajoute passkey',
+	passkeySubtitle: 'pou koneksyon pi rapid, pi fasil, pi sekirize',
+	passkeyAdd: 'Ajoute passkey kounye a',
 	passkeyMaybeLater: 'Petèt pita',
 	passkeySuccess: 'Ou gen yon passkey!',
 

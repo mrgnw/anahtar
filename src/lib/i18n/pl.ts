@@ -11,10 +11,8 @@ const pl: AuthMessages = {
 	differentEmail: 'Użyj innego emaila',
 
 	passkeyCreating: 'Tworzenie klucza dostępu',
-	passkeySubtitle: 'aby łatwiej się logować',
-	passkeySkip: 'Pomiń',
-	passkeySetup: 'Skonfigurować klucz dostępu?',
-	passkeyAdd: 'Dodaj klucz dostępu',
+	passkeySubtitle: 'dla szybszego, latwiejszego i bezpieczniejszego logowania',
+	passkeyAdd: 'Dodaj passkey teraz',
 	passkeyMaybeLater: 'Może później',
 	passkeySuccess: 'Masz klucz dostępu!',
 

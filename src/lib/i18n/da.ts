@@ -11,10 +11,8 @@ const da: AuthMessages = {
 	differentEmail: 'Brug en anden e-mail',
 
 	passkeyCreating: 'Opretter en passkey',
-	passkeySubtitle: 'for nemmere login',
-	passkeySkip: 'Spring over',
-	passkeySetup: 'Opsæt en passkey?',
-	passkeyAdd: 'Tilføj passkey',
+	passkeySubtitle: 'for hurtigere, nemmere og sikrere login',
+	passkeyAdd: 'Tilføj passkey nu',
 	passkeyMaybeLater: 'Måske senere',
 	passkeySuccess: 'Du har en passkey!',
 

@@ -11,10 +11,8 @@ const ms: AuthMessages = {
 	differentEmail: 'Guna e-mel lain',
 
 	passkeyCreating: 'Mencipta passkey anda',
-	passkeySubtitle: 'untuk log masuk lebih mudah',
-	passkeySkip: 'Langkau',
-	passkeySetup: 'Sediakan passkey?',
-	passkeyAdd: 'Tambah passkey',
+	passkeySubtitle: 'untuk log masuk lebih pantas, mudah dan selamat',
+	passkeyAdd: 'Tambah passkey sekarang',
 	passkeyMaybeLater: 'Mungkin nanti',
 	passkeySuccess: 'Passkey anda sudah sedia!',
 

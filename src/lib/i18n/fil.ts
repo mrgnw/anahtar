@@ -11,10 +11,8 @@ const fil: AuthMessages = {
 	differentEmail: 'Gumamit ng ibang email',
 
 	passkeyCreating: 'Gumagawa ng passkey para sa iyo',
-	passkeySubtitle: 'para mas madaling mag-login',
-	passkeySkip: 'Laktawan',
-	passkeySetup: 'Mag-set up ng passkey?',
-	passkeyAdd: 'Magdagdag ng passkey',
+	passkeySubtitle: 'para sa mas mabilis, madali, at ligtas na pag-login',
+	passkeyAdd: 'Magdagdag ng passkey ngayon',
 	passkeyMaybeLater: 'Mamaya na lang',
 	passkeySuccess: 'Mayroon ka nang passkey!',
 

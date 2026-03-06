@@ -11,10 +11,8 @@ const yo: AuthMessages = {
 	differentEmail: 'Lo àdírẹ́sì ímeèlì mìíràn',
 
 	passkeyCreating: 'A ń ṣe passkey fún ẹ',
-	passkeySubtitle: 'fún ìwọlé tó rọrùn',
-	passkeySkip: 'Fojú fo',
-	passkeySetup: 'Ṣètò passkey?',
-	passkeyAdd: 'Fi passkey kún',
+	passkeySubtitle: 'fun wiwọle yiyara, irọrun, ati ailewu',
+	passkeyAdd: 'Fi passkey kun bayi',
 	passkeyMaybeLater: 'Bóyá nígbàmíì',
 	passkeySuccess: 'O ti ní passkey!',
 

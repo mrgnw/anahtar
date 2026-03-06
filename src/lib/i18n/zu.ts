@@ -11,10 +11,8 @@ const zu: AuthMessages = {
 	differentEmail: 'Sebenzisa enye i-imeyili',
 
 	passkeyCreating: 'Sikwenzela passkey',
-	passkeySubtitle: 'ukuze ungene kalula',
-	passkeySkip: 'Yeqa',
-	passkeySetup: 'Setha passkey?',
-	passkeyAdd: 'Engeza passkey',
+	passkeySubtitle: 'ukungena ngokushesha, okulula nokulondekile',
+	passkeyAdd: 'Engeza passkey manje',
 	passkeyMaybeLater: 'Mhlawumbe kamuva',
 	passkeySuccess: 'Unayo passkey!',
 

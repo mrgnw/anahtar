@@ -11,10 +11,8 @@ const kn: AuthMessages = {
 	differentEmail: 'ಬೇರೆ ಇಮೇಲ್ ಬಳಸಿ',
 
 	passkeyCreating: 'ನಿಮಗಾಗಿ passkey ರಚಿಸಲಾಗುತ್ತಿದೆ',
-	passkeySubtitle: 'ಸುಲಭ ಲಾಗಿನ್‌ಗಾಗಿ',
-	passkeySkip: 'ಬಿಡಿ',
-	passkeySetup: 'Passkey ಹೊಂದಿಸುವುದೇ?',
-	passkeyAdd: 'Passkey ಸೇರಿಸಿ',
+	passkeySubtitle: 'ವೇಗವಾದ, ಸುಲಭ, ಸುರಕ್ಷಿತ ಲಾಗಿನ್‌ಗಾಗಿ',
+	passkeyAdd: 'ಈಗ ಪಾಸ್‌ಕೀ ಸೇರಿಸಿ',
 	passkeyMaybeLater: 'ಆಮೇಲೆ ನೋಡೋಣ',
 	passkeySuccess: 'ನಿಮ್ಮ passkey ಸಿದ್ಧವಾಗಿದೆ!',
 

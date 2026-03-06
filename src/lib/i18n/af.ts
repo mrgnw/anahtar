@@ -11,10 +11,8 @@ const af: AuthMessages = {
 	differentEmail: 'Gebruik \'n ander e-pos',
 
 	passkeyCreating: 'Ons skep jou passkey',
-	passkeySubtitle: 'vir makliker aanmelding',
-	passkeySkip: 'Slaan oor',
-	passkeySetup: 'Stel \'n passkey op?',
-	passkeyAdd: 'Voeg passkey by',
+	passkeySubtitle: 'vir vinniger, makliker, veiliger aanmelding',
+	passkeyAdd: 'Voeg nou passkey by',
 	passkeyMaybeLater: 'Miskien later',
 	passkeySuccess: 'Jy het \'n passkey!',
 

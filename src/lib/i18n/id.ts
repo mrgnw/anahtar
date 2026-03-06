@@ -11,10 +11,8 @@ const id: AuthMessages = {
 	differentEmail: 'Gunakan email lain',
 
 	passkeyCreating: 'Membuat passkey untuk Anda',
-	passkeySubtitle: 'agar login lebih mudah',
-	passkeySkip: 'Lewati',
-	passkeySetup: 'Buat passkey?',
-	passkeyAdd: 'Tambah passkey',
+	passkeySubtitle: 'untuk login lebih cepat, mudah, dan aman',
+	passkeyAdd: 'Tambahkan passkey sekarang',
 	passkeyMaybeLater: 'Nanti saja',
 	passkeySuccess: 'Passkey Anda siap!',
 

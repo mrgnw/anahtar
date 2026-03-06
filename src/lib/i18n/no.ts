@@ -11,10 +11,8 @@ const no: AuthMessages = {
 	differentEmail: 'Bruk en annen e-post',
 
 	passkeyCreating: 'Oppretter en passkey',
-	passkeySubtitle: 'for enklere innlogging',
-	passkeySkip: 'Hopp over',
-	passkeySetup: 'Sett opp en passkey?',
-	passkeyAdd: 'Legg til passkey',
+	passkeySubtitle: 'for raskere, enklere og sikrere innlogging',
+	passkeyAdd: 'Legg til passkey na',
 	passkeyMaybeLater: 'Kanskje senere',
 	passkeySuccess: 'Du har en passkey!',
 

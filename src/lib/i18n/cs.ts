@@ -11,10 +11,8 @@ const cs: AuthMessages = {
 	differentEmail: 'Použít jiný e-mail',
 
 	passkeyCreating: 'Vytváříme vám passkey',
-	passkeySubtitle: 'pro snazší přihlášení',
-	passkeySkip: 'Přeskočit',
-	passkeySetup: 'Nastavit passkey?',
-	passkeyAdd: 'Přidat passkey',
+	passkeySubtitle: 'pro rychlejsi, snazsi a bezpecnejsi prihlaseni',
+	passkeyAdd: 'Pridat passkey nyni',
 	passkeyMaybeLater: 'Možná později',
 	passkeySuccess: 'Máte passkey!',
 

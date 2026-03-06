@@ -11,10 +11,8 @@ const sv: AuthMessages = {
 	differentEmail: 'Använd en annan e-post',
 
 	passkeyCreating: 'Skapar en passkey',
-	passkeySubtitle: 'för enklare inloggning',
-	passkeySkip: 'Hoppa över',
-	passkeySetup: 'Skapa en passkey?',
-	passkeyAdd: 'Lägg till passkey',
+	passkeySubtitle: 'for snabbare, enklare och sakrare inloggning',
+	passkeyAdd: 'Lagg till passkey nu',
 	passkeyMaybeLater: 'Kanske senare',
 	passkeySuccess: 'Din passkey är klar!',
 

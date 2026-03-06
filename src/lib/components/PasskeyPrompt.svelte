@@ -38,9 +38,15 @@ async function triggerRegistration() {
 		await onRegister();
 	} catch {
 		failed = true;
+		countdown = countdownSeconds;
 	} finally {
 		registering = false;
 	}
+}
+
+function registerNow() {
+	if (interval) { clearInterval(interval); interval = null; }
+	triggerRegistration();
 }
 
 let circumference = 2 * Math.PI * 40;
@@ -50,7 +56,7 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 <div class="anahtar-passkey-prompt">
 	<button
 		class="anahtar-passkey-ring"
-		onclick={() => { if (interval) { clearInterval(interval); interval = null; } triggerRegistration(); }}
+		onclick={registerNow}
 		disabled={registering}
 		title="Set up now"
 	>
@@ -77,17 +83,12 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 		</div>
 	</button>
 
-	{#if !failed}
-		<p class="anahtar-passkey-title">{m.passkeyCreating}</p>
-		<p class="anahtar-passkey-subtitle">{m.passkeySubtitle}</p>
-		<button onclick={onSkip} class="anahtar-passkey-skip">{m.passkeySkip}</button>
-	{:else}
-		<p class="anahtar-passkey-title">{m.passkeySetup}</p>
-		<button onclick={triggerRegistration} class="anahtar-passkey-add" disabled={registering}>
-			{m.passkeyAdd}
-		</button>
-		<button onclick={onSkip} class="anahtar-passkey-skip">{m.passkeyMaybeLater}</button>
-	{/if}
+	<p class="anahtar-passkey-title">{m.passkeyCreating}</p>
+	<p class="anahtar-passkey-subtitle">{m.passkeySubtitle}</p>
+	<button onclick={registerNow} class="anahtar-passkey-add" disabled={registering}>
+		{m.passkeyAdd}
+	</button>
+	<button onclick={onSkip} class="anahtar-passkey-later">{m.passkeyMaybeLater}</button>
 </div>
 
 <style>
@@ -101,7 +102,7 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 		position: relative;
 		width: 7rem;
 		height: 7rem;
-		margin-bottom: 1.5rem;
+		margin-bottom: 1rem;
 		background: none;
 		border: none;
 		padding: 0;
@@ -153,7 +154,7 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 	.anahtar-passkey-subtitle {
 		font-size: 0.875rem;
 		opacity: 0.6;
-		margin-bottom: 1.5rem;
+		margin-bottom: 1.25rem;
 	}
 
 	.anahtar-passkey-add {
@@ -161,12 +162,13 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 		padding: 0.5rem;
 		font-size: 0.875rem;
 		font-weight: 500;
+		font-family: inherit;
 		border-radius: 0.375rem;
 		background: var(--anahtar-primary, #3b82f6);
 		color: var(--anahtar-primary-fg, #fff);
 		border: none;
 		cursor: pointer;
-		margin-bottom: 0.75rem;
+		margin-bottom: 0.5rem;
 	}
 
 	.anahtar-passkey-add:hover {
@@ -177,16 +179,17 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 		opacity: 0.5;
 	}
 
-	.anahtar-passkey-skip {
+	.anahtar-passkey-later {
 		font-size: 0.75rem;
 		opacity: 0.6;
 		background: none;
 		border: none;
 		cursor: pointer;
 		color: inherit;
+		font-family: inherit;
 	}
 
-	.anahtar-passkey-skip:hover {
+	.anahtar-passkey-later:hover {
 		opacity: 1;
 	}
 </style>

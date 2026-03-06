@@ -11,10 +11,8 @@ const pa: AuthMessages = {
 	differentEmail: 'ਵੱਖਰੀ ਈਮੇਲ ਵਰਤੋ',
 
 	passkeyCreating: 'ਤੁਹਾਡੇ ਲਈ passkey ਬਣਾ ਰਹੇ ਹਾਂ',
-	passkeySubtitle: 'ਅਸਾਨ ਲੌਗਇਨ ਲਈ',
-	passkeySkip: 'ਛੱਡੋ',
-	passkeySetup: 'Passkey ਬਣਾਉਣੀ ਹੈ?',
-	passkeyAdd: 'Passkey ਜੋੜੋ',
+	passkeySubtitle: 'ਤੇਜ਼, ਆਸਾਨ, ਸੁਰੱਖਿਅਤ ਲੌਗਇਨ ਲਈ',
+	passkeyAdd: 'ਹੁਣੇ ਪਾਸਕੀ ਸ਼ਾਮਲ ਕਰੋ',
 	passkeyMaybeLater: 'ਬਾਅਦ ਵਿੱਚ',
 	passkeySuccess: 'ਤੁਹਾਡੀ passkey ਤਿਆਰ ਹੈ!',
 

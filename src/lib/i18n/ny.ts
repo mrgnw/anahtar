@@ -11,10 +11,8 @@ const ny: AuthMessages = {
 	differentEmail: 'Gwiritsani ntchito imelo ina',
 
 	passkeyCreating: 'Tikukupangirani passkey',
-	passkeySubtitle: 'kuti mulowe mosavuta',
-	passkeySkip: 'Dumphani',
-	passkeySetup: 'Khazikitsani passkey?',
-	passkeyAdd: 'Onjezani passkey',
+	passkeySubtitle: 'kuti mulowe mwachangu, mosavuta, motetezeka',
+	passkeyAdd: 'Onjezani passkey tsopano',
 	passkeyMaybeLater: 'Mwina pambuyo pake',
 	passkeySuccess: 'Muli ndi passkey!',
 

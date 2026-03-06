@@ -11,10 +11,8 @@ const ps: AuthMessages = {
 	differentEmail: 'بل بریښنالیک وکاروئ',
 
 	passkeyCreating: 'ستاسو لپاره passkey جوړیږي',
-	passkeySubtitle: 'د اسانه ننوتلو لپاره',
-	passkeySkip: 'تېر کړئ',
-	passkeySetup: 'Passkey جوړ کړئ؟',
-	passkeyAdd: 'Passkey اضافه کړئ',
+	passkeySubtitle: 'د ګړندي، اسانه، خوندي ننوتلو لپاره',
+	passkeyAdd: 'اوس پاسکي اضافه کړئ',
 	passkeyMaybeLater: 'شاید وروسته',
 	passkeySuccess: 'ستاسو passkey چمتو دی!',
 

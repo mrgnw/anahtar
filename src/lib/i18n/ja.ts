@@ -10,10 +10,8 @@ const ja: AuthMessages = {
 	differentEmail: '別のメールアドレスを使用',
 
 	passkeyCreating: 'パスキーを作成中',
-	passkeySubtitle: 'より簡単にログイン',
-	passkeySkip: 'スキップ',
-	passkeySetup: 'パスキーを設定しますか？',
-	passkeyAdd: 'パスキーを追加',
+	passkeySubtitle: 'より速く、簡単で、安全なログインのために',
+	passkeyAdd: '今すぐパスキーを追加',
 	passkeyMaybeLater: 'あとで',
 	passkeySuccess: 'パスキーの準備ができました！',
 

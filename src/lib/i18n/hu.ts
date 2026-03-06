@@ -11,10 +11,8 @@ const hu: AuthMessages = {
 	differentEmail: 'Másik e-mail használata',
 
 	passkeyCreating: 'Passkey létrehozása',
-	passkeySubtitle: 'a könnyebb bejelentkezéshez',
-	passkeySkip: 'Kihagyás',
-	passkeySetup: 'Passkey beállítása?',
-	passkeyAdd: 'Passkey hozzáadása',
+	passkeySubtitle: 'gyorsabb, konnyebb es biztonsagosabb belepes',
+	passkeyAdd: 'Passkey hozzaadasa most',
 	passkeyMaybeLater: 'Talán később',
 	passkeySuccess: 'Passkey kész!',
 

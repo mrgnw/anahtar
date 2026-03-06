@@ -11,10 +11,8 @@ const ig: AuthMessages = {
 	differentEmail: 'Jiri email ọzọ',
 
 	passkeyCreating: 'Anyị na-emepụtara gị passkey',
-	passkeySubtitle: 'maka ịbanye nʼụzọ dị mfe',
-	passkeySkip: 'Fegharịa',
-	passkeySetup: 'Tọọ passkey?',
-	passkeyAdd: 'Tinye passkey',
+	passkeySubtitle: 'maka nbanye ọsọ, dị mfe, nchekwa karịa',
+	passkeyAdd: 'Tinye passkey ugbu a',
 	passkeyMaybeLater: 'Eleghị anya emechaa',
 	passkeySuccess: 'Ị nwere passkey!',
 

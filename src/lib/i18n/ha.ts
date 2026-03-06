@@ -11,10 +11,8 @@ const ha: AuthMessages = {
 	differentEmail: 'Yi amfani da wani imel',
 
 	passkeyCreating: 'Ana samar maka da passkey',
-	passkeySubtitle: 'don sauƙin shiga',
-	passkeySkip: 'Tsallake',
-	passkeySetup: 'Saita passkey?',
-	passkeyAdd: 'Ƙara passkey',
+	passkeySubtitle: 'don shiga da sauri, sauƙi, da aminci',
+	passkeyAdd: 'Ƙara passkey yanzu',
 	passkeyMaybeLater: 'Watakila daga baya',
 	passkeySuccess: 'Kana da passkey yanzu!',
 

@@ -11,10 +11,8 @@ const hy: AuthMessages = {
 	differentEmail: 'Օգտագործել այլ էլ. հասցե',
 
 	passkeyCreating: 'Passkey ենք ստեղծում ձեզ համար',
-	passkeySubtitle: 'ավելի հեշտ մուտքի համար',
-	passkeySkip: 'Բաց թողնել',
-	passkeySetup: 'Կարգավորե՞լ passkey՝',
-	passkeyAdd: 'Ավելացնել passkey',
+	passkeySubtitle: ' delays avoreli arag, heshtm yev anvtang mtk',
+	passkeyAdd: 'Avelacnel passkey hima',
 	passkeyMaybeLater: 'Գուցե ավելի ուշ',
 	passkeySuccess: 'Դուք ունեք passkey։',
 

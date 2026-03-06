@@ -11,10 +11,8 @@ const my: AuthMessages = {
 	differentEmail: 'အခြားအီးမေးလ် သုံးရန်',
 
 	passkeyCreating: 'သင့်အတွက် passkey ပြုလုပ်နေသည်',
-	passkeySubtitle: 'လွယ်ကူစွာ ဝင်ရောက်ရန်',
-	passkeySkip: 'ကျော်ရန်',
-	passkeySetup: 'Passkey ထည့်သွင်းမလား?',
-	passkeyAdd: 'Passkey ထည့်ရန်',
+	passkeySubtitle: 'ပိုမြန်၊ ပိုလွယ်၊ ပိုလုံခြုံသော login အတွက်',
+	passkeyAdd: 'ယခု passkey ထည့်ပါ',
 	passkeyMaybeLater: 'နောက်မှပါ',
 	passkeySuccess: 'သင့်မှာ passkey ရှိပါပြီ!',
 

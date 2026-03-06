@@ -11,10 +11,8 @@ const uz: AuthMessages = {
 	differentEmail: 'Boshqa email ishlatish',
 
 	passkeyCreating: 'Sizga passkey yaratilmoqda',
-	passkeySubtitle: 'oson kirish uchun',
-	passkeySkip: 'Oʻtkazib yuborish',
-	passkeySetup: 'Passkey sozlash?',
-	passkeyAdd: 'Passkey qoʻshish',
+	passkeySubtitle: 'tezroq, osonroq va xavfsizroq kirish uchun',
+	passkeyAdd: 'Hozir passkey qo'shing',
 	passkeyMaybeLater: 'Keyinroq',
 	passkeySuccess: 'Passkey tayyor!',
 

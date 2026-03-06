@@ -11,10 +11,8 @@ const te: AuthMessages = {
 	differentEmail: 'వేరే ఇమెయిల్ వాడు',
 
 	passkeyCreating: 'మీ కోసం passkey తయారు చేస్తోంది',
-	passkeySubtitle: 'సులభంగా లాగిన్ అవడానికి',
-	passkeySkip: 'దాటవేయి',
-	passkeySetup: 'Passkey ఏర్పాటు చేయాలా?',
-	passkeyAdd: 'Passkey జోడించు',
+	passkeySubtitle: 'వేగవంతమైన, సులభమైన, సురక్షితమైన లాగిన్ కోసం',
+	passkeyAdd: 'ఇప్పుడు పాస్‌కీ జోడించండి',
 	passkeyMaybeLater: 'తర్వాత',
 	passkeySuccess: 'మీ passkey సిద్ధంగా ఉంది!',
 

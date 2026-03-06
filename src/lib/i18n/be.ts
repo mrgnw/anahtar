@@ -11,10 +11,8 @@ const be: AuthMessages = {
 	differentEmail: 'Выкарыстаць іншы email',
 
 	passkeyCreating: 'Ствараем вам passkey',
-	passkeySubtitle: 'для лягчэйшага ўваходу',
-	passkeySkip: 'Прапусціць',
-	passkeySetup: 'Наладзіць passkey?',
-	passkeyAdd: 'Дадаць passkey',
+	passkeySubtitle: 'для хутчэйшага, прасцейшага, бяспечнейшага ўваходу',
+	passkeyAdd: 'Дадаць passkey зараз',
 	passkeyMaybeLater: 'Можа, пазней',
 	passkeySuccess: 'У вас ёсць passkey!',
 

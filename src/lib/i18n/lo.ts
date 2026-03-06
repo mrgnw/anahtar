@@ -11,10 +11,8 @@ const lo: AuthMessages = {
 	differentEmail: 'ໃຊ້ອີເມວອື່ນ',
 
 	passkeyCreating: 'ກຳລັງສ້າງ passkey ໃຫ້ທ່ານ',
-	passkeySubtitle: 'ເພື່ອເຂົ້າລະບົບງ່າຍຂຶ້ນ',
-	passkeySkip: 'ຂ້າມ',
-	passkeySetup: 'ຕັ້ງຄ່າ passkey ບໍ?',
-	passkeyAdd: 'ເພີ່ມ passkey',
+	passkeySubtitle: 'ສຳລັບການເຂົ້າສູ່ລະບົບທີ່ໄວ, ງ່າຍ, ປອດໄພກວ່າ',
+	passkeyAdd: 'ເພີ່ມ passkey ດຽວນີ້',
 	passkeyMaybeLater: 'ໄວ້ທີຫຼັງ',
 	passkeySuccess: 'ທ່ານມີ passkey ແລ້ວ!',
 

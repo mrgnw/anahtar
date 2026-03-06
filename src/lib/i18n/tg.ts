@@ -11,10 +11,8 @@ const tg: AuthMessages = {
 	differentEmail: 'Почтаи дигар истифода баред',
 
 	passkeyCreating: 'Passkey сохта истодааст',
-	passkeySubtitle: 'барои вуруди осонтар',
-	passkeySkip: 'Гузаштан',
-	passkeySetup: 'Passkey танзим кунед?',
-	passkeyAdd: 'Passkey илова кунед',
+	passkeySubtitle: 'барои воридшавии тезтар, осонтар ва бехатартар',
+	passkeyAdd: 'Ҳозир passkey илова кунед',
 	passkeyMaybeLater: 'Шояд баъдтар',
 	passkeySuccess: 'Шумо passkey доред!',
 

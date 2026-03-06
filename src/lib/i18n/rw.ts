@@ -11,10 +11,8 @@ const rw: AuthMessages = {
 	differentEmail: 'Koresha imeyili itandukanye',
 
 	passkeyCreating: 'Tugukoresha passkey',
-	passkeySubtitle: 'kugira ngo winjire byoroshye',
-	passkeySkip: 'Simbuka',
-	passkeySetup: 'Gushyiraho passkey?',
-	passkeyAdd: 'Ongeraho passkey',
+	passkeySubtitle: 'kugira kwinjira byihuse, byoroshye, byizewe',
+	passkeyAdd: 'Ongeramo passkey ubu',
 	passkeyMaybeLater: 'Birashoboka nyuma',
 	passkeySuccess: 'Ufite passkey!',
 
