@@ -196,12 +196,12 @@ AuthFlow handles everything: email input with conditional WebAuthn (passkey auto
 
 Props:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `apiBase` | `string` | `'/api/auth'` | Base path for auth API routes |
-| `locale` | `string` | auto-detected | Language code (e.g. `'fr'`, `'ja'`) |
-| `messages` | `Partial<AuthMessages>` | — | Override specific UI strings |
-| `onSuccess` | `() => void` | — | Called after successful login |
+| Prop        | Type                    | Default       | Description                         |
+| ----------- | ----------------------- | ------------- | ----------------------------------- |
+| `apiBase`   | `string`                | `'/api/auth'` | Base path for auth API routes       |
+| `locale`    | `string`                | auto-detected | Language code (e.g. `'fr'`, `'ja'`) |
+| `messages`  | `Partial<AuthMessages>` | —             | Override specific UI strings        |
+| `onSuccess` | `() => void`            | —             | Called after successful login       |
 
 ### AuthPill — compact inline auth
 
@@ -245,16 +245,16 @@ With passkey management (lets the user view, add, and remove passkeys):
 
 Props:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `apiBase` | `string` | `'/api/auth'` | Base path for auth API routes |
-| `user` | `{ email: string } \| null` | `null` | Current user — controls signed-in vs signed-out state |
-| `locale` | `string` | auto-detected | Language code (e.g. `'es'`, `'de'`) |
-| `messages` | `Partial<AuthMessages>` | — | Override specific UI strings |
-| `onSuccess` | `() => void` | — | Called after successful sign-in |
-| `onSignOut` | `() => void` | — | Called when user clicks sign out (you handle the fetch) |
-| `onPasskeysChange` | `() => void` | — | Called after a passkey is added or removed |
-| `getPasskeys` | `() => Promise<PasskeyInfo[]>` | — | If provided, enables passkey management panel |
+| Prop               | Type                           | Default       | Description                                             |
+| ------------------ | ------------------------------ | ------------- | ------------------------------------------------------- |
+| `apiBase`          | `string`                       | `'/api/auth'` | Base path for auth API routes                           |
+| `user`             | `{ email: string } \| null`    | `null`        | Current user — controls signed-in vs signed-out state   |
+| `locale`           | `string`                       | auto-detected | Language code (e.g. `'es'`, `'de'`)                     |
+| `messages`         | `Partial<AuthMessages>`        | —             | Override specific UI strings                            |
+| `onSuccess`        | `() => void`                   | —             | Called after successful sign-in                         |
+| `onSignOut`        | `() => void`                   | —             | Called when user clicks sign out (you handle the fetch) |
+| `onPasskeysChange` | `() => void`                   | —             | Called after a passkey is added or removed              |
+| `getPasskeys`      | `() => Promise<PasskeyInfo[]>` | —             | If provided, enables passkey management panel           |
 
 `PasskeyInfo` shape: `{ id: string; credentialId?: string; name?: string | null; createdAt?: number }`
 
@@ -433,17 +433,21 @@ Override specific strings:
 ### Using i18n in your own UI
 
 ```ts
-import { resolveMessages, detectLocaleClient, locales } from '@mrgnw/anahtar/components';
+import {
+  resolveMessages,
+  detectLocaleClient,
+  locales,
+} from "@mrgnw/anahtar/components";
 
 // Auto-detect + resolve
 const m = resolveMessages(detectLocaleClient());
 // → m.continue, m.emailPlaceholder, m.errorInvalidCode, etc.
 
 // Specific locale with overrides
-const m = resolveMessages('de', { continue: 'Anmelden' });
+const m = resolveMessages("de", { continue: "Anmelden" });
 
 // Server-side detection (in +page.server.ts or hooks)
-import { detectLocaleServer } from '@mrgnw/anahtar';
+import { detectLocaleServer } from "@mrgnw/anahtar";
 const locale = detectLocaleServer(event.request); // reads Accept-Language header
 
 // List all available locale codes
@@ -459,9 +463,9 @@ The `AuthMessages` type defines all 34 translatable strings — see `src/lib/i18
 Generates a human-readable name for a passkey from the user agent string:
 
 ```ts
-import { guessDeviceName } from '@mrgnw/anahtar/components';
+import { guessDeviceName } from "@mrgnw/anahtar/components";
 // or
-import { guessDeviceName } from '@mrgnw/anahtar';
+import { guessDeviceName } from "@mrgnw/anahtar";
 
 guessDeviceName(); // "Chrome on macOS"
 guessDeviceName(customUA); // pass a UA string directly
@@ -563,6 +567,65 @@ const profile = db
   .prepare("SELECT * FROM user_profiles WHERE user_id = ?")
   .get(locals.user.id);
 ```
+
+## Email provider: Scaleway TEM
+
+[Scaleway Transactional Email](https://www.scaleway.com/en/transactional-email/) works well for sending OTP emails from Cloudflare Workers (no SDK needed, just `fetch`).
+
+### Setup
+
+1. Register your sending domain in [Scaleway TEM](https://console.scaleway.com/transactional-email/domains) and configure SPF, DKIM, and DMARC DNS records
+2. Create an [IAM Application](https://console.scaleway.com/iam/applications) and generate an API key for it
+3. Create an [IAM Policy](https://console.scaleway.com/iam/policies) that grants the application **TransactionalEmailFullAccess** (found under _Domains & Web Hosting_ in the permission sets picker), scoped to your project
+4. Add `SCW_SECRET_KEY` and `SCW_PROJECT_ID` as secrets to your worker
+
+### Implementation
+
+```ts
+onSendOTP: async (email, code) => {
+  const scwKey = env.SCW_SECRET_KEY;
+  const scwProject = env.SCW_PROJECT_ID;
+
+  if (!scwKey || !scwProject) {
+    console.log(`[dev] OTP for ${email}: ${code}`);
+    return;
+  }
+
+  let res: Response;
+  try {
+    res = await fetch(
+      "https://api.scaleway.com/transactional-email/v1alpha1/regions/fr-par/emails",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Auth-Token": scwKey,
+        },
+        body: JSON.stringify({
+          from: { name: "MyApp", email: "noreply@myapp.com" },
+          to: [{ email }],
+          subject: `Your verification code: ${code}`,
+          text: `Your verification code is: ${code}\n\nExpires in 30 minutes.`,
+          project_id: scwProject,
+        }),
+      },
+    );
+  } catch (err) {
+    console.error("Scaleway TEM network error:", err);
+    throw new Error("Failed to send verification email");
+  }
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.error(`Scaleway TEM error: ${res.status}`, body);
+    throw new Error("Failed to send verification email");
+  }
+},
+```
+
+The `throw` is important — anahtar's handler catches it and returns `{"error": "Failed to send verification email"}` with status 400 to the client, so the user sees an error instead of a fake "code sent."
+
+The API also accepts an `html` field for styled emails (alongside `text` as the fallback).
 
 ## What anahtar does NOT do
 
