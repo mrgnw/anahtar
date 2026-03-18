@@ -13,7 +13,13 @@ import type { AuthDB, ResolvedConfig } from "./types.js";
 
 const CHALLENGE_EXPIRY_MS = 5 * 60 * 1000;
 
-export function getWebAuthnConfig(requestUrl: URL) {
+export function getWebAuthnConfig(requestUrl: URL, config?: { rpId?: string; origin?: string }) {
+  if (config?.rpId || config?.origin) {
+    return {
+      rpID: config.rpId ?? requestUrl.hostname,
+      origin: config.origin ?? requestUrl.origin,
+    };
+  }
   const envOrigin = process.env.ORIGIN;
   if (envOrigin) {
     const url = new URL(envOrigin);
@@ -28,7 +34,7 @@ export async function generateRegistrationChallenge(
   requestUrl: URL,
   config: ResolvedConfig,
 ) {
-  const { rpID } = getWebAuthnConfig(requestUrl);
+  const { rpID } = getWebAuthnConfig(requestUrl, config);
   const existingPasskeys = await db.getUserPasskeys(user.id);
   const excludeCredentials = existingPasskeys.map((pk) => ({
     id: pk.credentialId,
@@ -65,8 +71,9 @@ export async function verifyRegistrationResponse(
   response: RegistrationResponseJSON,
   requestUrl: URL,
   name: string | null = null,
+  config?: ResolvedConfig,
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
-  const { rpID, origin } = getWebAuthnConfig(requestUrl);
+  const { rpID, origin } = getWebAuthnConfig(requestUrl, config);
 
   let challenge: string;
   try {
@@ -124,13 +131,14 @@ export async function generateAuthenticationChallengeForUser(
   db: AuthDB,
   email: string,
   requestUrl: URL,
+  config?: ResolvedConfig,
 ) {
-  const { rpID } = getWebAuthnConfig(requestUrl);
+  const { rpID } = getWebAuthnConfig(requestUrl, config);
   const user = await db.getUserByEmail(email);
-  if (!user) return generateAuthenticationChallenge(db, requestUrl);
+  if (!user) return generateAuthenticationChallenge(db, requestUrl, config);
   const passkeys = await db.getUserPasskeys(user.id);
   if (passkeys.length === 0)
-    return generateAuthenticationChallenge(db, requestUrl);
+    return generateAuthenticationChallenge(db, requestUrl, config);
   const allowCredentials = passkeys.map((pk) => ({
     id: pk.credentialId,
     transports: pk.transports
@@ -153,8 +161,9 @@ export async function generateAuthenticationChallengeForUser(
 export async function generateAuthenticationChallenge(
   db: AuthDB,
   requestUrl: URL,
+  config?: ResolvedConfig,
 ) {
-  const { rpID } = getWebAuthnConfig(requestUrl);
+  const { rpID } = getWebAuthnConfig(requestUrl, config);
   const options = await generateAuthenticationOptions({
     rpID,
     allowCredentials: [],
@@ -174,8 +183,9 @@ export async function verifyAuthenticationResponse(
   db: AuthDB,
   response: AuthenticationResponseJSON,
   requestUrl: URL,
+  config?: ResolvedConfig,
 ): Promise<{ user: { id: string; email: string } } | null> {
-  const { rpID, origin } = getWebAuthnConfig(requestUrl);
+  const { rpID, origin } = getWebAuthnConfig(requestUrl, config);
   const passkey = await db.getPasskeyByCredentialId(response.id);
 
   if (!passkey) return null;

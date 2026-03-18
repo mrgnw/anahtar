@@ -158,6 +158,7 @@ export function createHandlers(config: ResolvedConfig): {
         const options = await generateAuthenticationChallenge(
           config.db,
           event.url,
+          config,
         );
         return json(options);
       },
@@ -174,6 +175,7 @@ export function createHandlers(config: ResolvedConfig): {
           config.db,
           email,
           event.url,
+          config,
         );
         return json(options);
       },
@@ -190,6 +192,7 @@ export function createHandlers(config: ResolvedConfig): {
           config.db,
           body,
           event.url,
+          config,
         );
         if (!result) return json({ error: m.errorAuthFailed }, { status: 401 });
 
@@ -241,6 +244,7 @@ export function createHandlers(config: ResolvedConfig): {
           response,
           event.url,
           passkeyName,
+          config,
         );
         if (!result.ok) {
           console.error("register-finish failed:", result.reason);
