@@ -124,6 +124,24 @@ export const auth = createAuth({
 });
 ```
 
+For TinyBase (in-memory, optionally synced via Durable Objects):
+
+```ts
+import { tinybaseAdapter } from "@mrgnw/anahtar/tinybase";
+import { createStore } from "tinybase";
+
+const store = createStore();
+
+export const auth = createAuth({
+  db: tinybaseAdapter(store),
+  onSendOTP: async (email, code) => {
+    console.log(`OTP for ${email}: ${code}`);
+  },
+});
+```
+
+See [tinybase.md](./tinybase.md) for the full TinyBase guide including MergeableStore + Durable Object sync.
+
 Tables are created automatically on first use via `db.init()`.
 
 ## Wire into SvelteKit
