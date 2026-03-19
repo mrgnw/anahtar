@@ -59,8 +59,6 @@ DATABASE=my-db
 npx wrangler d1 execute $DATABASE --remote --command "ALTER TABLE auth_users ADD COLUMN skip_passkey_prompt INTEGER DEFAULT 0"
 ```
 
-For TinyBase: no migrations needed — rows are flexible objects and new cells are simply absent on old rows.
-
 ---
 
 ## Project-specific user data

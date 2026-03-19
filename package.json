@@ -40,10 +40,6 @@
       "types": "./dist/db/d1.d.ts",
       "default": "./dist/db/d1.js"
     },
-    "./tinybase": {
-      "types": "./dist/db/tinybase.d.ts",
-      "default": "./dist/db/tinybase.js"
-    },
     "./components": {
       "types": "./dist/components/index.d.ts",
       "svelte": "./dist/components/index.js",
@@ -57,17 +53,13 @@
   "peerDependencies": {
     "@simplewebauthn/browser": "^13.0.0",
     "@sveltejs/kit": "^2.0.0",
-    "svelte": "^5.0.0",
-    "tinybase": "^8.0.0"
+    "svelte": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "svelte": {
       "optional": true
     },
     "@simplewebauthn/browser": {
-      "optional": true
-    },
-    "tinybase": {
       "optional": true
     }
   },
@@ -91,7 +83,6 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.6.2",
-    "tinybase": "^8.0.1",
     "happy-dom": "^20.6.1",
     "svelte": "^5.38.1",
     "svelte-check": "^4.3.1",

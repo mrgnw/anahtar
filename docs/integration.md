@@ -90,31 +90,6 @@ export const auth = createAuth({
 });
 ```
 
-### TinyBase
-
-For in-memory auth with optional sync through a Durable Object. See [tinybase.md](./tinybase.md) for the full guide.
-
-```sh
-pnpm add tinybase
-```
-
-```ts
-import { createAuth } from '@mrgnw/anahtar';
-import { tinybaseAdapter } from '@mrgnw/anahtar/tinybase';
-import { createStore } from 'tinybase';
-
-const store = createStore();
-
-export const auth = createAuth({
-  db: tinybaseAdapter(store),
-  onSendOTP: async (email, code) => {
-    console.log(`[dev] OTP for ${email}: ${code}`);
-  },
-});
-```
-
-Tables are created automatically on first write. No `CREATE TABLE` or migrations needed.
-
 ---
 
 ## Wire into SvelteKit
@@ -197,7 +172,6 @@ export {};
 |-----|-------------|
 | [components.md](./components.md) | AuthFlow, AuthPill, OtpInput, PasskeyPrompt, theming, i18n |
 | [configuration.md](./configuration.md) | Full config reference, table prefix, migrations, email providers |
-| [tinybase.md](./tinybase.md) | TinyBase adapter — MergeableStore, Durable Objects, how tables work |
 | [sveltekit-patterns.md](./sveltekit-patterns.md) | Reactive user store, route-based panels, passkey management UI |
 
 ---
