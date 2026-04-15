@@ -2,7 +2,7 @@
 import { guessDeviceName } from '../device.js';
 import { resolveMessages, detectLocaleClient, type AuthMessages } from '../i18n/index.js';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
-import { onMount } from 'svelte';
+import { onMount, type Snippet } from 'svelte';
 import { slide } from 'svelte/transition';
 
 interface PasskeyInfo {
@@ -23,6 +23,8 @@ interface Props {
 	onPasskeysChange?: () => void | Promise<void>;
 	getPasskeys?: () => Promise<PasskeyInfo[]>;
 	onStepChange?: (step: 'email' | 'otp' | 'authenticated') => void;
+	/** Extra inline icons rendered before the sign-out button when authenticated. */
+	actions?: Snippet;
 }
 
 let {
@@ -36,6 +38,7 @@ let {
 	onPasskeysChange,
 	getPasskeys,
 	onStepChange,
+	actions,
 }: Props = $props();
 
 let expanded = $state(false);
@@ -358,6 +361,10 @@ async function removePasskey(id: string) {
 						<circle cx="7.5" cy="15.5" r="5.5"/><path d="m11.5 12 4-4"/><path d="m15 7 2 2"/><path d="m17.5 4.5 2 2"/>
 					</svg>
 				</button>
+				<span class="anahtar-pill-sep">&middot;</span>
+			{/if}
+			{#if actions}
+				{@render actions()}
 				<span class="anahtar-pill-sep">&middot;</span>
 			{/if}
 			<button class="anahtar-pill-icon anahtar-pill-signout" onclick={handleSignOut} title="Sign out" disabled={loading}>
