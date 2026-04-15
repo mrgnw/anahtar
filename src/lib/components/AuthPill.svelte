@@ -25,6 +25,8 @@ interface Props {
 	onStepChange?: (step: 'email' | 'otp' | 'authenticated') => void;
 	/** Extra inline icons rendered before the sign-out button when authenticated. */
 	actions?: Snippet;
+	/** Show `·` dot separators between pill segments. Defaults to false (flex gap only). */
+	separators?: boolean;
 }
 
 let {
@@ -39,6 +41,7 @@ let {
 	getPasskeys,
 	onStepChange,
 	actions,
+	separators = false,
 }: Props = $props();
 
 let expanded = $state(false);
@@ -348,7 +351,7 @@ async function removePasskey(id: string) {
 			</button>
 		{:else if isAuthenticated}
 			<span class="anahtar-pill-email">{user?.email}</span>
-			<span class="anahtar-pill-sep">&middot;</span>
+			{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			{#if getPasskeys}
 				<button
 					class="anahtar-pill-icon"
@@ -361,11 +364,11 @@ async function removePasskey(id: string) {
 						<circle cx="7.5" cy="15.5" r="5.5"/><path d="m11.5 12 4-4"/><path d="m15 7 2 2"/><path d="m17.5 4.5 2 2"/>
 					</svg>
 				</button>
-				<span class="anahtar-pill-sep">&middot;</span>
+				{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			{/if}
 			{#if actions}
 				{@render actions()}
-				<span class="anahtar-pill-sep">&middot;</span>
+				{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			{/if}
 			<button class="anahtar-pill-icon anahtar-pill-signout" onclick={handleSignOut} title="Sign out" disabled={loading}>
 				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -373,7 +376,7 @@ async function removePasskey(id: string) {
 				</svg>
 			</button>
 			{#if compact}
-				<span class="anahtar-pill-sep">&middot;</span>
+				{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 				<button class="anahtar-pill-icon" onclick={() => { expanded = false; showPasskeys = false; }} title="Collapse">
 					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/>
@@ -383,7 +386,7 @@ async function removePasskey(id: string) {
 
 		{:else if otpStep}
 			<span class="anahtar-pill-otp-label">{email}</span>
-			<span class="anahtar-pill-sep">&middot;</span>
+			{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			<div class="anahtar-pill-otp-boxes">
 				{#each otpDigits as _, i}
 					<input
