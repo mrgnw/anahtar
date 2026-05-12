@@ -13,6 +13,12 @@ Auth for SvelteKit. Email+OTP + optional passkeys.
 3. First login -> passkey registration prompt
 4. Future logins -> passkey autofill, OTP fallback
 
+## Roadmpa: Proof-of-concept: everything can change
+The goal is simplicity, we will likely stay with passkeys and email+OTP only.
+
+- we may change the implemenation.
+- we will likely split the UI elements from the API, making it easier to run headless, just use the UI, or use both.
+
 ## Quick start
 
 ```sh
