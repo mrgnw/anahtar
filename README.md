@@ -1,4 +1,4 @@
-# @mrgnw/anahtar
+# anahtar: incredibly simple & secure auth with passkeys and email+otp fallback
 
 > **Pre-alpha.** API may change between releases.
 
