@@ -7,6 +7,7 @@ import type {
 	PasskeyRecord,
 	SessionRecord
 } from '../types.js';
+import { normalizeEmail } from '../email.js';
 
 interface D1Database {
 	prepare(sql: string): D1PreparedStatement;
@@ -73,8 +74,8 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 
 		async getUserByEmail(email: string): Promise<AuthUser | null> {
 			const row = await db
-				.prepare(`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE email = ?`)
-				.bind(email)
+				.prepare(`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE email = ? COLLATE NOCASE`)
+				.bind(normalizeEmail(email))
 				.first<{ id: string; email: string; skip_passkey_prompt: number; created_at: number }>();
 			if (!row) return null;
 			return {
@@ -87,10 +88,11 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 
 		async createUser(email: string): Promise<AuthUser> {
 			const id = crypto.randomUUID();
-			await db.prepare(`INSERT INTO ${t.users} (id, email) VALUES (?, ?)`).bind(id, email).run();
+			const normalized = normalizeEmail(email);
+			await db.prepare(`INSERT INTO ${t.users} (id, email) VALUES (?, ?)`).bind(id, normalized).run();
 			return {
 				id,
-				email,
+				email: normalized,
 				skipPasskeyPrompt: false,
 				createdAt: Math.floor(Date.now() / 1000)
 			};
@@ -136,16 +138,16 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			await db
 				.prepare(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES (?, ?, ?, ?)`)
-				.bind(id, email, code, expiresAt)
+				.bind(id, normalizeEmail(email), code, expiresAt)
 				.run();
 		},
 
 		async getLatestOTP(email: string): Promise<OTPRecord | null> {
 			const row = await db
 				.prepare(
-					`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE email = ? ORDER BY created_at DESC LIMIT 1`
+					`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE email = ? COLLATE NOCASE ORDER BY created_at DESC LIMIT 1`
 				)
-				.bind(email)
+				.bind(normalizeEmail(email))
 				.first<{ id: string; email: string; code: string; attempts: number; expires_at: number }>();
 			if (!row) return null;
 			return {
@@ -166,7 +168,7 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 		},
 
 		async deleteOTPsForEmail(email: string) {
-			await db.prepare(`DELETE FROM ${t.otpCodes} WHERE email = ?`).bind(email).run();
+			await db.prepare(`DELETE FROM ${t.otpCodes} WHERE email = ? COLLATE NOCASE`).bind(normalizeEmail(email)).run();
 		},
 
 		async storeChallenge(challenge: string, userId: string, expiresAt: number) {

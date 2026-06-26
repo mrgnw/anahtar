@@ -69,6 +69,30 @@ describe('users', () => {
 	});
 });
 
+describe('email case-insensitivity', () => {
+	it('stores new users with a normalized (lowercased, trimmed) email', () => {
+		const user = db.createUser('  Bob@Example.COM ');
+		expect(user.email).toBe('bob@example.com');
+		expect(db.getUserByEmail('bob@example.com')!.id).toBe(user.id);
+	});
+
+	it('getUserByEmail finds a user regardless of the queried case', () => {
+		const created = db.createUser('alice@example.com');
+		expect(db.getUserByEmail('ALICE@example.com')?.id).toBe(created.id);
+		expect(db.getUserByEmail('Alice@Example.com')?.id).toBe(created.id);
+	});
+
+	it('finds a legacy mixed-case row when queried in a different case', () => {
+		rawDb.prepare(`INSERT INTO auth_users (id, email) VALUES ('legacy-1', 'John@X.com')`).run();
+		expect(db.getUserByEmail('john@x.com')?.id).toBe('legacy-1');
+	});
+
+	it('OTP lookup matches the stored email across case', () => {
+		db.storeOTP('Carol@Example.com', 'otp-1', '12345', Date.now() + 60000);
+		expect(db.getLatestOTP('carol@example.com')?.code).toBe('12345');
+	});
+});
+
 describe('sessions', () => {
 	it('createSession and getSession round-trip', () => {
 		const user = db.createUser('sess@example.com');

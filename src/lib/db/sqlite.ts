@@ -9,6 +9,7 @@ import type {
 	PasskeyRecord,
 	SessionRecord
 } from '../types.js';
+import { normalizeEmail } from '../email.js';
 
 interface SqliteAdapterOptions {
 	tablePrefix?: string;
@@ -70,8 +71,8 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 
 		getUserByEmail(email: string): AuthUser | null {
 			const row = db
-				.prepare(`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE email = ?`)
-				.get(email) as { id: string; email: string; skip_passkey_prompt: number; created_at: number } | undefined;
+				.prepare(`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE email = ? COLLATE NOCASE`)
+				.get(normalizeEmail(email)) as { id: string; email: string; skip_passkey_prompt: number; created_at: number } | undefined;
 			if (!row) return null;
 			return {
 				id: row.id,
@@ -83,10 +84,11 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 
 		createUser(email: string): AuthUser {
 			const id = randomUUID();
-			db.prepare(`INSERT INTO ${t.users} (id, email) VALUES (?, ?)`).run(id, email);
+			const normalized = normalizeEmail(email);
+			db.prepare(`INSERT INTO ${t.users} (id, email) VALUES (?, ?)`).run(id, normalized);
 			return {
 				id,
-				email,
+				email: normalized,
 				skipPasskeyPrompt: false,
 				createdAt: Math.floor(Date.now() / 1000)
 			};
@@ -129,7 +131,7 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 		storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			db.prepare(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES (?, ?, ?, ?)`).run(
 				id,
-				email,
+				normalizeEmail(email),
 				code,
 				expiresAt
 			);
@@ -138,9 +140,9 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 		getLatestOTP(email: string): OTPRecord | null {
 			const row = db
 				.prepare(
-					`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE email = ? ORDER BY created_at DESC LIMIT 1`
+					`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE email = ? COLLATE NOCASE ORDER BY created_at DESC LIMIT 1`
 				)
-				.get(email) as { id: string; email: string; code: string; attempts: number; expires_at: number } | undefined;
+				.get(normalizeEmail(email)) as { id: string; email: string; code: string; attempts: number; expires_at: number } | undefined;
 			if (!row) return null;
 			return {
 				id: row.id,
@@ -160,7 +162,7 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 		},
 
 		deleteOTPsForEmail(email: string) {
-			db.prepare(`DELETE FROM ${t.otpCodes} WHERE email = ?`).run(email);
+			db.prepare(`DELETE FROM ${t.otpCodes} WHERE email = ? COLLATE NOCASE`).run(normalizeEmail(email));
 		},
 
 		storeChallenge(challenge: string, userId: string, expiresAt: number) {

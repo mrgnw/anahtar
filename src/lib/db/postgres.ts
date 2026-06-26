@@ -8,6 +8,7 @@ import type {
 	PasskeyRecord,
 	SessionRecord
 } from '../types.js';
+import { normalizeEmail } from '../email.js';
 
 interface PgPool {
 	query(text: string, values?: unknown[]): Promise<{ rows: Record<string, unknown>[]; rowCount: number | null }>;
@@ -81,8 +82,8 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 
 		async getUserByEmail(email: string): Promise<AuthUser | null> {
 			const row = await queryOne<{ id: string; email: string; skip_passkey_prompt: boolean; created_at: string }>(
-				`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE email = $1`,
-				[email]
+				`SELECT id, email, skip_passkey_prompt, created_at FROM ${t.users} WHERE LOWER(email) = $1`,
+				[normalizeEmail(email)]
 			);
 			if (!row) return null;
 			return {
@@ -95,10 +96,11 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 
 		async createUser(email: string): Promise<AuthUser> {
 			const id = randomUUID();
-			await pool.query(`INSERT INTO ${t.users} (id, email) VALUES ($1, $2)`, [id, email]);
+			const normalized = normalizeEmail(email);
+			await pool.query(`INSERT INTO ${t.users} (id, email) VALUES ($1, $2)`, [id, normalized]);
 			return {
 				id,
-				email,
+				email: normalized,
 				skipPasskeyPrompt: false,
 				createdAt: Date.now()
 			};
@@ -140,7 +142,7 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			await pool.query(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES ($1, $2, $3, $4)`, [
 				id,
-				email,
+				normalizeEmail(email),
 				code,
 				expiresAt
 			]);
@@ -148,8 +150,8 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 
 		async getLatestOTP(email: string): Promise<OTPRecord | null> {
 			const row = await queryOne<{ id: string; email: string; code: string; attempts: number; expires_at: string }>(
-				`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE email = $1 ORDER BY created_at DESC LIMIT 1`,
-				[email]
+				`SELECT id, email, code, attempts, expires_at FROM ${t.otpCodes} WHERE LOWER(email) = $1 ORDER BY created_at DESC LIMIT 1`,
+				[normalizeEmail(email)]
 			);
 			if (!row) return null;
 			return {
@@ -170,7 +172,7 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 		},
 
 		async deleteOTPsForEmail(email: string) {
-			await pool.query(`DELETE FROM ${t.otpCodes} WHERE email = $1`, [email]);
+			await pool.query(`DELETE FROM ${t.otpCodes} WHERE LOWER(email) = $1`, [normalizeEmail(email)]);
 		},
 
 		async storeChallenge(challenge: string, userId: string, expiresAt: number) {

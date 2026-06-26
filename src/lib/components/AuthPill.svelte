@@ -412,6 +412,9 @@ async function removePasskey(id: string) {
 					placeholder={m.emailPlaceholder}
 					class="anahtar-pill-email-input"
 					autocomplete="username webauthn"
+					autocapitalize="none"
+					autocorrect="off"
+					spellcheck="false"
 					disabled={loading}
 				/>
 			<button type="submit" class="anahtar-pill-go" disabled={loading || !email.includes('@')}>

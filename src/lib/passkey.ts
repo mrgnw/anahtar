@@ -186,16 +186,33 @@ export async function verifyAuthenticationResponse(
   config?: ResolvedConfig,
 ): Promise<{ user: { id: string; email: string } } | null> {
   const { rpID, origin } = getWebAuthnConfig(requestUrl, config);
+  const idHint = `${response.id.slice(0, 8)}…`;
   const passkey = await db.getPasskeyByCredentialId(response.id);
 
-  if (!passkey) return null;
+  if (!passkey) {
+    console.warn(
+      `[anahtar login-finish] no stored passkey for credentialId=${idHint} (rpID=${rpID})`,
+    );
+    return null;
+  }
 
-  const challenge = JSON.parse(
-    Buffer.from(response.response.clientDataJSON, "base64url").toString(),
-  ).challenge;
+  let challenge: string;
+  try {
+    challenge = JSON.parse(
+      Buffer.from(response.response.clientDataJSON, "base64url").toString(),
+    ).challenge;
+  } catch (e) {
+    console.warn(`[anahtar login-finish] clientDataJSON parse failed: ${e}`);
+    return null;
+  }
 
   const stored = await db.consumeChallenge(challenge);
-  if (!stored) return null;
+  if (!stored) {
+    console.warn(
+      `[anahtar login-finish] challenge not found or expired (credentialId=${idHint})`,
+    );
+    return null;
+  }
 
   try {
     const verification = await verifyAuthResponse({
@@ -214,7 +231,12 @@ export async function verifyAuthenticationResponse(
       },
     });
 
-    if (!verification.verified) return null;
+    if (!verification.verified) {
+      console.warn(
+        `[anahtar login-finish] not verified (credentialId=${idHint}, expectedRPID=${rpID}, expectedOrigin=${origin})`,
+      );
+      return null;
+    }
 
     await db.updatePasskeyCounter(
       passkey.id,
@@ -224,7 +246,10 @@ export async function verifyAuthenticationResponse(
     return {
       user: { id: passkey.userId, email: passkey.email },
     };
-  } catch {
+  } catch (e) {
+    console.warn(
+      `[anahtar login-finish] verification threw (credentialId=${idHint}, expectedRPID=${rpID}, expectedOrigin=${origin}): ${e}`,
+    );
     return null;
   }
 }

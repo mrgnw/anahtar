@@ -210,6 +210,9 @@ function handlePasskeySkip() {
 					bind:value={email}
 					required
 					autocomplete="username webauthn"
+					autocapitalize="none"
+					autocorrect="off"
+					spellcheck="false"
 					placeholder={m.emailPlaceholder}
 					class="anahtar-input"
 				/>
