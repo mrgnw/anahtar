@@ -64,7 +64,6 @@
     }
   },
   "dependencies": {
-    "@mrgnw/anahtar": "0.0.29-diagnostic.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@simplewebauthn/server": "^13.2.2"
