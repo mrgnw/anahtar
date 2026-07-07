@@ -60,9 +60,24 @@ let isTouch = $state(false);
 let hoveredKey = $state<string | null>(null);
 let passkeyRefresh = $state(0);
 let passkeyOnboarding = $state(false);
-let conditionalAbort: AbortController | null = null;
+
+const PASSKEY_TIMEOUT_MS = 8000;
+// Captured from the lazy @simplewebauthn/browser import so onMount cleanup (sync)
+// and handleEmailSubmit can cancel an in-flight ceremony without re-importing.
+let webauthnAbort: { cancelCeremony: () => void } | null = null;
 
 const isAuthenticated = $derived(!!user);
+
+// Best-effort bound on a promise so a WebAuthn ceremony that never settles
+// (e.g. rpID mismatch on preview domains) can't wedge the sign-in flow.
+function raceTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const timeout = new Promise<never>((_, reject) => {
+		timer = setTimeout(() => reject(new Error('timeout')), ms);
+	});
+	// Promise.race consumes the loser's later settlement, so no unhandled rejection.
+	return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 function shortDate(ts?: number): string {
 	if (!ts) return '';
@@ -77,7 +92,7 @@ const passkeyPromise = $derived(
 onMount(() => {
 	isTouch = matchMedia('(pointer: coarse)').matches;
 	if (!isAuthenticated) tryConditionalWebAuthn();
-	return () => conditionalAbort?.abort();
+	return () => webauthnAbort?.cancelCeremony();
 });
 
 async function handleSignOut() {
@@ -94,40 +109,45 @@ async function handleSignOut() {
 
 async function tryConditionalWebAuthn() {
 	try {
-		const { startAuthentication } = await import('@simplewebauthn/browser');
+		const mod = await import('@simplewebauthn/browser');
+		webauthnAbort = mod.WebAuthnAbortService;
 		const res = await fetch(`${apiBase}/passkey/login-start`);
 		if (!res.ok) return;
 		const options = (await res.json()) as any;
-		conditionalAbort = new AbortController();
-		const authResponse = await startAuthentication({
+		const authResponse = await mod.startAuthentication({
 			optionsJSON: options,
 			useBrowserAutofill: true,
 		});
+		// Only reached when the user actually picks a passkey via autofill.
+		// Scope `loading` to the verify step so the abort path never touches it
+		// (an aborted ceremony throws straight to the catch below).
 		loading = true;
-		const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(authResponse),
-		});
-		if (verifyRes.ok) await onSuccess?.();
+		try {
+			const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(authResponse),
+			});
+			if (verifyRes.ok) await onSuccess?.();
+		} finally {
+			loading = false;
+		}
 	} catch {
 		/* not available or cancelled */
-	} finally {
-		loading = false;
 	}
 }
 
 async function handleEmailSubmit(e: SubmitEvent) {
 	e.preventDefault();
 	if (!email.includes('@')) return;
-	conditionalAbort?.abort();
-	conditionalAbort = null;
+	webauthnAbort?.cancelCeremony();
 	loading = true;
 	error = '';
 	try {
 		// Passkey-first: check if user has passkeys before falling back to OTP
 		try {
-			const { startAuthentication } = await import('@simplewebauthn/browser');
+			const mod = await import('@simplewebauthn/browser');
+			webauthnAbort = mod.WebAuthnAbortService;
 			const checkRes = await fetch(`${apiBase}/passkey/check-email`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -137,7 +157,10 @@ async function handleEmailSubmit(e: SubmitEvent) {
 				const opts = (await checkRes.json()) as any;
 				if ((opts?.allowCredentials?.length ?? 0) > 0) {
 					try {
-						const authResp = await startAuthentication({ optionsJSON: opts });
+						const authResp = await raceTimeout(
+							mod.startAuthentication({ optionsJSON: opts }),
+							PASSKEY_TIMEOUT_MS,
+						);
 						const vRes = await fetch(`${apiBase}/passkey/login-finish`, {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
@@ -148,7 +171,8 @@ async function handleEmailSubmit(e: SubmitEvent) {
 							return;
 						}
 					} catch {
-						/* cancelled */
+						mod.WebAuthnAbortService.cancelCeremony();
+						/* stalled, cancelled, or failed — fall through to OTP */
 					}
 				}
 			}
