@@ -40,6 +40,10 @@
       "types": "./dist/db/d1.d.ts",
       "default": "./dist/db/d1.js"
     },
+    "./device": {
+      "types": "./dist/device.d.ts",
+      "default": "./dist/device.js"
+    },
     "./components": {
       "types": "./dist/components/index.d.ts",
       "svelte": "./dist/components/index.js",
