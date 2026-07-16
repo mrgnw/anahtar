@@ -90,6 +90,19 @@ describe('AuthPill', () => {
 		expect(mockCancelCeremony).toHaveBeenCalled();
 	});
 
+	it('shows an accessible spinner (not literal dots) while the email submit is in flight', async () => {
+		// Hang every request so the component stays in its loading state.
+		globalThis.fetch = vi.fn(() => new Promise<Response>(() => {})) as unknown as typeof fetch;
+
+		render(AuthPill);
+		await submitEmail();
+
+		const go = await screen.findByRole('button', { name: 'Continue' });
+		expect(go).toBeDisabled();
+		expect(go.querySelector('.anahtar-spinner')).not.toBeNull();
+		expect(go.textContent).not.toContain('...');
+	});
+
 	it('completes passkey login and skips the email OTP path', async () => {
 		const onSuccess = vi.fn();
 		mockStartAuthentication.mockResolvedValue({ id: 'cred', response: {} });

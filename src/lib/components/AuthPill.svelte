@@ -441,11 +441,13 @@ async function removePasskey(id: string) {
 					spellcheck="false"
 					disabled={loading}
 				/>
-			<button type="submit" class="anahtar-pill-go" disabled={loading || !email.includes('@')}>
+			<button type="submit" class="anahtar-pill-go" disabled={loading || !email.includes('@')} aria-label={m.continue}>
 				{#if loading}
-					...
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="anahtar-spinner" aria-hidden="true">
+						<path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+					</svg>
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
 					</svg>
 				{/if}
@@ -611,6 +613,11 @@ async function removePasskey(id: string) {
 	}
 	.anahtar-pill-go:disabled { opacity: 0.4; cursor: not-allowed; }
 	.anahtar-pill-go:hover:not(:disabled) { opacity: 0.85; }
+
+	@keyframes anahtar-spin {
+		to { transform: rotate(360deg); }
+	}
+	.anahtar-spinner { animation: anahtar-spin 0.8s linear infinite; }
 
 	/* OTP */
 	.anahtar-pill-otp-label {
