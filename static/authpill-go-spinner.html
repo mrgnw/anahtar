@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>AuthPill go-button loading state (#3)</title>
+		<style>
+			/* Tokens + rules copied inline from AuthPill.svelte so this reads as the product. */
+			:root {
+				--anahtar-primary: #3730a3;
+				--anahtar-primary-fg: #fff;
+				--anahtar-pill-bg: rgba(255, 255, 255, 0.9);
+				--anahtar-pill-border: rgba(0, 0, 0, 0.06);
+				--anahtar-pill-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+				--anahtar-pill-icon: #6b7280;
+				--anahtar-pill-fg: #111827;
+				--anahtar-pill-placeholder: #9ca3af;
+				--fg: #0f172a;
+				--muted: #64748b;
+				--border: #e2e8f0;
+			}
+			* { box-sizing: border-box; }
+			body {
+				margin: 0;
+				font: 15px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				color: var(--fg);
+				background: #f1f5f9;
+			}
+			.wrap { max-width: 1200px; margin: 0 auto; padding: 1.25rem 1.5rem 3rem; }
+			header h1 { font-size: 1.05rem; margin: 0 0 0.25rem; }
+			header p { margin: 0 0 1rem; color: var(--muted); max-width: 60ch; }
+			.controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1.5rem; }
+			.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 0.6rem; overflow: hidden; background: #fff; }
+			.seg button {
+				border: 0; background: #fff; padding: 0.4rem 0.8rem; font: inherit; font-size: 0.85rem;
+				cursor: pointer; color: var(--muted); border-right: 1px solid var(--border);
+			}
+			.seg button:last-child { border-right: 0; }
+			.seg button[aria-pressed='true'] { background: var(--anahtar-primary); color: #fff; }
+			.stage { display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start; }
+			.lane[hidden] { display: none; }
+			.lane-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem; }
+
+			/* Phone lane — real 390px device, never scaled. */
+			.phone { width: 390px; }
+			.phone-bezel { border: 11px solid #22272e; border-radius: 42px; padding: 16px 12px; background: #dbe4f0; min-height: 300px; position: relative; }
+			/* Desktop lane. */
+			.desk { flex: 1 1 560px; max-width: 760px; }
+			.win { border: 1px solid var(--border); border-radius: 0.7rem; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(15,23,42,.06); }
+			.win-bar { display: flex; gap: 6px; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); background: #f8fafc; }
+			.win-bar i { width: 11px; height: 11px; border-radius: 50%; background: #cbd5e1; }
+			.win-body { padding: 3rem 2.5rem; display: flex; justify-content: flex-end; min-height: 220px; background: #dbe4f0; }
+			.stage-note { margin-top: 0.75rem; font-size: 0.8rem; color: var(--muted); }
+
+			/* ---- Real AuthPill styles ---- */
+			.anahtar-pill {
+				display: flex; align-items: center; gap: 0.4rem;
+				background: var(--anahtar-pill-bg);
+				backdrop-filter: blur(8px);
+				border: 1px solid var(--anahtar-pill-border);
+				border-radius: 9999px;
+				padding: 0.25rem 0.75rem;
+				box-shadow: var(--anahtar-pill-shadow);
+				font-size: 0.875rem; white-space: nowrap; height: 2.25rem;
+				box-sizing: border-box; overflow: hidden;
+			}
+			.anahtar-pill-icon {
+				display: flex; align-items: center; justify-content: center;
+				background: none; border: none; cursor: pointer; padding: 0.2rem;
+				border-radius: 9999px; color: var(--anahtar-pill-icon); line-height: 1;
+			}
+			.anahtar-pill-form { display: flex; align-items: center; gap: 0.375rem; flex: 1; min-width: 0; overflow: hidden; }
+			.anahtar-pill-email-input {
+				border: none; background: transparent; outline: none; font-size: 0.875rem;
+				color: var(--anahtar-pill-fg); flex: 1; min-width: 0; padding: 0.125rem 0;
+			}
+			.anahtar-pill-email-input::placeholder { color: var(--anahtar-pill-placeholder); }
+			.anahtar-pill-go {
+				background: var(--anahtar-primary); color: var(--anahtar-primary-fg);
+				border: none; border-radius: 9999px; padding: 0.3rem;
+				display: flex; align-items: center; justify-content: center;
+				flex-shrink: 0; cursor: pointer; line-height: 1;
+			}
+			.anahtar-pill-go:disabled { opacity: 0.4; cursor: not-allowed; }
+			.go-dots { color: var(--anahtar-primary-fg); font-weight: 700; font-size: 14px; letter-spacing: 1px; line-height: 1; padding: 0 3px; }
+			@keyframes anahtar-spin { to { transform: rotate(360deg); } }
+			.anahtar-spinner { animation: anahtar-spin 0.8s linear infinite; }
+			@media (prefers-reduced-motion: reduce) { .anahtar-spinner { animation-duration: 3s; } }
+		</style>
+	</head>
+	<body>
+		<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+			<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+			<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+			<symbol id="i-spinner" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+		</defs></svg>
+
+		<div class="wrap">
+			<header>
+				<h1>AuthPill go-button loading state — issue #3</h1>
+				<p>
+					While the email submit is in flight the go button rendered a literal
+					<code>...</code>, which reads as a second ⋯ options button (see “Before”). It now
+					renders the same arc spinner AuthFlow uses, with <code>aria-label="Continue"</code>.
+					Use ←/→ or the pager.
+				</p>
+				<div class="controls">
+					<div class="seg" id="pager" role="group" aria-label="Cases"></div>
+					<div class="seg" id="focus" role="group" aria-label="Which device">
+						<button data-focus="both" aria-pressed="true">Both</button>
+						<button data-focus="phone" aria-pressed="false">Phone</button>
+						<button data-focus="desk" aria-pressed="false">Desktop</button>
+					</div>
+				</div>
+			</header>
+			<main class="stage">
+				<section class="lane phone" id="lane-phone">
+					<div class="lane-label">Phone · 390px</div>
+					<div class="phone-bezel"><div id="card-phone"></div></div>
+				</section>
+				<section class="lane desk" id="lane-desk">
+					<div class="lane-label">Desktop</div>
+					<div class="win"><div class="win-bar"><i></i><i></i><i></i></div><div class="win-body"><div id="card-desk"></div></div></div>
+				</section>
+			</main>
+			<p class="stage-note" id="note"></p>
+		</div>
+
+		<script>
+			const svg = (id, extra) =>
+				`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"${extra || ''}><use href="#${id}"/></svg>`;
+
+			const CASES = [
+				{
+					id: 'idle', label: 'Idle',
+					note: 'Email entered, request not yet sent — arrow, button enabled.',
+					go: `<button class="anahtar-pill-go" aria-label="Continue">${svg('i-arrow')}</button>`,
+				},
+				{
+					id: 'after', label: 'After · spinner',
+					note: 'In flight — arc spinner, button disabled, aria-label="Continue". The fix.',
+					go: `<button class="anahtar-pill-go" disabled aria-label="Continue">${svg('i-spinner', ' class="anahtar-spinner" aria-hidden="true"')}</button>`,
+				},
+				{
+					id: 'before', label: 'Before · "..."',
+					note: 'The old behavior — literal "..." reads as a second ⋯ options button. Removed.',
+					go: `<button class="anahtar-pill-go" disabled aria-label="Continue"><span class="go-dots">...</span></button>`,
+				},
+			];
+
+			function cardHTML(c) {
+				return `<div class="anahtar-pill">
+					<button class="anahtar-pill-icon" aria-label="Options">${svg('i-more')}</button>
+					<div class="anahtar-pill-form">
+						<input class="anahtar-pill-email-input" value="you@example.com" readonly />
+						${c.go}
+					</div>
+				</div>`;
+			}
+
+			const pager = document.getElementById('pager');
+			const cardPhone = document.getElementById('card-phone');
+			const cardDesk = document.getElementById('card-desk');
+			const note = document.getElementById('note');
+			let active = CASES[0].id;
+
+			CASES.forEach((c) => {
+				const b = document.createElement('button');
+				b.type = 'button'; b.textContent = c.label; b.dataset.set = c.id;
+				b.setAttribute('aria-pressed', 'false');
+				b.addEventListener('click', () => select(c.id, true));
+				pager.appendChild(b);
+			});
+
+			function render() {
+				const c = CASES.find((x) => x.id === active) || CASES[0];
+				cardPhone.innerHTML = cardHTML(c);
+				cardDesk.innerHTML = cardHTML(c);
+				note.textContent = c.note;
+				pager.querySelectorAll('button').forEach((b) =>
+					b.setAttribute('aria-pressed', String(b.dataset.set === active)));
+			}
+
+			function select(id, push) {
+				if (!CASES.some((c) => c.id === id)) return;
+				active = id;
+				if (push) history.replaceState(null, '', '#' + id);
+				render();
+			}
+
+			const focusBar = document.getElementById('focus');
+			const lanePhone = document.getElementById('lane-phone');
+			const laneDesk = document.getElementById('lane-desk');
+			focusBar.addEventListener('click', (e) => {
+				const btn = e.target.closest('button'); if (!btn) return;
+				const mode = btn.dataset.focus;
+				focusBar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+				lanePhone.hidden = mode === 'desk';
+				laneDesk.hidden = mode === 'phone';
+			});
+
+			addEventListener('keydown', (e) => {
+				if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+				const i = CASES.findIndex((c) => c.id === active);
+				const n = (i + (e.key === 'ArrowRight' ? 1 : CASES.length - 1)) % CASES.length;
+				select(CASES[n].id, true);
+			});
+			addEventListener('hashchange', () => {
+				const id = location.hash.replace('#', '');
+				if (CASES.some((c) => c.id === id)) select(id, false);
+			});
+			const fromHash = location.hash.replace('#', '');
+			select(CASES.some((c) => c.id === fromHash) ? fromHash : CASES[0].id, false);
+		</script>
+	</body>
+</html>
