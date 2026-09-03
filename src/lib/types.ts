@@ -80,7 +80,6 @@ export interface AuthDB {
 
 export interface AuthConfig {
 	db: AuthDB;
-	tablePrefix?: string;
 	cookie?: string;
 	sessionDuration?: number;
 	otpExpiry?: number;

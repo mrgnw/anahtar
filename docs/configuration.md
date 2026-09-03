@@ -5,22 +5,33 @@
 ```ts
 interface AuthConfig {
   db: AuthDB;
-  rpName?: string;          // WebAuthn relying party name — default: 'App'
-  tablePrefix?: string;     // default: 'auth_' — set to '' for no prefix
+  rpName?: string;          // WebAuthn relying party name — default: 'anahtar'
+  rpId?: string;            // WebAuthn rpID — default: request hostname
+  origin?: string;          // WebAuthn origin — default: request origin
   cookie?: string;          // session cookie name — default: 'session'
   sessionDuration?: number; // default: 30 days (ms)
   otpExpiry?: number;       // default: 30 min (ms)
   otpLength?: number;       // default: 5 digits
   otpMaxAttempts?: number;  // default: 5
+  locale?: string;          // server-side error messages — default: Accept-Language
+  messages?: Partial<AuthMessages>;
   onSendOTP: (email: string, code: string) => Promise<void>;
 }
 ```
 
 ## Table prefix
 
-All tables use the prefix (default `auth_`):
+The prefix is an adapter option:
 
-| Default           | `tablePrefix: 'myapp_'` | `tablePrefix: ''` |
+```ts
+sqliteAdapter(db, { tablePrefix: 'myapp_' });
+postgresAdapter(pool, { tablePrefix: 'myapp_' });
+d1Adapter(env.DB, { tablePrefix: 'myapp_' });
+```
+
+Default `auth_`; pass `''` for no prefix:
+
+| Default           | `'myapp_'`              | `''`              |
 | ----------------- | ----------------------- | ----------------- |
 | `auth_users`      | `myapp_users`           | `users`           |
 | `auth_sessions`   | `myapp_sessions`        | `sessions`        |
