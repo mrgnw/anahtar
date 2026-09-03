@@ -96,7 +96,7 @@ All components auto-detect locale (88 languages). Override with `locale="fr"` or
 
 ## Tests
 
-68 tests: 46 unit (node) + 22 component (happy-dom).
+109 tests: 83 unit (node) + 26 component (happy-dom).
 
 ```sh
 pnpm test:unit
