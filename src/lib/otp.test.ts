@@ -6,7 +6,7 @@ function mockConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
 	return {
 		db: {} as AuthDB,
 		cookie: 'session',
-		sessionDuration: 30 * 24 * 60 * 60 * 1000,
+		sessionDuration: () => 30 * 24 * 60 * 60 * 1000,
 		otpExpiry: 30 * 60 * 1000,
 		otpLength: 5,
 		otpMaxAttempts: 5,
@@ -25,6 +25,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		createSession: vi.fn(),
 		getSession: vi.fn(),
 		deleteSession: vi.fn(),
+		updateSessionExpiry: vi.fn(),
 		storeOTP: vi.fn(),
 		getLatestOTP: vi.fn(),
 		incrementOTPAttempts: vi.fn().mockReturnValue(1),

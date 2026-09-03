@@ -6,7 +6,7 @@ function mockConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
 	return {
 		db: {} as AuthDB,
 		cookie: 'session',
-		sessionDuration: 30 * 24 * 60 * 60 * 1000,
+		sessionDuration: () => 30 * 24 * 60 * 60 * 1000,
 		otpExpiry: 30 * 60 * 1000,
 		otpLength: 5,
 		otpMaxAttempts: 5,
@@ -25,6 +25,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		createSession: vi.fn(),
 		getSession: vi.fn(),
 		deleteSession: vi.fn(),
+		updateSessionExpiry: vi.fn(),
 		storeOTP: vi.fn(),
 		getLatestOTP: vi.fn(),
 		updateOTPAttempts: vi.fn(),
@@ -45,14 +46,14 @@ describe('createSession', () => {
 	it('returns a 64-char hex session token', async () => {
 		const db = mockDB();
 		const config = mockConfig();
-		const result = await createSession(db, 'user-1', config);
+		const result = await createSession(db, 'user-1', config, 'otp');
 		expect(result.sessionToken).toMatch(/^[0-9a-f]{64}$/);
 	});
 
 	it('stores a hashed token, not the raw token', async () => {
 		const db = mockDB();
 		const config = mockConfig();
-		const result = await createSession(db, 'user-1', config);
+		const result = await createSession(db, 'user-1', config, 'otp');
 		const [storedHash] = (db.createSession as ReturnType<typeof vi.fn>).mock.calls[0];
 		expect(storedHash).not.toBe(result.sessionToken);
 		expect(storedHash).toMatch(/^[0-9a-f]{64}$/);
@@ -62,11 +63,20 @@ describe('createSession', () => {
 		const db = mockDB();
 		const config = mockConfig();
 		const before = Date.now();
-		await createSession(db, 'user-1', config);
+		await createSession(db, 'user-1', config, 'otp');
 		const [, userId, expiresAt] = (db.createSession as ReturnType<typeof vi.fn>).mock.calls[0];
 		expect(userId).toBe('user-1');
 		expect(expiresAt).toBeGreaterThan(before);
-		expect(expiresAt).toBeLessThanOrEqual(before + config.sessionDuration + 100);
+		expect(expiresAt).toBeLessThanOrEqual(before + config.sessionDuration('otp') + 100);
+	});
+
+	it('uses the duration for the sign-in method', async () => {
+		const db = mockDB();
+		const config = mockConfig({ sessionDuration: (m) => (m === 'passkey' ? 2000 : 1000) });
+		const before = Date.now();
+		const { expiresAt } = await createSession(db, 'user-1', config, 'passkey');
+		expect(expiresAt).toBeGreaterThanOrEqual(before + 2000);
+		expect(expiresAt).toBeLessThanOrEqual(before + 2100);
 	});
 });
 
@@ -111,7 +121,7 @@ describe('validateSession', () => {
 		const db = mockDB();
 		const config = mockConfig();
 
-		const { sessionToken } = await createSession(db, 'user-1', config);
+		const { sessionToken } = await createSession(db, 'user-1', config, 'otp');
 
 		const [storedHash, storedUserId, storedExpiry] = (db.createSession as ReturnType<typeof vi.fn>).mock.calls[0];
 

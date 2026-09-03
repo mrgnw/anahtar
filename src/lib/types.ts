@@ -5,6 +5,8 @@ export interface AuthUser {
 	createdAt: number;
 }
 
+export type SessionMethod = 'otp' | 'passkey';
+
 export interface AuthLocals {
 	user: { id: string; email: string } | null;
 	session: { id: string; expiresAt: number } | null;
@@ -67,6 +69,7 @@ export interface AuthDB {
 	createSession(tokenHash: string, userId: string, expiresAt: number): MaybePromise<void>;
 	getSession(tokenHash: string): MaybePromise<(SessionRecord & { email: string }) | null>;
 	deleteSession(tokenHash: string): MaybePromise<void>;
+	updateSessionExpiry(tokenHash: string, expiresAt: number): MaybePromise<void>;
 
 	storeOTP(email: string, id: string, code: string, expiresAt: number): MaybePromise<void>;
 	getLatestOTP(email: string): MaybePromise<OTPRecord | null>;
@@ -86,7 +89,7 @@ export interface AuthDB {
 export interface AuthConfig {
 	db: AuthDB;
 	cookie?: string;
-	sessionDuration?: number;
+	sessionDuration?: number | ((method: SessionMethod) => number);
 	otpExpiry?: number;
 	otpLength?: number;
 	otpMaxAttempts?: number;
@@ -98,7 +101,11 @@ export interface AuthConfig {
 	onSendOTP: (email: string, code: string) => Promise<void>;
 }
 
-export interface ResolvedConfig extends Required<Omit<AuthConfig, 'onSendOTP' | 'locale' | 'messages' | 'rpId' | 'origin'>> {
+export interface ResolvedConfig
+	extends Required<
+		Omit<AuthConfig, 'onSendOTP' | 'locale' | 'messages' | 'rpId' | 'origin' | 'sessionDuration'>
+	> {
+	sessionDuration: (method: SessionMethod) => number;
 	rpId?: string;
 	origin?: string;
 	locale?: string;

@@ -128,6 +128,10 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 			db.prepare(`DELETE FROM ${t.sessions} WHERE id = ?`).run(tokenHash);
 		},
 
+		updateSessionExpiry(tokenHash: string, expiresAt: number) {
+			db.prepare(`UPDATE ${t.sessions} SET expires_at = ? WHERE id = ?`).run(expiresAt, tokenHash);
+		},
+
 		storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			db.prepare(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES (?, ?, ?, ?)`).run(
 				id,

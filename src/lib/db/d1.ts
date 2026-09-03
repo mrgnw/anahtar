@@ -135,6 +135,10 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 			await db.prepare(`DELETE FROM ${t.sessions} WHERE id = ?`).bind(tokenHash).run();
 		},
 
+		async updateSessionExpiry(tokenHash: string, expiresAt: number) {
+			await db.prepare(`UPDATE ${t.sessions} SET expires_at = ? WHERE id = ?`).bind(expiresAt, tokenHash).run();
+		},
+
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			await db
 				.prepare(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES (?, ?, ?, ?)`)
