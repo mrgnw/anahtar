@@ -77,6 +77,16 @@ describe('generateOTP', () => {
 		const result = await generateOTP(db, 'test@example.com', config);
 		expect(result.code).toMatch(/^\d{6}$/);
 	});
+
+	it('allows leading zeros so the whole digit space is used', async () => {
+		const db = mockDB();
+		const config = mockConfig({ otpLength: 1 });
+		const codes = new Set<string>();
+		for (let i = 0; i < 300; i++) {
+			codes.add((await generateOTP(db, 'test@example.com', config)).code);
+		}
+		expect(codes.has('0')).toBe(true);
+	});
 });
 
 function validRow() {
