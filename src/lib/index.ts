@@ -4,7 +4,6 @@ import { createHandlers } from './kit/handlers.js';
 import type { AuthConfig } from './types.js';
 
 export { resolveConfig } from './config.js';
-export { guessDeviceName } from './device.js';
 export type {
 	AuthConfig,
 	AuthDB,
@@ -17,10 +16,11 @@ export type {
 	OtpResult,
 	PasskeyRecord,
 	ResolvedConfig,
+	SessionMethod,
 	SessionRecord
 } from './types.js';
 export type { AuthMessages } from './i18n/types.js';
-export { resolveMessages, detectLocaleClient, detectLocaleServer, locales } from './i18n/index.js';
+export { detectLocaleServer } from './i18n/index.js';
 
 export type Auth = ReturnType<typeof createAuth>;
 
