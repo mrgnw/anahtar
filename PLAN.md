@@ -17,24 +17,29 @@ Opinionated, reusable auth for SvelteKit. Email+OTP identification with optional
 vitest.unit.ts                # Unit test config (node env)
 vitest.browser.ts             # Component test config (happy-dom + svelte compiler)
 vitest-setup.ts               # @testing-library/jest-dom setup
-src/
-├── index.ts                  # createAuth() entry point, re-exports
-├── config.ts                 # AuthConfig type + defaults
+src/lib/
+├── index.ts                  # createAuth() — server entry (.)
+├── client.ts                 # createAuthClient() — browser entry (./client)
+├── config.ts                 # defaults + resolveConfig()
+├── email.ts                  # normalizeEmail(), parseEmail()
 ├── session.ts                # create, validate, invalidate sessions
-├── otp.ts                    # generate, verify, cleanup OTP codes
+├── otp.ts                    # generate, verify OTP codes
 ├── passkey.ts                # WebAuthn registration + authentication
-├── types.ts                  # AuthUser, AuthDB, PasskeyRecord, etc.
+├── device.ts                 # guessDeviceName() (./device)
+├── types.ts                  # AuthConfig, AuthDB, AuthLocals, ...
+├── i18n/                     # 88 locales, resolveMessages() (./i18n)
 ├── db/
-│   ├── adapter.ts            # AuthDB interface definition
-│   ├── sqlite.ts             # better-sqlite3 adapter + schema SQL
-│   └── postgres.ts           # pg adapter + schema SQL
-└── kit/
-    ├── handle.ts             # SvelteKit handle() hook
-    ├── handlers.ts           # Route handler factories
-    └── components/           # Optional Svelte auth UI
-        ├── AuthFlow.svelte   # Full email→OTP→passkey flow
-        ├── OtpInput.svelte   # 5-digit OTP input
-        └── PasskeyPrompt.svelte
+│   ├── sqlite.ts             # better-sqlite3 adapter + schema (./sqlite)
+│   ├── postgres.ts           # pg adapter (./postgres)
+│   └── d1.ts                 # Cloudflare D1 adapter (./d1)
+├── kit/
+│   ├── handle.ts             # SvelteKit handle() → locals.user, locals.session
+│   └── handlers.ts           # GET/POST route handlers
+└── components/               # Optional Svelte UI (./components)
+    ├── AuthFlow.svelte       # Full email→OTP→passkey flow
+    ├── AuthPill.svelte       # Compact pill: sign-in, OTP, passkeys, sign-out
+    ├── OtpInput.svelte       # n-digit OTP input
+    └── PasskeyPrompt.svelte
 ```
 
 ## Dependencies
@@ -53,7 +58,7 @@ interface AuthConfig {
   rpId?: string; // default: request hostname
   origin?: string; // default: request origin
   cookie?: string; // default: 'session'
-  sessionDuration?: number; // default: 30 days (ms)
+  sessionDuration?: number | ((method: 'otp' | 'passkey') => number); // default: 30 days (ms)
   otpExpiry?: number; // default: 30 min (ms)
   otpLength?: number; // default: 5 digits
   otpMaxAttempts?: number; // default: 5
@@ -79,41 +84,48 @@ All tables are prefixed by the adapter option, e.g. `sqliteAdapter(db, { tablePr
 
 ## DB adapter interface
 
+Every method may return a value or a promise (`MaybePromise`). See `src/lib/types.ts` for the exact signatures.
+
 ```ts
 interface AuthDB {
-  init(): void;
+  init(): MaybePromise<void>;
 
   // Users
-  getUserByEmail(email: string): AuthUser | null;
-  createUser(email: string): AuthUser;
+  getUserByEmail(email: string): MaybePromise<AuthUser | null>;
+  createUser(email: string): MaybePromise<AuthUser>;
+  setSkipPasskeyPrompt(userId: string, skip: boolean): MaybePromise<void>;
 
-  // Sessions
-  createSession(tokenHash: string, userId: string, expiresAt: number): void;
-  getSession(tokenHash: string): SessionRecord | null;
-  deleteSession(tokenHash: string): void;
+  // Sessions (id = sha256 of the token)
+  createSession(tokenHash: string, userId: string, expiresAt: number): MaybePromise<void>;
+  getSession(tokenHash: string): MaybePromise<(SessionRecord & { email: string }) | null>;
+  deleteSession(tokenHash: string): MaybePromise<void>;
+  updateSessionExpiry(tokenHash: string, expiresAt: number): MaybePromise<void>;
 
   // OTP
-  storeOTP(email: string, id: string, code: string, expiresAt: number): void;
-  getLatestOTP(email: string): OTPRecord | null;
-  updateOTPAttempts(id: string, attempts: number): void;
-  deleteOTP(id: string): void;
-  deleteOTPsForEmail(email: string): void;
+  storeOTP(email: string, id: string, code: string, expiresAt: number): MaybePromise<void>;
+  getLatestOTP(email: string): MaybePromise<OTPRecord | null>;
+  incrementOTPAttempts(id: string): MaybePromise<number | null>; // atomic, returns the new count
+  deleteOTP(id: string): MaybePromise<void>;
+  deleteOTPsForEmail(email: string): MaybePromise<void>;
 
   // Passkeys + challenges
-  storeChallenge(challenge: string, userId: string, expiresAt: number): void;
-  consumeChallenge(challenge: string): { userId: string } | null;
-  getPasskeyByCredentialId(credentialId: string): FullPasskeyRecord | null;
-  getUserPasskeys(userId: string): PasskeyRecord[];
-  storePasskey(passkey: NewPasskey): void;
-  updatePasskeyCounter(id: string, counter: number): void;
-  deletePasskey(id: string, userId: string): boolean;
+  storeChallenge(challenge: string, userId: string, expiresAt: number): MaybePromise<void>;
+  consumeChallenge(challenge: string): MaybePromise<{ userId: string } | null>; // single-use
+  getPasskeyByCredentialId(credentialId: string): MaybePromise<FullPasskeyRecord | null>;
+  getUserPasskeys(userId: string): MaybePromise<PasskeyRecord[]>;
+  storePasskey(passkey: NewPasskey): MaybePromise<void>;
+  updatePasskeyCounter(id: string, counter: number): MaybePromise<void>;
+  deletePasskey(id: string, userId: string): MaybePromise<boolean>;
 }
 ```
+
+Timestamps (`createdAt`, `expiresAt`) are milliseconds.
 
 Built-in adapters:
 
 - `sqliteAdapter(db: Database)` — from `@mrgnw/anahtar/sqlite`
 - `postgresAdapter(pool: Pool)` — from `@mrgnw/anahtar/postgres`
+- `d1Adapter(env.DB)` — from `@mrgnw/anahtar/d1`
 
 Both accept the `tablePrefix` and auto-create tables on `init()`.
 
@@ -134,7 +146,7 @@ The `fresh-pineapple` branch of [anani](https://github.com/mrgnw/anani) contains
 
 ## Testing
 
-68 tests: 46 unit + 22 component.
+109 tests: 83 unit + 26 component.
 
 ```sh
 pnpm test:unit     # otp, session, sqlite adapter — node env
@@ -151,5 +163,5 @@ The `svelteTesting()` plugin from `@testing-library/svelte/vite` handles DOM cle
 ## Build / publish
 
 - TypeScript, compiled to ESM
-- Published to GitHub Packages as `@mrgnw/anahtar`
+- Published to npm as `@mrgnw/anahtar`
 - Svelte components ship as `.svelte` source (compiled by the consuming project's bundler)
