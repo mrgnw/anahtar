@@ -9,9 +9,7 @@ export async function generateOTP(
 	await db.deleteOTPsForEmail(email);
 
 	const id = randomUUID();
-	const max = 10 ** config.otpLength;
-	const min = 10 ** (config.otpLength - 1);
-	const code = String(randomInt(min, max));
+	const code = String(randomInt(0, 10 ** config.otpLength)).padStart(config.otpLength, '0');
 	const expiresAt = Date.now() + config.otpExpiry;
 
 	await db.storeOTP(email, id, code, expiresAt);
