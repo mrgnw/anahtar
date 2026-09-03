@@ -22,8 +22,6 @@ import {
 import type { ResolvedConfig } from "../types.js";
 import { parseEmail } from "../email.js";
 
-const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
-
 type RouteHandler = (event: RequestEvent) => Promise<Response>;
 
 function getMessages(

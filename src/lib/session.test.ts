@@ -5,7 +5,6 @@ import type { AuthDB, ResolvedConfig } from './types.js';
 function mockConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
 	return {
 		db: {} as AuthDB,
-		tablePrefix: 'auth_',
 		cookie: 'session',
 		sessionDuration: 30 * 24 * 60 * 60 * 1000,
 		otpExpiry: 30 * 60 * 1000,

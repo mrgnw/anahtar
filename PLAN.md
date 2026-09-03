@@ -50,7 +50,8 @@ DB drivers are **not** dependencies. The consuming project provides its own `bet
 ```ts
 interface AuthConfig {
   db: AuthDB;
-  tablePrefix?: string; // default: 'auth_'
+  rpId?: string; // default: request hostname
+  origin?: string; // default: request origin
   cookie?: string; // default: 'session'
   sessionDuration?: number; // default: 30 days (ms)
   otpExpiry?: number; // default: 30 min (ms)
@@ -62,7 +63,7 @@ interface AuthConfig {
 
 ### Table prefix
 
-All tables are prefixed with `tablePrefix` (default `auth_`):
+All tables are prefixed by the adapter option, e.g. `sqliteAdapter(db, { tablePrefix: 'myapp_' })` (default `auth_`):
 
 | Default name      | With `tablePrefix: 'myapp_'` |
 | ----------------- | ---------------------------- |
