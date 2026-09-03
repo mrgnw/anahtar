@@ -96,4 +96,5 @@ pnpm test
 ## Docs
 
 - [Integration guide](docs/integration.md) — install, config, components, i18n, theming, DB adapters
+- [Security notes](docs/security.md) — rate limiting you must add, passkey and session defaults
 - [PLAN.md](PLAN.md) — architecture, DB adapter interface, test setup

@@ -173,6 +173,7 @@ export {};
 | [components.md](./components.md) | AuthFlow, AuthPill, OtpInput, PasskeyPrompt, theming, i18n |
 | [configuration.md](./configuration.md) | Full config reference, table prefix, migrations, email providers |
 | [sveltekit-patterns.md](./sveltekit-patterns.md) | Reactive user store, route-based panels, passkey management UI |
+| [security.md](./security.md) | Rate limiting you must add, passkey and session defaults, proxies |
 
 ---
 
