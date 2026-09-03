@@ -16,8 +16,8 @@ Auth for SvelteKit. Email+OTP + optional passkeys.
 ## Roadmap: Proof-of-concept: everything can change
 The goal is simplicity, we will likely stay with passkeys and email+OTP only.
 
-- we may change the implemenation.
-- we will likely split the UI elements from the API, making it easier to run headless, just use the UI, or use both.
+- we may change the implementation.
+- headless use: `@mrgnw/anahtar/client` wraps every route (OTP, sessions, passkey ceremonies); the components are built on it.
 
 ## Quick start
 

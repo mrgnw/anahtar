@@ -110,79 +110,31 @@ Standalone OTP input with auto-advance, backspace navigation, and paste support:
 
 ## Building your own UI
 
-Call the API routes directly if you prefer full control.
+`@mrgnw/anahtar/client` wraps every route, including the WebAuthn ceremonies. The shipped components are built on it.
 
 ```ts
-// Send OTP
-await fetch('/api/auth/start', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email }),
-});
+import { createAuthClient, AuthError } from '@mrgnw/anahtar/client';
 
-// Verify OTP
-const res = await fetch('/api/auth/verify', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, code }),
-});
-const { hasPasskey, skipPasskeyPrompt } = await res.json();
+const auth = createAuthClient(); // apiBase defaults to '/api/auth'
 
-// Logout
-await fetch('/api/auth/logout', { method: 'POST' });
+const { otpLength } = await auth.sendCode(email);
+const { hasPasskey, skipPasskeyPrompt } = await auth.verifyCode(email, code);
+await auth.logout();
+
+await auth.passkeyLogin({ conditional: true }); // autofill on page load; resolves when the user picks a passkey
+await auth.passkeyLogin({ email });             // email-first: false if no passkeys, cancelled, or stalled (8 s)
+await auth.passkeyRegister();                   // false if the user dismissed the sheet; name defaults to guessDeviceName()
+await auth.passkeyList();
+await auth.passkeyRemove(id);
+await auth.skipPasskeyPrompt();
+auth.passkeyCancel();                           // abort a pending ceremony, e.g. on unmount
 ```
 
-### Conditional WebAuthn (passkey autofill)
+Server errors throw `AuthError` with the translated `message` and the HTTP `status` (`429` when the OTP attempt cap is hit).
 
-To offer instant passkey login when the page loads, before the user types anything:
+`passkeyLogin({ email })` and `passkeyRegister()` must run from a user gesture (WebAuthn needs transient activation). Give the email input `autocomplete="username webauthn"` so the conditional ceremony can offer saved passkeys.
 
-```ts
-import { startAuthentication } from '@simplewebauthn/browser';
-
-async function tryConditionalWebAuthn() {
-  const res = await fetch('/api/auth/passkey/login-start');
-  if (!res.ok) return;
-  const options = await res.json();
-
-  const authResponse = await startAuthentication({
-    optionsJSON: options,
-    useBrowserAutofill: true, // enables conditional mediation
-  });
-
-  const verifyRes = await fetch('/api/auth/passkey/login-finish', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(authResponse),
-  });
-  if (verifyRes.ok) {
-    // user is logged in
-  }
-}
-```
-
-Requires `autocomplete="username webauthn"` on your email input. The browser will show saved passkeys in the autofill dropdown.
-
-### Passkey-first login (check before OTP)
-
-When a user submits their email, check for existing passkeys first:
-
-```ts
-const checkRes = await fetch('/api/auth/passkey/check-email', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email }),
-});
-
-if (checkRes.ok) {
-  const opts = await checkRes.json();
-  if (opts.allowCredentials?.length > 0) {
-    // user has passkeys — try passkey auth first
-    const authResp = await startAuthentication({ optionsJSON: opts });
-    // ... verify with passkey/login-finish
-  }
-}
-// fall through to OTP if no passkeys or user cancelled
-```
+The raw routes are listed in [integration.md](./integration.md#wire-into-sveltekit).
 
 ---
 
