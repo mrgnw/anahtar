@@ -17,21 +17,21 @@ describe('PasskeyPrompt', () => {
 		const onSkip = vi.fn();
 		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
 		expect(screen.getByText('Making you a passkey')).toBeInTheDocument();
-		expect(screen.getByText('for easier login')).toBeInTheDocument();
+		expect(screen.getByText('for faster, easier, safer login')).toBeInTheDocument();
 	});
 
-	it('shows Skip button initially', () => {
+	it('shows the "Maybe later" button initially', () => {
 		const onRegister = vi.fn().mockResolvedValue(undefined);
 		const onSkip = vi.fn();
 		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
-		expect(screen.getByText('Skip')).toBeInTheDocument();
+		expect(screen.getByText('Maybe later')).toBeInTheDocument();
 	});
 
-	it('calls onSkip when Skip clicked', async () => {
+	it('calls onSkip when "Maybe later" clicked', async () => {
 		const onRegister = vi.fn().mockResolvedValue(undefined);
 		const onSkip = vi.fn();
 		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
-		await fireEvent.click(screen.getByText('Skip'));
+		await fireEvent.click(screen.getByText('Maybe later'));
 		expect(onSkip).toHaveBeenCalledOnce();
 	});
 
@@ -46,18 +46,17 @@ describe('PasskeyPrompt', () => {
 		expect(onRegister).toHaveBeenCalledOnce();
 	});
 
-	it('shows failed state when onRegister throws', async () => {
+	it('re-enables the manual buttons when onRegister throws', async () => {
 		const onRegister = vi.fn().mockRejectedValue(new Error('fail'));
 		const onSkip = vi.fn();
 		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip, countdownSeconds: 1 } });
 
 		await vi.advanceTimersByTimeAsync(1000);
 
-		// Wait for the rejected promise to settle
 		await vi.waitFor(() => {
-			expect(screen.getByText('Set up a passkey?')).toBeInTheDocument();
+			expect(onRegister).toHaveBeenCalledOnce();
+			expect(screen.getByText('Add passkey now')).not.toBeDisabled();
 		});
-		expect(screen.getByText('Add passkey')).toBeInTheDocument();
 		expect(screen.getByText('Maybe later')).toBeInTheDocument();
 	});
 
