@@ -20,6 +20,7 @@ import {
   type AuthMessages,
 } from "../i18n/index.js";
 import type { ResolvedConfig } from "../types.js";
+import { parseEmail } from "../email.js";
 
 const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
@@ -67,18 +68,15 @@ export function createHandlers(config: ResolvedConfig): {
       handler: async (event) => {
         const m = getMessages(event, config);
         const body = await event.request.json().catch(() => null);
-        if (
-          !body ||
-          typeof body.email !== "string" ||
-          !body.email.includes("@")
-        ) {
+        const email = parseEmail(body?.email);
+        if (!email) {
           return json({ error: m.errorInvalidEmail }, { status: 400 });
         }
 
-        const { code } = await generateOTP(config.db, body.email, config);
+        const { code } = await generateOTP(config.db, email, config);
 
         try {
-          await config.onSendOTP(body.email, code);
+          await config.onSendOTP(email, code);
         } catch (err) {
           const message =
             err instanceof Error ? err.message : m.errorGeneric;
@@ -94,15 +92,12 @@ export function createHandlers(config: ResolvedConfig): {
       handler: async (event) => {
         const m = getMessages(event, config);
         const body = await event.request.json().catch(() => null);
-        if (
-          !body ||
-          typeof body.email !== "string" ||
-          typeof body.code !== "string"
-        ) {
+        const email = parseEmail(body?.email);
+        if (!email || typeof body.code !== "string") {
           return json({ error: m.errorInvalidInput }, { status: 400 });
         }
 
-        const otp = await verifyOTP(config.db, body.email, body.code, config);
+        const otp = await verifyOTP(config.db, email, body.code, config);
         if (!otp.ok) {
           const messages = {
             invalid: m.errorInvalidCode,
@@ -115,9 +110,9 @@ export function createHandlers(config: ResolvedConfig): {
           );
         }
 
-        let user = await config.db.getUserByEmail(body.email);
+        let user = await config.db.getUserByEmail(email);
         if (!user) {
-          user = await config.db.createUser(body.email);
+          user = await config.db.createUser(email);
         }
 
         const session = await createSession(config.db, user.id, config);
@@ -168,9 +163,8 @@ export function createHandlers(config: ResolvedConfig): {
       method: "POST",
       handler: async (event) => {
         const body = await event.request.json().catch(() => null);
-        const email = body?.email;
-        if (!email || typeof email !== "string")
-          return json({ allowCredentials: [] });
+        const email = parseEmail(body?.email);
+        if (!email) return json({ allowCredentials: [] });
         const options = await generateAuthenticationChallengeForUser(
           config.db,
           email,
