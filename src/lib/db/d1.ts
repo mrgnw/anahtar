@@ -82,7 +82,7 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 				id: row.id,
 				email: row.email,
 				skipPasskeyPrompt: row.skip_passkey_prompt === 1,
-				createdAt: row.created_at
+				createdAt: row.created_at * 1000
 			};
 		},
 
@@ -94,7 +94,7 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 				id,
 				email: normalized,
 				skipPasskeyPrompt: false,
-				createdAt: Math.floor(Date.now() / 1000)
+				createdAt: Date.now()
 			};
 		},
 
@@ -221,7 +221,7 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 				counter: row.counter,
 				transports: row.transports,
 				name: row.name,
-				createdAt: row.created_at,
+				createdAt: row.created_at * 1000,
 				email: row.email
 			};
 		},
@@ -248,7 +248,7 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 				counter: row.counter,
 				transports: row.transports,
 				name: row.name,
-				createdAt: row.created_at
+				createdAt: row.created_at * 1000
 			}));
 		},
 

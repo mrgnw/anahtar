@@ -78,7 +78,7 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 				id: row.id,
 				email: row.email,
 				skipPasskeyPrompt: row.skip_passkey_prompt === 1,
-				createdAt: row.created_at
+				createdAt: row.created_at * 1000
 			};
 		},
 
@@ -90,7 +90,7 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 				id,
 				email: normalized,
 				skipPasskeyPrompt: false,
-				createdAt: Math.floor(Date.now() / 1000)
+				createdAt: Date.now()
 			};
 		},
 
@@ -215,7 +215,7 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 				counter: row.counter,
 				transports: row.transports,
 				name: row.name,
-				createdAt: row.created_at,
+				createdAt: row.created_at * 1000,
 				email: row.email
 			};
 		},
@@ -241,7 +241,7 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 				counter: row.counter,
 				transports: row.transports,
 				name: row.name,
-				createdAt: row.created_at
+				createdAt: row.created_at * 1000
 			}));
 		},
 
