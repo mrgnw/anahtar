@@ -1,5 +1,5 @@
 <script lang="ts">
-import { guessDeviceName } from '../device.js';
+import { AuthError, createAuthClient } from '../client.js';
 import { resolveMessages, detectLocaleClient, type AuthMessages } from '../i18n/index.js';
 import OtpInput from './OtpInput.svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
@@ -48,6 +48,7 @@ let {
 let expanded = $state(false);
 
 let m = $derived(resolveMessages(locale ?? detectLocaleClient(), messageOverrides));
+const api = $derived(createAuthClient(apiBase));
 
 let email = $state('');
 let loading = $state(false);
@@ -62,23 +63,7 @@ let hoveredKey = $state<string | null>(null);
 let passkeyRefresh = $state(0);
 let passkeyOnboarding = $state(false);
 
-const PASSKEY_TIMEOUT_MS = 8000;
-// Captured from the lazy @simplewebauthn/browser import so onMount cleanup (sync)
-// and handleEmailSubmit can cancel an in-flight ceremony without re-importing.
-let webauthnAbort: { cancelCeremony: () => void } | null = null;
-
 const isAuthenticated = $derived(!!user);
-
-// Best-effort bound on a promise so a WebAuthn ceremony that never settles
-// (e.g. rpID mismatch on preview domains) can't wedge the sign-in flow.
-function raceTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-	let timer: ReturnType<typeof setTimeout> | undefined;
-	const timeout = new Promise<never>((_, reject) => {
-		timer = setTimeout(() => reject(new Error('timeout')), ms);
-	});
-	// Promise.race consumes the loser's later settlement, so no unhandled rejection.
-	return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
-}
 
 function shortDate(ts?: number): string {
 	if (!ts) return '';
@@ -86,22 +71,19 @@ function shortDate(ts?: number): string {
 	const mon = d.toLocaleDateString(undefined, { month: 'short' });
 	return `${mon} ${d.getFullYear()}`;
 }
-async function fetchPasskeys(): Promise<PasskeyInfo[]> {
-	const res = await fetch(`${apiBase}/passkey/list`);
-	return res.ok ? res.json() : [];
-}
+
 const passkeyPromise = $derived(
-	isAuthenticated && passkeyRefresh >= 0 ? (getPasskeys ?? fetchPasskeys)() : null
+	isAuthenticated && passkeyRefresh >= 0 ? (getPasskeys ?? api.passkeyList)() : null
 );
 
 onMount(() => {
 	isTouch = matchMedia('(pointer: coarse)').matches;
 	if (!isAuthenticated) tryConditionalWebAuthn();
-	return () => webauthnAbort?.cancelCeremony();
+	return () => api.passkeyCancel();
 });
 
 async function handleSignOut() {
-	await fetch(`${apiBase}/logout`, { method: 'POST' }).catch(() => {});
+	await api.logout().catch(() => {});
 	email = '';
 	otpStep = false;
 	passkeyOnboarding = false;
@@ -114,99 +96,30 @@ async function handleSignOut() {
 }
 
 async function tryConditionalWebAuthn() {
-	try {
-		const mod = await import('@simplewebauthn/browser');
-		webauthnAbort = mod.WebAuthnAbortService;
-		const res = await fetch(`${apiBase}/passkey/login-start`);
-		if (!res.ok) return;
-		const options = (await res.json()) as any;
-		const authResponse = await mod.startAuthentication({
-			optionsJSON: options,
-			useBrowserAutofill: true,
-		});
-		// Only reached when the user actually picks a passkey via autofill.
-		// Scope `loading` to the verify step so the abort path never touches it
-		// (an aborted ceremony throws straight to the catch below).
-		loading = true;
-		try {
-			const verifyRes = await fetch(`${apiBase}/passkey/login-finish`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(authResponse),
-			});
-			if (verifyRes.ok) await onSuccess?.();
-		} finally {
-			loading = false;
-		}
-	} catch {
-		/* not available or cancelled */
-	}
+	if (await api.passkeyLogin({ conditional: true })) await onSuccess?.();
 }
 
 async function handleEmailSubmit(e: SubmitEvent) {
 	e.preventDefault();
 	if (!email.includes('@')) return;
-	webauthnAbort?.cancelCeremony();
 	loading = true;
 	error = '';
 	try {
-		// Passkey-first: check if user has passkeys before falling back to OTP
-		try {
-			const mod = await import('@simplewebauthn/browser');
-			webauthnAbort = mod.WebAuthnAbortService;
-			const checkRes = await fetch(`${apiBase}/passkey/check-email`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email }),
-			});
-			if (checkRes.ok) {
-				const opts = (await checkRes.json()) as any;
-				if ((opts?.allowCredentials?.length ?? 0) > 0) {
-					try {
-						const authResp = await raceTimeout(
-							mod.startAuthentication({ optionsJSON: opts }),
-							PASSKEY_TIMEOUT_MS,
-						);
-						const vRes = await fetch(`${apiBase}/passkey/login-finish`, {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify(authResp),
-						});
-						if (vRes.ok) {
-							await onSuccess?.();
-							return;
-						}
-					} catch {
-						mod.WebAuthnAbortService.cancelCeremony();
-						/* stalled, cancelled, or failed — fall through to OTP */
-					}
-				}
-			}
-		} catch {
-			/* passkey check failed */
-		}
-
-		const res = await fetch(`${apiBase}/start`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email }),
-		});
-		if (!res.ok) {
-			const d = ((await res.json().catch(() => ({}))) as any);
-			error = d?.error ?? m.errorGeneric;
+		if (await api.passkeyLogin({ email })) {
+			await onSuccess?.();
 			return;
 		}
-		const data = ((await res.json().catch(() => ({}))) as any);
-		otpLength = Number(data?.otpLength) || otpLength;
+		const data: { otpLength?: number; devCode?: unknown } = await api.sendCode(email);
+		otpLength = data.otpLength || otpLength;
 		otpStep = true;
 		onStepChange?.('otp');
-		if (data?.devCode) {
+		if (data.devCode) {
 			setTimeout(() => verifyOtp(String(data.devCode)), 50);
 		} else {
 			setTimeout(() => otpInput?.focus(), 50);
 		}
-	} catch {
-		error = m.errorGeneric;
+	} catch (e) {
+		error = e instanceof AuthError ? e.message : m.errorGeneric;
 	} finally {
 		loading = false;
 	}
@@ -216,18 +129,7 @@ async function verifyOtp(code: string) {
 	loading = true;
 	error = '';
 	try {
-		const res = await fetch(`${apiBase}/verify`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email, code }),
-		});
-		if (!res.ok) {
-			const d = ((await res.json().catch(() => ({}))) as any);
-			error = d?.error ?? m.errorInvalidCode;
-			otpInput?.clear();
-			return;
-		}
-		const data = ((await res.json().catch(() => ({}))) as any);
+		const data = await api.verifyCode(email, code);
 		otpStep = false;
 		if (!data.hasPasskey && !data.skipPasskeyPrompt) {
 			pendingSuccess = true;
@@ -236,8 +138,9 @@ async function verifyOtp(code: string) {
 			await onSuccess?.();
 			onStepChange?.('authenticated');
 		}
-	} catch {
-		error = m.errorGeneric;
+	} catch (e) {
+		error = e instanceof AuthError ? e.message : m.errorGeneric;
+		otpInput?.clear();
 	} finally {
 		loading = false;
 	}
@@ -246,11 +149,7 @@ async function verifyOtp(code: string) {
 async function resend() {
 	loading = true;
 	try {
-		await fetch(`${apiBase}/start`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email }),
-		});
+		await api.sendCode(email);
 		otpInput?.clear();
 	} catch {
 		/* ignore */
@@ -260,17 +159,7 @@ async function resend() {
 }
 
 async function handlePasskeyRegister() {
-	const { startRegistration } = await import('@simplewebauthn/browser');
-	const optRes = await fetch(`${apiBase}/passkey/register-start`, { method: 'POST' });
-	if (!optRes.ok) throw new Error('Failed to get registration options');
-	const options = (await optRes.json()) as any;
-	const regResponse = await startRegistration({ optionsJSON: options });
-	const res = await fetch(`${apiBase}/passkey/register-finish`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ ...regResponse, name: guessDeviceName() }),
-	});
-	if (!res.ok) throw new Error('Registration failed');
+	if (!(await api.passkeyRegister())) throw new Error('cancelled');
 	passkeyOnboarding = false;
 	passkeyRefresh++;
 	await onPasskeysChange?.();
@@ -282,7 +171,7 @@ async function handlePasskeyRegister() {
 }
 
 async function handlePasskeySkip() {
-	fetch(`${apiBase}/skip-passkey`, { method: 'POST' });
+	api.skipPasskeyPrompt().catch(() => {});
 	passkeyOnboarding = false;
 	if (pendingSuccess) {
 		pendingSuccess = false;
@@ -295,25 +184,10 @@ async function addPasskey() {
 	loading = true;
 	error = '';
 	try {
-		const { startRegistration } = await import('@simplewebauthn/browser');
-		const startRes = await fetch(`${apiBase}/passkey/register-start`, { method: 'POST' });
-		if (!startRes.ok) {
-			error = 'Failed to start';
-			return;
+		if (await api.passkeyRegister()) {
+			passkeyRefresh++;
+			await onPasskeysChange?.();
 		}
-		const opts = (await startRes.json()) as any;
-		const regResponse = await startRegistration({ optionsJSON: opts });
-		const finishRes = await fetch(`${apiBase}/passkey/register-finish`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ ...regResponse, name: guessDeviceName() }),
-		});
-		if (!finishRes.ok) {
-			error = 'Failed to register';
-			return;
-		}
-		passkeyRefresh++;
-		await onPasskeysChange?.();
 	} catch (e) {
 		error = e instanceof Error ? e.message : 'Failed';
 	} finally {
@@ -324,11 +198,7 @@ async function addPasskey() {
 async function removePasskey(id: string) {
 	loading = true;
 	try {
-		await fetch(`${apiBase}/passkey/remove`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ passkeyId: id }),
-		});
+		await api.passkeyRemove(id);
 		passkeyRefresh++;
 		await onPasskeysChange?.();
 	} catch {
