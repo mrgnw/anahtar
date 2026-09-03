@@ -9,7 +9,7 @@ interface AuthConfig {
   rpId?: string;            // WebAuthn rpID — default: request hostname
   origin?: string;          // WebAuthn origin — default: request origin
   cookie?: string;          // session cookie name — default: 'session'
-  sessionDuration?: number; // default: 30 days (ms)
+  sessionDuration?: number | ((method: 'otp' | 'passkey') => number); // ms — default: 30 days
   otpExpiry?: number;       // default: 30 min (ms)
   otpLength?: number;       // default: 5 digits
   otpMaxAttempts?: number;  // default: 5
@@ -38,6 +38,18 @@ Default `auth_`; pass `''` for no prefix:
 | `auth_otp_codes`  | `myapp_otp_codes`       | `otp_codes`       |
 | `auth_passkeys`   | `myapp_passkeys`        | `passkeys`        |
 | `auth_challenges` | `myapp_challenges`      | `challenges`      |
+
+## Session duration
+
+A number of milliseconds, or a function of how the session was established:
+
+```ts
+const DAY = 24 * 60 * 60 * 1000;
+
+sessionDuration: (method) => (method === 'passkey' ? 60 * DAY : 30 * DAY),
+```
+
+`otp` is an email-code sign-in, `passkey` a WebAuthn assertion. Registering a passkey on an existing session extends it to the `passkey` duration when that is later than its current expiry. `event.locals.session.expiresAt` exposes the result.
 
 ## WebAuthn origin
 

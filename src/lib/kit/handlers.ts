@@ -19,7 +19,7 @@ import {
   detectLocaleServer,
   type AuthMessages,
 } from "../i18n/index.js";
-import type { ResolvedConfig } from "../types.js";
+import type { ResolvedConfig, SessionMethod } from "../types.js";
 import { parseEmail } from "../email.js";
 
 type RouteHandler = (event: RequestEvent) => Promise<Response>;
@@ -48,26 +48,46 @@ export function createHandlers(
   GET: RouteHandler;
   POST: RouteHandler;
 } {
-  const maxAge = Math.floor(config.sessionDuration / 1000);
-
-  function cookieOpts(event: RequestEvent) {
+  function cookieOpts(event: RequestEvent, durationMs: number) {
     return {
       httpOnly: true,
       secure: event.url.protocol === "https:",
       sameSite: "lax" as const,
       path: "/",
-      maxAge,
+      maxAge: Math.floor(durationMs / 1000),
     };
   }
 
-  async function startSession(event: RequestEvent, userId: string) {
+  async function startSession(
+    event: RequestEvent,
+    userId: string,
+    method: SessionMethod,
+  ) {
     const previous = event.cookies.get(config.cookie);
     if (previous) {
       const existing = await validateSession(config.db, previous);
       if (existing) await invalidateSession(config.db, existing.session.id);
     }
-    const session = await createSession(config.db, userId, config);
-    event.cookies.set(config.cookie, session.sessionToken, cookieOpts(event));
+    const session = await createSession(config.db, userId, config, method);
+    event.cookies.set(
+      config.cookie,
+      session.sessionToken,
+      cookieOpts(event, config.sessionDuration(method)),
+    );
+  }
+
+  async function extendCurrentSession(
+    event: RequestEvent,
+    method: SessionMethod,
+  ) {
+    const token = event.cookies.get(config.cookie);
+    const current = event.locals.session;
+    if (!token || !current) return;
+    const duration = config.sessionDuration(method);
+    const expiresAt = Date.now() + duration;
+    if (expiresAt <= current.expiresAt) return;
+    await config.db.updateSessionExpiry(current.id, expiresAt);
+    event.cookies.set(config.cookie, token, cookieOpts(event, duration));
   }
 
   const routes: Record<
@@ -126,7 +146,7 @@ export function createHandlers(
           user = await config.db.createUser(email);
         }
 
-        await startSession(event, user.id);
+        await startSession(event, user.id, "otp");
 
         const passkeys = await config.db.getUserPasskeys(user.id);
 
@@ -201,7 +221,7 @@ export function createHandlers(
         );
         if (!result) return json({ error: m.errorAuthFailed }, { status: 401 });
 
-        await startSession(event, result.user.id);
+        await startSession(event, result.user.id, "passkey");
 
         return json({ user: result.user });
       },
@@ -253,6 +273,7 @@ export function createHandlers(
           return json({ error: m.errorPasskeyRegFailed }, { status: 400 });
         }
 
+        await extendCurrentSession(event, "passkey");
         return json({ success: true });
       },
     },

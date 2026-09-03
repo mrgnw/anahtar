@@ -10,8 +10,10 @@ const DEFAULTS = {
 } as const;
 
 export function resolveConfig(config: AuthConfig): ResolvedConfig {
+	const { sessionDuration = DEFAULTS.sessionDuration, ...rest } = config;
 	return {
 		...DEFAULTS,
-		...config,
+		...rest,
+		sessionDuration: typeof sessionDuration === 'function' ? sessionDuration : () => sessionDuration,
 	};
 }

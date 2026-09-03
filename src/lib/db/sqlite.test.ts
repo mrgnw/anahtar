@@ -124,6 +124,13 @@ describe('sessions', () => {
 		db.deleteSession('hash-del');
 		expect(db.getSession('hash-del')).toBeNull();
 	});
+
+	it('updateSessionExpiry changes expires_at', () => {
+		const user = db.createUser('ext@example.com');
+		db.createSession('hash-ext', user.id, 1000);
+		db.updateSessionExpiry('hash-ext', 5000);
+		expect(db.getSession('hash-ext')!.expiresAt).toBe(5000);
+	});
 });
 
 describe('OTP', () => {

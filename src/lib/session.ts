@@ -1,17 +1,18 @@
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeHexLowerCase } from '@oslojs/encoding';
 import { randomBytes } from 'node:crypto';
-import type { AuthDB, ResolvedConfig } from './types.js';
+import type { AuthDB, ResolvedConfig, SessionMethod } from './types.js';
 
 export async function createSession(
 	db: AuthDB,
 	userId: string,
 	config: ResolvedConfig,
+	method: SessionMethod,
 ): Promise<{ sessionToken: string; expiresAt: number }> {
 	const tokenBytes = randomBytes(32);
 	const sessionToken = encodeHexLowerCase(tokenBytes);
 	const tokenHash = encodeHexLowerCase(sha256(tokenBytes));
-	const expiresAt = Date.now() + config.sessionDuration;
+	const expiresAt = Date.now() + config.sessionDuration(method);
 
 	await db.createSession(tokenHash, userId, expiresAt);
 

@@ -139,6 +139,10 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 			await pool.query(`DELETE FROM ${t.sessions} WHERE id = $1`, [tokenHash]);
 		},
 
+		async updateSessionExpiry(tokenHash: string, expiresAt: number) {
+			await pool.query(`UPDATE ${t.sessions} SET expires_at = $1 WHERE id = $2`, [expiresAt, tokenHash]);
+		},
+
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			await pool.query(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES ($1, $2, $3, $4)`, [
 				id,
