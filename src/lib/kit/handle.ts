@@ -6,19 +6,10 @@ export function createHandle(config: ResolvedConfig, ready: Promise<void>): Hand
 	return async ({ event, resolve }) => {
 		await ready;
 		const token = event.cookies.get(config.cookie);
-		if (!token) {
-			event.locals.user = null;
-			return resolve(event);
-		}
-
-		const result = await validateSession(config.db, token);
-		if (!result) {
-			event.cookies.delete(config.cookie, { path: '/' });
-			event.locals.user = null;
-			return resolve(event);
-		}
-
-		event.locals.user = result.user;
+		const result = token ? await validateSession(config.db, token) : null;
+		if (token && !result) event.cookies.delete(config.cookie, { path: '/' });
+		event.locals.user = result?.user ?? null;
+		event.locals.session = result?.session ?? null;
 		return resolve(event);
 	};
 }

@@ -5,6 +5,11 @@ export interface AuthUser {
 	createdAt: number;
 }
 
+export interface AuthLocals {
+	user: { id: string; email: string } | null;
+	session: { id: string; expiresAt: number } | null;
+}
+
 export interface SessionRecord {
 	id: string;
 	userId: string;
