@@ -59,6 +59,16 @@ export function createHandlers(config: ResolvedConfig): {
     };
   }
 
+  async function startSession(event: RequestEvent, userId: string) {
+    const previous = event.cookies.get(config.cookie);
+    if (previous) {
+      const existing = await validateSession(config.db, previous);
+      if (existing) await invalidateSession(config.db, existing.session.id);
+    }
+    const session = await createSession(config.db, userId, config);
+    event.cookies.set(config.cookie, session.sessionToken, cookieOpts(event));
+  }
+
   const routes: Record<
     string,
     { method: "GET" | "POST"; handler: RouteHandler }
@@ -115,12 +125,7 @@ export function createHandlers(config: ResolvedConfig): {
           user = await config.db.createUser(email);
         }
 
-        const session = await createSession(config.db, user.id, config);
-        event.cookies.set(
-          config.cookie,
-          session.sessionToken,
-          cookieOpts(event),
-        );
+        await startSession(event, user.id);
 
         const passkeys = await config.db.getUserPasskeys(user.id);
 
@@ -195,12 +200,7 @@ export function createHandlers(config: ResolvedConfig): {
         );
         if (!result) return json({ error: m.errorAuthFailed }, { status: 401 });
 
-        const session = await createSession(config.db, result.user.id, config);
-        event.cookies.set(
-          config.cookie,
-          session.sessionToken,
-          cookieOpts(event),
-        );
+        await startSession(event, result.user.id);
 
         return json({ user: result.user });
       },
