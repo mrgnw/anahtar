@@ -4,3 +4,13 @@
 export function normalizeEmail(email: string): string {
 	return email.trim().toLowerCase();
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254;
+
+export function parseEmail(raw: unknown): string | null {
+	if (typeof raw !== 'string') return null;
+	const email = normalizeEmail(raw);
+	if (email.length > MAX_EMAIL_LENGTH || !EMAIL_RE.test(email)) return null;
+	return email;
+}
