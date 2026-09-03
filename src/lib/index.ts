@@ -21,13 +21,20 @@ export type {
 export type { AuthMessages } from './i18n/types.js';
 export { resolveMessages, detectLocaleClient, detectLocaleServer, locales } from './i18n/index.js';
 
-export async function createAuth(config: AuthConfig) {
+export type Auth = ReturnType<typeof createAuth>;
+
+export function createAuth(config: AuthConfig) {
 	const resolved = resolveConfig(config);
-	await config.db.init();
+	const ready = Promise.resolve().then(() => config.db.init());
 
 	return {
-		handle: createHandle(resolved),
-		handlers: createHandlers(resolved),
+		handle: createHandle(resolved, ready),
+		handlers: createHandlers(resolved, ready),
+		listPasskeys: async (userId: string) => {
+			await ready;
+			return config.db.getUserPasskeys(userId);
+		},
+		ready,
 		config: resolved
 	};
 }
