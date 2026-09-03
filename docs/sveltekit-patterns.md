@@ -10,10 +10,10 @@ The three moments that matter: sign-in, sign-out, and page load.
 // src/routes/+layout.server.ts
 export const load = async ({ locals, depends }) => {
   depends("app:auth");
-  const user = locals.user
-    ? { id: locals.user.id, email: locals.user.email }
-    : null;
-  return { user };
+  return {
+    user: locals.user,
+    sessionExpiresAt: locals.session?.expiresAt ?? null, // for a "stay signed in" prompt
+  };
 };
 ```
 
@@ -186,31 +186,21 @@ Map your app's design tokens to anahtar's CSS custom properties so components ma
 
 ## Passkey management UI
 
-For listing and adding passkeys in the account panel, expose a server remote function:
+`AuthPill` lists, adds and removes passkeys through the built-in routes. For your own account page, expose a remote query:
 
 ```ts
 // src/lib/user.remote.ts
-import { createRemoteFunction } from "@sveltejs/kit";
+import { query, getRequestEvent } from "$app/server";
 import { getAuth } from "$lib/server/auth";
 
-export const getMyPasskeys = createRemoteFunction(
-  async ({ locals, platform }) => {
-    if (!locals.user) return [];
-    const auth = getAuth(platform!.env.DB);
-    return auth.getUserPasskeys(locals.user.id);
-  },
-);
+export const getMyPasskeys = query(async () => {
+  const { locals, platform } = getRequestEvent();
+  if (!locals.user) return [];
+  return getAuth(platform!.env).listPasskeys(locals.user.id);
+});
 ```
 
-In the component, refresh passkeys after add/remove by reassigning the promise (Svelte 5 — `$derived` won't re-run, use `$state`):
-
-```js
-let passkeyPromise = $state(getMyPasskeys());
-
-// after successful add or remove:
-await invalidateAll();
-passkeyPromise = getMyPasskeys();
-```
+After an add or remove, `await getMyPasskeys().refresh()`.
 
 ## User-specific data tables
 
@@ -234,4 +224,4 @@ CREATE TABLE user_preferences (
 | User-specific app data        | your tables, your remote functions            |
 | UI feedback (banners, toasts) | your components                               |
 | Auth route redirects          | your `+page.server.ts` load functions         |
-| Passkey management UI         | your component using `auth.getUserPasskeys()` |
+| Passkey management UI         | `AuthPill`, or your component using `auth.listPasskeys()` |

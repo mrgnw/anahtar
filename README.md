@@ -52,9 +52,20 @@ export const handle = auth.handle;
 ```
 
 ```ts
-// src/routes/api/auth/[...path]/+server.ts
+// src/routes/api/auth/[...path]/+server.ts   (the param must be named `path`)
 import { auth } from "$lib/server/auth";
 export const { GET, POST } = auth.handlers;
+```
+
+```ts
+// src/app.d.ts
+import type { AuthLocals } from "@mrgnw/anahtar";
+declare global {
+  namespace App {
+    interface Locals extends AuthLocals {} // locals.user, locals.session
+  }
+}
+export {};
 ```
 
 Optional UI components:
@@ -74,11 +85,11 @@ Optional UI components:
 <script>
   import { AuthPill } from '@mrgnw/anahtar/components';
   import { invalidateAll } from '$app/navigation';
-  import { page } from '$app/stores';
-  let user = $derived($page.data.user);
+  import { page } from '$app/state';
+  let user = $derived(page.data.user);
 </script>
 
-<AuthPill {user} onSuccess={() => invalidateAll()} />
+<AuthPill {user} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
 ```
 
 All components auto-detect locale (88 languages). Override with `locale="fr"` or `messages={{ continue: 'Go' }}`.
