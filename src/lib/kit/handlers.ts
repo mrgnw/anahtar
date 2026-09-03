@@ -43,7 +43,10 @@ function requireAuth(
   return user;
 }
 
-export function createHandlers(config: ResolvedConfig): {
+export function createHandlers(
+  config: ResolvedConfig,
+  ready: Promise<void>,
+): {
   GET: RouteHandler;
   POST: RouteHandler;
 } {
@@ -323,7 +326,13 @@ export function createHandlers(config: ResolvedConfig): {
   }
 
   return {
-    GET: async (event) => getRoute(event, "GET")?.(event) ?? notFound(event),
-    POST: async (event) => getRoute(event, "POST")?.(event) ?? notFound(event),
+    GET: async (event) => {
+      await ready;
+      return getRoute(event, "GET")?.(event) ?? notFound(event);
+    },
+    POST: async (event) => {
+      await ready;
+      return getRoute(event, "POST")?.(event) ?? notFound(event);
+    },
   };
 }

@@ -34,27 +34,24 @@ export const auth = createAuth({
 
 ### Cloudflare D1
 
+The D1 binding only exists per request (`event.platform.env`), so build the auth instance lazily and keep it for the life of the isolate:
+
 ```ts
 // src/lib/server/auth.ts
-import { createAuth } from '@mrgnw/anahtar';
+import { createAuth, type Auth } from '@mrgnw/anahtar';
 import { d1Adapter } from '@mrgnw/anahtar/d1';
 
-type Auth = Awaited<ReturnType<typeof createAuth>>;
-let _auth: Auth | null = null;
-let _initPromise: Promise<Auth> | null = null;
+let auth: Auth | undefined;
 
-export async function getAuth(env: App.Platform['env']): Promise<Auth> {
-  if (_auth) return _auth;
-  if (_initPromise) return _initPromise;
-  _initPromise = createAuth({
+export function getAuth(env: App.Platform['env']): Auth {
+  auth ??= createAuth({
     db: d1Adapter(env.DB),
     rpName: 'myapp',
     onSendOTP: async (email, code) => {
       console.log(`[dev] OTP for ${email}: ${code}`);
     },
   });
-  _auth = await _initPromise;
-  return _auth;
+  return auth;
 }
 ```
 
@@ -104,23 +101,37 @@ export const handle = auth.handle;
 // Sets event.locals.user = { id, email } | null on every request
 ```
 
-For Cloudflare Workers where `auth` is async:
-
-```ts
-// src/hooks.server.ts
-import { getAuth } from '$lib/server/auth';
-
-export const handle = async ({ event, resolve }) => {
-  const auth = await getAuth(event.platform!.env);
-  return auth.handle({ event, resolve });
-};
-```
-
 ```ts
 // src/routes/api/auth/[...path]/+server.ts
 import { auth } from '$lib/server/auth';
 
 export const { GET, POST } = auth.handlers;
+```
+
+The route parameter must be called `path`: the handlers read `event.params.path`.
+
+`createAuth` is synchronous. `db.init()` starts immediately; `handle` and the handlers wait for it, and `auth.ready` is the same promise if you want to fail at boot:
+
+```ts
+await auth.ready;
+```
+
+For Cloudflare Workers, where the instance is created per request:
+
+```ts
+// src/hooks.server.ts
+import { getAuth } from '$lib/server/auth';
+
+export const handle = ({ event, resolve }) =>
+  getAuth(event.platform!.env).handle({ event, resolve });
+```
+
+```ts
+// src/routes/api/auth/[...path]/+server.ts
+import { getAuth } from '$lib/server/auth';
+
+export const GET = (event) => getAuth(event.platform!.env).handlers.GET(event);
+export const POST = (event) => getAuth(event.platform!.env).handlers.POST(event);
 ```
 
 This provides these routes:
