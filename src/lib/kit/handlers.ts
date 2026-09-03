@@ -180,7 +180,12 @@ export function createHandlers(config: ResolvedConfig): {
       handler: async (event) => {
         const m = getMessages(event, config);
         const body = await event.request.json().catch(() => null);
-        if (!body) return json({ error: m.errorInvalidInput }, { status: 400 });
+        if (
+          typeof body?.id !== "string" ||
+          typeof body.response?.clientDataJSON !== "string"
+        ) {
+          return json({ error: m.errorInvalidInput }, { status: 400 });
+        }
 
         const result = await verifyAuthenticationResponse(
           config.db,
@@ -226,11 +231,13 @@ export function createHandlers(config: ResolvedConfig): {
         if (user instanceof Response) return user;
 
         const body = await event.request.json().catch(() => null);
-        if (!body) return json({ error: m.errorInvalidInput }, { status: 400 });
+        if (typeof body?.response?.clientDataJSON !== "string") {
+          return json({ error: m.errorInvalidInput }, { status: 400 });
+        }
 
         const { name, ...response } = body;
         const passkeyName =
-          typeof name === "string" && name.trim() ? name.trim() : null;
+          typeof name === "string" && name.trim() ? name.trim().slice(0, 64) : null;
 
         const result = await verifyRegistrationResponse(
           config.db,
@@ -301,35 +308,22 @@ export function createHandlers(config: ResolvedConfig): {
     },
   };
 
-  function getRoute(event: RequestEvent): string | null {
+  function getRoute(
+    event: RequestEvent,
+    method: "GET" | "POST",
+  ): RouteHandler | null {
     const path = event.params.path;
-    if (typeof path === "string") return path;
-    return null;
+    if (typeof path !== "string" || !Object.hasOwn(routes, path)) return null;
+    const route = routes[path];
+    return route.method === method ? route.handler : null;
+  }
+
+  function notFound(event: RequestEvent) {
+    return json({ error: getMessages(event, config).errorNotFound }, { status: 404 });
   }
 
   return {
-    GET: async (event) => {
-      const m = getMessages(event, config);
-      const path = getRoute(event);
-      if (!path) return json({ error: m.errorNotFound }, { status: 404 });
-
-      const route = routes[path];
-      if (!route || route.method !== "GET") {
-        return json({ error: m.errorNotFound }, { status: 404 });
-      }
-      return route.handler(event);
-    },
-
-    POST: async (event) => {
-      const m = getMessages(event, config);
-      const path = getRoute(event);
-      if (!path) return json({ error: m.errorNotFound }, { status: 404 });
-
-      const route = routes[path];
-      if (!route || route.method !== "POST") {
-        return json({ error: m.errorNotFound }, { status: 404 });
-      }
-      return route.handler(event);
-    },
+    GET: async (event) => getRoute(event, "GET")?.(event) ?? notFound(event),
+    POST: async (event) => getRoute(event, "POST")?.(event) ?? notFound(event),
   };
 }
