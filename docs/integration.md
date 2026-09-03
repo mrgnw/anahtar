@@ -161,19 +161,21 @@ Use `hasPasskey` and `skipPasskeyPrompt` to decide whether to show the passkey o
 
 ## TypeScript
 
-Augment `App.Locals` so `event.locals.user` is typed:
+Extend `App.Locals` with `AuthLocals` so `event.locals.user` (`{ id, email } | null`) and `event.locals.session` (`{ id, expiresAt } | null`, ms) are typed:
 
 ```ts
 // src/app.d.ts
+import type { AuthLocals } from '@mrgnw/anahtar';
+
 declare global {
   namespace App {
-    interface Locals {
-      user: { id: string; email: string } | null;
-    }
+    interface Locals extends AuthLocals {}
   }
 }
 export {};
 ```
+
+`session.expiresAt` is what a "stay signed in" prompt needs; the handle already read it while validating the cookie.
 
 ---
 

@@ -8,6 +8,7 @@ export { guessDeviceName } from './device.js';
 export type {
 	AuthConfig,
 	AuthDB,
+	AuthLocals,
 	AuthUser,
 	FullPasskeyRecord,
 	MaybePromise,
