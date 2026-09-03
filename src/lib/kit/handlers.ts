@@ -242,10 +242,7 @@ export function createHandlers(config: ResolvedConfig): {
         );
         if (!result.ok) {
           console.error("register-finish failed:", result.reason);
-          return json(
-            { error: m.errorPasskeyRegFailed, reason: result.reason },
-            { status: 400 },
-          );
+          return json({ error: m.errorPasskeyRegFailed }, { status: 400 });
         }
 
         return json({ success: true });
