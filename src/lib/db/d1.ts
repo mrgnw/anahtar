@@ -185,12 +185,10 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 
 		async consumeChallenge(challenge: string): Promise<{ userId: string } | null> {
 			const row = await db
-				.prepare(`SELECT user_id, expires_at FROM ${t.challenges} WHERE challenge = ?`)
+				.prepare(`DELETE FROM ${t.challenges} WHERE challenge = ? RETURNING user_id, expires_at`)
 				.bind(challenge)
 				.first<{ user_id: string; expires_at: number }>();
-			if (!row) return null;
-			await db.prepare(`DELETE FROM ${t.challenges} WHERE challenge = ?`).bind(challenge).run();
-			if (row.expires_at < Date.now()) return null;
+			if (!row || row.expires_at < Date.now()) return null;
 			return { userId: row.user_id };
 		},
 
