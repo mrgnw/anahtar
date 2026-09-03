@@ -51,7 +51,7 @@ export async function generateRegistrationChallenge(
     userID: new TextEncoder().encode(user.id),
     authenticatorSelection: {
       residentKey: "required",
-      userVerification: "preferred",
+      userVerification: "required",
     },
     excludeCredentials,
   });
@@ -99,7 +99,7 @@ export async function verifyRegistrationResponse(
       expectedChallenge: challenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
-      requireUserVerification: false,
+      requireUserVerification: true,
     });
 
     if (!verification.verified)
@@ -148,7 +148,7 @@ export async function generateAuthenticationChallengeForUser(
   const options = await generateAuthenticationOptions({
     rpID,
     allowCredentials,
-    userVerification: "preferred",
+    userVerification: "required",
   });
   await db.storeChallenge(
     options.challenge,
@@ -167,7 +167,7 @@ export async function generateAuthenticationChallenge(
   const options = await generateAuthenticationOptions({
     rpID,
     allowCredentials: [],
-    userVerification: "preferred",
+    userVerification: "required",
   });
 
   await db.storeChallenge(
@@ -220,7 +220,7 @@ export async function verifyAuthenticationResponse(
       expectedChallenge: challenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
-      requireUserVerification: false,
+      requireUserVerification: true,
       credential: {
         id: passkey.credentialId,
         publicKey: new Uint8Array(passkey.publicKey),
