@@ -187,7 +187,7 @@ export function resolveMessages(
 	overrides?: Partial<AuthMessages>,
 ): AuthMessages {
 	const lang = locale?.split('-')[0]?.toLowerCase();
-	const base = (lang && locales[lang]) || en;
+	const base = lang && Object.hasOwn(locales, lang) ? locales[lang] : en;
 	return overrides ? { ...base, ...overrides } : base;
 }
 
