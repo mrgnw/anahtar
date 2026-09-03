@@ -3,12 +3,16 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { AuthDB } from '../types.js';
 import { sqliteAdapter } from './sqlite.js';
 
-let db: AuthDB;
+type SyncAuthDB = {
+	[K in keyof AuthDB]: (...args: Parameters<AuthDB[K]>) => Awaited<ReturnType<AuthDB[K]>>;
+};
+
+let db: SyncAuthDB;
 let rawDb: InstanceType<typeof Database>;
 
 beforeEach(() => {
 	rawDb = new Database(':memory:');
-	db = sqliteAdapter(rawDb);
+	db = sqliteAdapter(rawDb) as SyncAuthDB;
 	db.init();
 });
 
