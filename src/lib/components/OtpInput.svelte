@@ -91,16 +91,16 @@
 	.anahtar-otp {
 		display: flex;
 		justify-content: center;
-		gap: 0.5rem;
+		gap: var(--anahtar-otp-gap, 0.5rem);
 	}
 
 	.anahtar-otp-digit {
-		width: 2.75rem;
-		height: 3rem;
+		width: var(--anahtar-otp-size, 2.75rem);
+		height: var(--anahtar-otp-height, 3rem);
 		text-align: center;
-		font-size: 1.125rem;
+		font-size: var(--anahtar-otp-font-size, 1.125rem);
 		border: 1px solid var(--anahtar-border, #d1d5db);
-		border-radius: 0.375rem;
+		border-radius: var(--anahtar-otp-radius, 0.375rem);
 		background: var(--anahtar-bg, transparent);
 		color: var(--anahtar-fg, inherit);
 	}

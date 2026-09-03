@@ -114,7 +114,7 @@ export function createHandlers(
           return json({ error: message }, { status: 400 });
         }
 
-        return json({ success: true });
+        return json({ success: true, otpLength: config.otpLength });
       },
     },
 

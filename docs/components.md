@@ -39,32 +39,12 @@ A pill-shaped component for headers, floating islands, or inline placement. Hand
   let user = $derived(page.data.user);
 </script>
 
-<AuthPill
-  {user}
-  onSuccess={() => invalidateAll()}
-  onSignOut={async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    invalidateAll();
-  }}
-/>
+<AuthPill {user} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
 ```
 
-With passkey management:
+Signed in, the pill shows the email, a passkey panel (list, add, remove, backed by the built-in `passkey/list` route) and sign-out. Sign-out POSTs `{apiBase}/logout` itself, then calls `onSignOut`.
 
-```svelte
-<AuthPill
-  {user}
-  onSuccess={() => invalidateAll()}
-  onSignOut={async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    invalidateAll();
-  }}
-  getPasskeys={async () => {
-    const res = await fetch('/api/passkeys');
-    return res.json();
-  }}
-/>
-```
+The OTP step sizes itself from the `otpLength` the `/start` response carries, so `otpLength: 6` server-side needs no client change. If `/start` returns a `devCode` field (a dev-only wrapper can add one), the pill submits it immediately.
 
 Props:
 
@@ -75,9 +55,13 @@ Props:
 | `locale`           | `string`                       | auto-detected | Language code (e.g. `'es'`, `'de'`)                     |
 | `messages`         | `Partial<AuthMessages>`        | —             | Override specific UI strings                            |
 | `onSuccess`        | `() => void`                   | —             | Called after successful sign-in                         |
-| `onSignOut`        | `() => void`                   | —             | Called when user clicks sign out (you handle the fetch) |
+| `onSignOut`        | `() => void`                   | —             | Called after the pill has POSTed `{apiBase}/logout`     |
 | `onPasskeysChange` | `() => void`                   | —             | Called after a passkey is added or removed              |
-| `getPasskeys`      | `() => Promise<PasskeyInfo[]>` | —             | If provided, enables passkey management panel           |
+| `getPasskeys`      | `() => Promise<PasskeyInfo[]>` | built-in      | Replaces the `GET {apiBase}/passkey/list` fetcher       |
+| `onStepChange`     | `(step) => void`               | —             | `'email'`, `'otp'` or `'authenticated'`                 |
+| `compact`          | `boolean`                      | `false`       | Collapse the signed-in pill to an avatar button         |
+| `separators`       | `boolean`                      | `false`       | Dot separators between pill segments                    |
+| `actions`          | `Snippet`                      | —             | Extra inline icons before the sign-out button           |
 
 `PasskeyInfo` shape: `{ id: string; credentialId?: string; name?: string | null; createdAt?: number }`
 
@@ -282,7 +266,7 @@ const locale = detectLocaleServer(event.request); // reads Accept-Language heade
 Object.keys(locales); // ['af', 'ak', 'am', 'ar', ..., 'zh', 'zu']
 ```
 
-The `AuthMessages` type defines all 34 translatable strings — see `src/lib/i18n/types.ts`.
+The `AuthMessages` type defines all translatable strings — see `src/lib/i18n/types.ts`. The same helpers are also exported from `@mrgnw/anahtar/i18n`. The root `@mrgnw/anahtar` entry is server-only (it pulls in `node:crypto`); import client helpers from `/components`, `/i18n` or `/device`.
 
 ---
 
@@ -293,9 +277,9 @@ The `AuthMessages` type defines all 34 translatable strings — see `src/lib/i18
 Generates a human-readable passkey name from the user agent string:
 
 ```ts
-import { guessDeviceName } from '@mrgnw/anahtar/components';
+import { guessDeviceName } from '@mrgnw/anahtar/device';
 // or
-import { guessDeviceName } from '@mrgnw/anahtar';
+import { guessDeviceName } from '@mrgnw/anahtar/components';
 
 guessDeviceName();          // "Chrome on macOS"
 guessDeviceName(customUA);  // pass a UA string directly

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { guessDeviceName } from '../device.js';
 import { resolveMessages, detectLocaleClient, type AuthMessages } from '../i18n/index.js';
+import OtpInput from './OtpInput.svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
 import { onMount, type Snippet } from 'svelte';
 import { slide } from 'svelte/transition';
@@ -52,8 +53,8 @@ let email = $state('');
 let loading = $state(false);
 let error = $state('');
 let otpStep = $state(false);
-let otpDigits = $state<string[]>(['', '', '', '', '']);
-let otpInputs = $state<HTMLInputElement[]>([]);
+let otpLength = $state(5);
+let otpInput = $state<{ clear: () => void; focus: () => void }>();
 let showPasskeys = $state(false);
 let pendingSuccess = $state(false);
 let isTouch = $state(false);
@@ -85,8 +86,12 @@ function shortDate(ts?: number): string {
 	const mon = d.toLocaleDateString(undefined, { month: 'short' });
 	return `${mon} ${d.getFullYear()}`;
 }
+async function fetchPasskeys(): Promise<PasskeyInfo[]> {
+	const res = await fetch(`${apiBase}/passkey/list`);
+	return res.ok ? res.json() : [];
+}
 const passkeyPromise = $derived(
-	isAuthenticated && getPasskeys && passkeyRefresh >= 0 ? getPasskeys() : null
+	isAuthenticated && passkeyRefresh >= 0 ? (getPasskeys ?? fetchPasskeys)() : null
 );
 
 onMount(() => {
@@ -96,6 +101,7 @@ onMount(() => {
 });
 
 async function handleSignOut() {
+	await fetch(`${apiBase}/logout`, { method: 'POST' }).catch(() => {});
 	email = '';
 	otpStep = false;
 	passkeyOnboarding = false;
@@ -191,49 +197,19 @@ async function handleEmailSubmit(e: SubmitEvent) {
 			return;
 		}
 		const data = ((await res.json().catch(() => ({}))) as any);
-		otpDigits = ['', '', '', '', ''];
+		otpLength = Number(data?.otpLength) || otpLength;
 		otpStep = true;
 		onStepChange?.('otp');
 		if (data?.devCode) {
-			const code = String(data.devCode);
-			for (let i = 0; i < 5; i++) otpDigits[i] = code[i] ?? '';
-			setTimeout(() => verifyOtp(code), 50);
+			setTimeout(() => verifyOtp(String(data.devCode)), 50);
 		} else {
-			setTimeout(() => otpInputs[0]?.focus(), 50);
+			setTimeout(() => otpInput?.focus(), 50);
 		}
 	} catch {
 		error = m.errorGeneric;
 	} finally {
 		loading = false;
 	}
-}
-
-function handleOtpInput(i: number, e: Event) {
-	const input = e.target as HTMLInputElement;
-	const val = input.value.replace(/\D/g, '');
-	if (val.length > 1) {
-		for (let j = 0; j < 5; j++) otpDigits[j] = val[j] ?? '';
-		const next = otpDigits.findIndex((d) => !d);
-		otpInputs[next === -1 ? 4 : next]?.focus();
-	} else {
-		otpDigits[i] = val.slice(0, 1);
-		input.value = otpDigits[i];
-		if (val && i < 4) otpInputs[i + 1]?.focus();
-	}
-	if (otpDigits.every((d) => d.length === 1)) verifyOtp(otpDigits.join(''));
-}
-
-function handleOtpKeydown(i: number, e: KeyboardEvent) {
-	if (e.key === 'Backspace' && !otpDigits[i] && i > 0) otpInputs[i - 1]?.focus();
-}
-
-function handleOtpPaste(e: ClipboardEvent) {
-	e.preventDefault();
-	const pasted = (e.clipboardData?.getData('text') ?? '').replace(/\D/g, '');
-	for (let i = 0; i < 5; i++) otpDigits[i] = pasted[i] ?? '';
-	const next = otpDigits.findIndex((d) => !d);
-	otpInputs[next === -1 ? 4 : next]?.focus();
-	if (otpDigits.every((d) => d.length === 1)) verifyOtp(otpDigits.join(''));
 }
 
 async function verifyOtp(code: string) {
@@ -248,8 +224,7 @@ async function verifyOtp(code: string) {
 		if (!res.ok) {
 			const d = ((await res.json().catch(() => ({}))) as any);
 			error = d?.error ?? m.errorInvalidCode;
-			otpDigits = ['', '', '', '', ''];
-			setTimeout(() => otpInputs[0]?.focus(), 50);
+			otpInput?.clear();
 			return;
 		}
 		const data = ((await res.json().catch(() => ({}))) as any);
@@ -276,8 +251,7 @@ async function resend() {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email }),
 		});
-		otpDigits = ['', '', '', '', ''];
-		setTimeout(() => otpInputs[0]?.focus(), 50);
+		otpInput?.clear();
 	} catch {
 		/* ignore */
 	} finally {
@@ -376,20 +350,18 @@ async function removePasskey(id: string) {
 		{:else if isAuthenticated}
 			<span class="anahtar-pill-email">{user?.email}</span>
 			{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
-			{#if getPasskeys}
-				<button
-					class="anahtar-pill-icon"
-					class:anahtar-pill-icon-active={showPasskeys}
-					onclick={() => (showPasskeys = !showPasskeys)}
-					title="Passkeys"
-					disabled={loading}
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="7.5" cy="15.5" r="5.5"/><path d="m11.5 12 4-4"/><path d="m15 7 2 2"/><path d="m17.5 4.5 2 2"/>
-					</svg>
-				</button>
-				{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
-			{/if}
+			<button
+				class="anahtar-pill-icon"
+				class:anahtar-pill-icon-active={showPasskeys}
+				onclick={() => (showPasskeys = !showPasskeys)}
+				title="Passkeys"
+				disabled={loading}
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="7.5" cy="15.5" r="5.5"/><path d="m11.5 12 4-4"/><path d="m15 7 2 2"/><path d="m17.5 4.5 2 2"/>
+				</svg>
+			</button>
+			{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			{#if actions}
 				{@render actions()}
 				{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
@@ -412,20 +384,7 @@ async function removePasskey(id: string) {
 			<span class="anahtar-pill-otp-label">{email}</span>
 			{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			<div class="anahtar-pill-otp-boxes">
-				{#each otpDigits as _, i}
-					<input
-						bind:this={otpInputs[i]}
-						class="anahtar-pill-otp-box"
-						type="text"
-						inputmode="numeric"
-						autocomplete={i === 0 ? 'one-time-code' : 'off'}
-						value={otpDigits[i]}
-						disabled={loading}
-						oninput={(e) => handleOtpInput(i, e)}
-						onkeydown={(e) => handleOtpKeydown(i, e)}
-						onpaste={handleOtpPaste}
-					/>
-				{/each}
+				<OtpInput bind:this={otpInput} length={otpLength} onComplete={verifyOtp} disabled={loading} />
 			</div>
 
 		{:else}
@@ -629,22 +588,17 @@ async function removePasskey(id: string) {
 		text-overflow: ellipsis;
 	}
 
-	.anahtar-pill-otp-boxes { display: flex; gap: 0.2rem; }
-
-	.anahtar-pill-otp-box {
-		width: 1.75rem;
-		height: 1.75rem;
-		text-align: center;
-		font-size: 0.9375rem;
-		border: 1px solid var(--anahtar-pill-border, rgba(0,0,0,0.15));
-		border-radius: 0.3rem;
-		background: var(--anahtar-pill-bg, rgba(255,255,255,0.8));
-		outline: none;
-		color: var(--anahtar-pill-fg, #111827);
-	}
-	.anahtar-pill-otp-box:focus {
-		border-color: var(--anahtar-primary, #3730a3);
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--anahtar-primary, #3730a3) 20%, transparent);
+	.anahtar-pill-otp-boxes {
+		display: flex;
+		--anahtar-otp-size: 1.75rem;
+		--anahtar-otp-height: 1.75rem;
+		--anahtar-otp-gap: 0.2rem;
+		--anahtar-otp-font-size: 0.9375rem;
+		--anahtar-otp-radius: 0.3rem;
+		--anahtar-border: var(--anahtar-pill-border, rgba(0, 0, 0, 0.15));
+		--anahtar-bg: var(--anahtar-pill-bg, rgba(255, 255, 255, 0.8));
+		--anahtar-fg: var(--anahtar-pill-fg, #111827);
+		--anahtar-ring: color-mix(in srgb, var(--anahtar-primary, #3730a3) 20%, transparent);
 	}
 
 	/* OTP helper row */
