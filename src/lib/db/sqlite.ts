@@ -178,12 +178,10 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 		},
 
 		consumeChallenge(challenge: string): { userId: string } | null {
-			const row = db.prepare(`SELECT user_id, expires_at FROM ${t.challenges} WHERE challenge = ?`).get(challenge) as
-				| { user_id: string; expires_at: number }
-				| undefined;
-			if (!row) return null;
-			db.prepare(`DELETE FROM ${t.challenges} WHERE challenge = ?`).run(challenge);
-			if (row.expires_at < Date.now()) return null;
+			const row = db
+				.prepare(`DELETE FROM ${t.challenges} WHERE challenge = ? RETURNING user_id, expires_at`)
+				.get(challenge) as { user_id: string; expires_at: number } | undefined;
+			if (!row || row.expires_at < Date.now()) return null;
 			return { userId: row.user_id };
 		},
 

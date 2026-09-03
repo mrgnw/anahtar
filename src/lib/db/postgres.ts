@@ -190,12 +190,10 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 
 		async consumeChallenge(challenge: string): Promise<{ userId: string } | null> {
 			const row = await queryOne<{ user_id: string; expires_at: string }>(
-				`SELECT user_id, expires_at FROM ${t.challenges} WHERE challenge = $1`,
+				`DELETE FROM ${t.challenges} WHERE challenge = $1 RETURNING user_id, expires_at`,
 				[challenge]
 			);
-			if (!row) return null;
-			await pool.query(`DELETE FROM ${t.challenges} WHERE challenge = $1`, [challenge]);
-			if (Number(row.expires_at) < Date.now()) return null;
+			if (!row || Number(row.expires_at) < Date.now()) return null;
 			return { userId: row.user_id };
 		},
 
