@@ -153,8 +153,11 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 			};
 		},
 
-		updateOTPAttempts(id: string, attempts: number) {
-			db.prepare(`UPDATE ${t.otpCodes} SET attempts = ? WHERE id = ?`).run(attempts, id);
+		incrementOTPAttempts(id: string): number | null {
+			const row = db
+				.prepare(`UPDATE ${t.otpCodes} SET attempts = attempts + 1 WHERE id = ? RETURNING attempts`)
+				.get(id) as { attempts: number } | undefined;
+			return row?.attempts ?? null;
 		},
 
 		deleteOTP(id: string) {

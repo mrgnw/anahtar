@@ -28,7 +28,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		deleteSession: vi.fn(),
 		storeOTP: vi.fn(),
 		getLatestOTP: vi.fn(),
-		updateOTPAttempts: vi.fn(),
+		incrementOTPAttempts: vi.fn().mockReturnValue(1),
 		deleteOTP: vi.fn(),
 		deleteOTPsForEmail: vi.fn(),
 		storeChallenge: vi.fn(),
@@ -79,6 +79,16 @@ describe('generateOTP', () => {
 	});
 });
 
+function validRow() {
+	return {
+		id: 'otp-1',
+		email: 'test@example.com',
+		code: '12345',
+		attempts: 0,
+		expiresAt: Date.now() + 60000,
+	};
+}
+
 describe('verifyOTP', () => {
 	it('returns invalid when no OTP exists', async () => {
 		const db = mockDB({ getLatestOTP: vi.fn().mockReturnValue(null) });
@@ -103,15 +113,10 @@ describe('verifyOTP', () => {
 		expect(db.deleteOTP).toHaveBeenCalledWith('otp-1');
 	});
 
-	it('returns rate_limited when max attempts reached', async () => {
+	it('returns rate_limited without comparing once the cap is exceeded, even for the right code', async () => {
 		const db = mockDB({
-			getLatestOTP: vi.fn().mockReturnValue({
-				id: 'otp-1',
-				email: 'test@example.com',
-				code: '12345',
-				attempts: 5,
-				expiresAt: Date.now() + 60000,
-			}),
+			getLatestOTP: vi.fn().mockReturnValue(validRow()),
+			incrementOTPAttempts: vi.fn().mockReturnValue(6),
 		});
 		const config = mockConfig({ otpMaxAttempts: 5 });
 		const result = await verifyOTP(db, 'test@example.com', '12345', config);
@@ -119,37 +124,61 @@ describe('verifyOTP', () => {
 		expect(db.deleteOTP).toHaveBeenCalledWith('otp-1');
 	});
 
-	it('returns invalid and increments attempts on wrong code', async () => {
-		const db = mockDB({
-			getLatestOTP: vi.fn().mockReturnValue({
-				id: 'otp-1',
-				email: 'test@example.com',
-				code: '12345',
-				attempts: 0,
-				expiresAt: Date.now() + 60000,
-			}),
-		});
+	it('returns invalid and counts the attempt on wrong code', async () => {
+		const db = mockDB({ getLatestOTP: vi.fn().mockReturnValue(validRow()) });
 		const config = mockConfig();
 		const result = await verifyOTP(db, 'test@example.com', '99999', config);
 		expect(result).toEqual({ ok: false, error: 'invalid' });
-		expect(db.updateOTPAttempts).toHaveBeenCalledWith('otp-1', 1);
+		expect(db.incrementOTPAttempts).toHaveBeenCalledWith('otp-1');
+		expect(db.deleteOTP).not.toHaveBeenCalled();
 	});
 
-	it('returns rate_limited when wrong code hits max attempts', async () => {
+	it('returns rate_limited when the wrong code uses the last attempt', async () => {
 		const db = mockDB({
-			getLatestOTP: vi.fn().mockReturnValue({
-				id: 'otp-1',
-				email: 'test@example.com',
-				code: '12345',
-				attempts: 4,
-				expiresAt: Date.now() + 60000,
-			}),
+			getLatestOTP: vi.fn().mockReturnValue(validRow()),
+			incrementOTPAttempts: vi.fn().mockReturnValue(5),
 		});
 		const config = mockConfig({ otpMaxAttempts: 5 });
 		const result = await verifyOTP(db, 'test@example.com', '99999', config);
 		expect(result).toEqual({ ok: false, error: 'rate_limited', attemptsLeft: 0 });
-		expect(db.updateOTPAttempts).toHaveBeenCalledWith('otp-1', 5);
 		expect(db.deleteOTP).toHaveBeenCalledWith('otp-1');
+	});
+
+	it('accepts the right code on the last attempt', async () => {
+		const db = mockDB({
+			getLatestOTP: vi.fn().mockReturnValue(validRow()),
+			incrementOTPAttempts: vi.fn().mockReturnValue(5),
+		});
+		const config = mockConfig({ otpMaxAttempts: 5 });
+		expect(await verifyOTP(db, 'test@example.com', '12345', config)).toEqual({ ok: true });
+	});
+
+	it('returns invalid when the OTP disappeared before it could be counted', async () => {
+		const db = mockDB({
+			getLatestOTP: vi.fn().mockReturnValue(validRow()),
+			incrementOTPAttempts: vi.fn().mockReturnValue(null),
+		});
+		const result = await verifyOTP(db, 'test@example.com', '12345', mockConfig());
+		expect(result).toEqual({ ok: false, error: 'invalid' });
+	});
+
+	it('bounds guesses to otpMaxAttempts under concurrent requests', async () => {
+		let attempts = 0;
+		const db = mockDB({
+			getLatestOTP: vi.fn(async () => {
+				await new Promise((resolve) => setTimeout(resolve, 1));
+				return validRow();
+			}),
+			incrementOTPAttempts: vi.fn(async () => ++attempts),
+		});
+		const config = mockConfig({ otpMaxAttempts: 5 });
+		const results = await Promise.all(
+			Array.from({ length: 50 }, () => verifyOTP(db, 'test@example.com', '00000', config)),
+		);
+		const invalid = results.filter((r) => !r.ok && r.error === 'invalid');
+		const limited = results.filter((r) => !r.ok && r.error === 'rate_limited');
+		expect(invalid).toHaveLength(4);
+		expect(limited).toHaveLength(46);
 	});
 
 	it('returns ok and deletes OTP on correct code', async () => {

@@ -1,4 +1,4 @@
-import { randomInt, randomUUID } from 'node:crypto';
+import { randomInt, randomUUID, timingSafeEqual } from 'node:crypto';
 import type { AuthDB, OtpResult, ResolvedConfig } from './types.js';
 
 export async function generateOTP(
@@ -33,15 +33,15 @@ export async function verifyOTP(
 		return { ok: false, error: 'expired' };
 	}
 
-	if (row.attempts >= config.otpMaxAttempts) {
+	const attempts = await db.incrementOTPAttempts(row.id);
+	if (attempts === null) return { ok: false, error: 'invalid' };
+	if (attempts > config.otpMaxAttempts) {
 		await db.deleteOTP(row.id);
 		return { ok: false, error: 'rate_limited', attemptsLeft: 0 };
 	}
 
-	if (row.code !== code) {
-		const newAttempts = row.attempts + 1;
-		await db.updateOTPAttempts(row.id, newAttempts);
-		if (newAttempts >= config.otpMaxAttempts) {
+	if (!codesMatch(row.code, code)) {
+		if (attempts >= config.otpMaxAttempts) {
 			await db.deleteOTP(row.id);
 			return { ok: false, error: 'rate_limited', attemptsLeft: 0 };
 		}
@@ -50,4 +50,10 @@ export async function verifyOTP(
 
 	await db.deleteOTP(row.id);
 	return { ok: true };
+}
+
+function codesMatch(expected: string, given: string): boolean {
+	const a = new TextEncoder().encode(expected);
+	const b = new TextEncoder().encode(given);
+	return a.length === b.length && timingSafeEqual(a, b);
 }

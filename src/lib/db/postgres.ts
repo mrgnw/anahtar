@@ -163,8 +163,12 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 			};
 		},
 
-		async updateOTPAttempts(id: string, attempts: number) {
-			await pool.query(`UPDATE ${t.otpCodes} SET attempts = $1 WHERE id = $2`, [attempts, id]);
+		async incrementOTPAttempts(id: string): Promise<number | null> {
+			const row = await queryOne<{ attempts: number }>(
+				`UPDATE ${t.otpCodes} SET attempts = attempts + 1 WHERE id = $1 RETURNING attempts`,
+				[id]
+			);
+			return row?.attempts ?? null;
 		},
 
 		async deleteOTP(id: string) {

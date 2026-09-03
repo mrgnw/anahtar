@@ -159,8 +159,12 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 			};
 		},
 
-		async updateOTPAttempts(id: string, attempts: number) {
-			await db.prepare(`UPDATE ${t.otpCodes} SET attempts = ? WHERE id = ?`).bind(attempts, id).run();
+		async incrementOTPAttempts(id: string): Promise<number | null> {
+			const row = await db
+				.prepare(`UPDATE ${t.otpCodes} SET attempts = attempts + 1 WHERE id = ? RETURNING attempts`)
+				.bind(id)
+				.first<{ attempts: number }>();
+			return row?.attempts ?? null;
 		},
 
 		async deleteOTP(id: string) {
