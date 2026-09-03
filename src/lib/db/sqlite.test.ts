@@ -45,6 +45,7 @@ describe('users', () => {
 		expect(user.id).toBeTruthy();
 		expect(user.email).toBe('alice@example.com');
 		expect(user.skipPasskeyPrompt).toBe(false);
+		expect(user.createdAt).toBeGreaterThan(1e12);
 	});
 
 	it('getUserByEmail returns the created user', () => {
@@ -53,6 +54,7 @@ describe('users', () => {
 		expect(found).not.toBeNull();
 		expect(found!.id).toBe(created.id);
 		expect(found!.email).toBe('bob@example.com');
+		expect(found!.createdAt).toBeGreaterThan(1e12);
 	});
 
 	it('getUserByEmail returns null for unknown email', () => {
@@ -216,6 +218,7 @@ describe('passkeys', () => {
 		expect(passkeys[0].publicKey).toEqual(new Uint8Array([1, 2, 3, 4]));
 		expect(passkeys[0].counter).toBe(0);
 		expect(passkeys[0].transports).toBe('["internal"]');
+		expect(passkeys[0].createdAt).toBeGreaterThan(1e12);
 	});
 
 	it('getPasskeyByCredentialId returns full record with email', () => {
