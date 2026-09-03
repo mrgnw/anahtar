@@ -137,11 +137,15 @@ describe('OTP', () => {
 		expect(db.getLatestOTP('nobody@example.com')).toBeNull();
 	});
 
-	it('updateOTPAttempts changes the attempt count', () => {
+	it('incrementOTPAttempts counts in the database and returns the new value', () => {
 		db.storeOTP('att@example.com', 'otp-att', '11111', Date.now() + 60000);
-		db.updateOTPAttempts('otp-att', 3);
-		const otp = db.getLatestOTP('att@example.com');
-		expect(otp!.attempts).toBe(3);
+		expect(db.incrementOTPAttempts('otp-att')).toBe(1);
+		expect(db.incrementOTPAttempts('otp-att')).toBe(2);
+		expect(db.getLatestOTP('att@example.com')!.attempts).toBe(2);
+	});
+
+	it('incrementOTPAttempts returns null for an unknown id', () => {
+		expect(db.incrementOTPAttempts('nonexistent')).toBeNull();
 	});
 
 	it('deleteOTP removes a specific OTP', () => {

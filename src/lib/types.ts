@@ -65,7 +65,7 @@ export interface AuthDB {
 
 	storeOTP(email: string, id: string, code: string, expiresAt: number): MaybePromise<void>;
 	getLatestOTP(email: string): MaybePromise<OTPRecord | null>;
-	updateOTPAttempts(id: string, attempts: number): MaybePromise<void>;
+	incrementOTPAttempts(id: string): MaybePromise<number | null>;
 	deleteOTP(id: string): MaybePromise<void>;
 	deleteOTPsForEmail(email: string): MaybePromise<void>;
 
