@@ -21,6 +21,7 @@ let email = $state('');
 let loading = $state(false);
 let error = $state('');
 let otpInput = $state<{ clear: () => void; focus: () => void }>();
+let otpLength = $state(5);
 
 let conditionalAbort: AbortController | null = null;
 
@@ -114,6 +115,8 @@ async function handleEmailSubmit() {
 			error = data?.error ?? `Request failed (${res.status})`;
 			return;
 		}
+		const data = await res.json().catch(() => null);
+		otpLength = Number(data?.otpLength) || otpLength;
 		step = 2;
 	} catch {
 		error = m.errorGeneric;
@@ -234,7 +237,7 @@ function handlePasskeySkip() {
 			<p class="anahtar-subtitle">{m.codeSentTo}</p>
 			<p class="anahtar-email">{email}</p>
 
-			<OtpInput bind:this={otpInput} onComplete={handleOtpComplete} disabled={loading} />
+			<OtpInput bind:this={otpInput} length={otpLength} onComplete={handleOtpComplete} disabled={loading} />
 
 			{#if error}
 				<p class="anahtar-error">{error}</p>
