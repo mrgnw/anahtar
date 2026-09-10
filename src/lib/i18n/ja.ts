@@ -9,7 +9,7 @@ const ja: AuthMessages = {
 	resend: '届きませんか？再送信',
 	differentEmail: '別のメールアドレスを使用',
 
-	passkeyCreating: 'パスキーを作成中',
+	passkeyTitle: 'パスキーを追加しますか？',
 	passkeySubtitle: 'より速く、簡単で、安全なログインのために',
 	passkeyAdd: '今すぐパスキーを追加',
 	passkeyMaybeLater: 'あとで',

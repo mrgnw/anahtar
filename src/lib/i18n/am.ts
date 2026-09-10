@@ -10,7 +10,7 @@ const am: AuthMessages = {
 	resend: 'አልደረሰህም? እንደገና ላክ',
 	differentEmail: 'ሌላ ኢሜይል ተጠቀም',
 
-	passkeyCreating: 'Passkey እየሠራንልህ ነው',
+	passkeyTitle: 'Passkey ይጨመር?',
 	passkeySubtitle: 'ፈጣን፣ ቀላል፣ ደህንነቱ የተጠበቀ ግባ',
 	passkeyAdd: 'አሁን passkey ጨምር',
 	passkeyMaybeLater: 'ሌላ ጊዜ',

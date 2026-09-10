@@ -10,7 +10,7 @@ const mg: AuthMessages = {
 	resend: 'Tsy voaray? Avereno alefa',
 	differentEmail: 'Mampiasà mailaka hafa',
 
-	passkeyCreating: 'Mamorona passkey ho anao',
+	passkeyTitle: 'Hanampy passkey?',
 	passkeySubtitle: 'ho fidirana haingana, mora, ary azo antoka kokoa',
 	passkeyAdd: 'Ampio passkey izao',
 	passkeyMaybeLater: 'Angamba aoriana',

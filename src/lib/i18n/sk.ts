@@ -10,7 +10,7 @@ const sk: AuthMessages = {
 	resend: 'Nedosli? Poslat znova',
 	differentEmail: 'Pouzit iny e-mail',
 
-	passkeyCreating: 'Vytvarame vam passkey',
+	passkeyTitle: 'Pridať passkey?',
 	passkeySubtitle: 'pre rychlejsie, jednoduchsie a bezpecnejsie prihlasenie',
 	passkeyAdd: 'Pridat passkey teraz',
 	passkeyMaybeLater: 'Mozno neskor',

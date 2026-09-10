@@ -10,7 +10,7 @@ const bn: AuthMessages = {
 	resend: 'পাননি? আবার পাঠান',
 	differentEmail: 'অন্য ইমেইল ব্যবহার করুন',
 
-	passkeyCreating: 'আপনার জন্য passkey তৈরি হচ্ছে',
+	passkeyTitle: 'Passkey যোগ করবেন?',
 	passkeySubtitle: 'দ্রুত, সহজ, নিরাপদ লগইনের জন্য',
 	passkeyAdd: 'এখনই পাসকি যোগ করুন',
 	passkeyMaybeLater: 'পরে হবে',

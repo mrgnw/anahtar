@@ -10,7 +10,7 @@ const om: AuthMessages = {
 	resend: 'Hin arganne? Irra deebiʼi ergi',
 	differentEmail: 'Email biraa fayyadami',
 
-	passkeyCreating: 'Passkey siif uumaa jira',
+	passkeyTitle: 'Passkey dabaltaa?',
 	passkeySubtitle: 'seensa saffisaa, salphaa fi nageenya qabuuf',
 	passkeyAdd: 'Passkey amma dabalaa',
 	passkeyMaybeLater: 'Tarii booda',

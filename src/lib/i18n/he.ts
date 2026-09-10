@@ -10,7 +10,7 @@ const he: AuthMessages = {
 	resend: 'לא קיבלת? שלח שוב',
 	differentEmail: 'שימוש בכתובת אחרת',
 
-	passkeyCreating: 'יוצר לך passkey',
+	passkeyTitle: 'להוסיף passkey?',
 	passkeySubtitle: 'להתחברות מהירה, קלה ובטוחה יותר',
 	passkeyAdd: 'הוסף passkey עכשיו',
 	passkeyMaybeLater: 'אולי אחר כך',

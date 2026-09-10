@@ -10,7 +10,7 @@ const bg: AuthMessages = {
 	resend: 'Не получихте? Изпрати отново',
 	differentEmail: 'Използвай друг имейл',
 
-	passkeyCreating: 'Създаваме ви passkey',
+	passkeyTitle: 'Да добавим passkey?',
 	passkeySubtitle: 'за по-бързо, по-лесно, по-сигурно влизане',
 	passkeyAdd: 'Добави passkey сега',
 	passkeyMaybeLater: 'По-късно',

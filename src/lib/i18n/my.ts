@@ -10,7 +10,7 @@ const my: AuthMessages = {
 	resend: 'မရရှိဘူးလား? ပြန်ပို့ရန်',
 	differentEmail: 'အခြားအီးမေးလ် သုံးရန်',
 
-	passkeyCreating: 'သင့်အတွက် passkey ပြုလုပ်နေသည်',
+	passkeyTitle: 'passkey ထည့်မလား?',
 	passkeySubtitle: 'ပိုမြန်၊ ပိုလွယ်၊ ပိုလုံခြုံသော login အတွက်',
 	passkeyAdd: 'ယခု passkey ထည့်ပါ',
 	passkeyMaybeLater: 'နောက်မှပါ',

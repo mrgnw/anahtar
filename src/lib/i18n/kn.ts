@@ -10,7 +10,7 @@ const kn: AuthMessages = {
 	resend: 'ಸಿಗಲಿಲ್ಲವೇ? ಮತ್ತೆ ಕಳುಹಿಸಿ',
 	differentEmail: 'ಬೇರೆ ಇಮೇಲ್ ಬಳಸಿ',
 
-	passkeyCreating: 'ನಿಮಗಾಗಿ passkey ರಚಿಸಲಾಗುತ್ತಿದೆ',
+	passkeyTitle: 'Passkey ಸೇರಿಸಬೇಕೆ?',
 	passkeySubtitle: 'ವೇಗವಾದ, ಸುಲಭ, ಸುರಕ್ಷಿತ ಲಾಗಿನ್‌ಗಾಗಿ',
 	passkeyAdd: 'ಈಗ ಪಾಸ್‌ಕೀ ಸೇರಿಸಿ',
 	passkeyMaybeLater: 'ಆಮೇಲೆ ನೋಡೋಣ',

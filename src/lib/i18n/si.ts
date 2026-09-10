@@ -10,7 +10,7 @@ const si: AuthMessages = {
 	resend: 'ලැබුණේ නැද්ද? නැවත යවන්න',
 	differentEmail: 'වෙනත් ඊමේල් එකක් භාවිතා කරන්න',
 
-	passkeyCreating: 'Passkey එකක් සාදමින්',
+	passkeyTitle: 'Passkey එකක් එකතු කරන්නද?',
 	passkeySubtitle: 'වේගවත්, පහසු, ආරක්ෂිත පුරනය සඳහා',
 	passkeyAdd: 'දැන් passkey එකතු කරන්න',
 	passkeyMaybeLater: 'පසුව සමහරවිට',

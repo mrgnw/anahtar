@@ -10,7 +10,7 @@ const ta: AuthMessages = {
 	resend: 'கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
 	differentEmail: 'வேறு மின்னஞ்சலைப் பயன்படுத்து',
 
-	passkeyCreating: 'உங்களுக்கு passkey உருவாக்கப்படுகிறது',
+	passkeyTitle: 'Passkey சேர்க்கவா?',
 	passkeySubtitle: 'விரைவான, எளிதான, பாதுகாப்பான உள்நுழைவுக்கு',
 	passkeyAdd: 'இப்போது பாஸ்கீ சேர்க்கவும்',
 	passkeyMaybeLater: 'பிறகு பார்க்கலாம்',

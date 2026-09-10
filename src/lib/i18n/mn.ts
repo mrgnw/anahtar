@@ -10,7 +10,7 @@ const mn: AuthMessages = {
 	resend: 'Ирээгүй юу? Дахин илгээх',
 	differentEmail: 'Өөр имэйл ашиглах',
 
-	passkeyCreating: 'Passkey үүсгэж байна',
+	passkeyTitle: 'Passkey нэмэх үү?',
 	passkeySubtitle: 'илүү хурдан, хялбар, аюулгүй нэвтрэхийн тулд',
 	passkeyAdd: 'Passkey одоо нэмэх',
 	passkeyMaybeLater: 'Дараа болох',

@@ -10,7 +10,7 @@ const su: AuthMessages = {
 	resend: 'Teu katampi? Kirim deui',
 	differentEmail: 'Paké email séjén',
 
-	passkeyCreating: 'Nuju nyieun passkey pikeun anjeun',
+	passkeyTitle: 'Tambahkeun passkey?',
 	passkeySubtitle: 'pikeun asup langkung gancang, gampang, sareng aman',
 	passkeyAdd: 'Tambahkeun passkey ayeuna',
 	passkeyMaybeLater: 'Engké waé',

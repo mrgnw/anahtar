@@ -10,7 +10,7 @@ const nl: AuthMessages = {
 	resend: 'Niet ontvangen? Opnieuw versturen',
 	differentEmail: 'Ander e-mailadres gebruiken',
 
-	passkeyCreating: 'Passkey wordt aangemaakt',
+	passkeyTitle: 'Passkey toevoegen?',
 	passkeySubtitle: 'voor sneller, makkelijker en veiliger inloggen',
 	passkeyAdd: 'Voeg nu passkey toe',
 	passkeyMaybeLater: 'Misschien later',

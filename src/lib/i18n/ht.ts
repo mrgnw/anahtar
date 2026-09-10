@@ -10,7 +10,7 @@ const ht: AuthMessages = {
 	resend: 'Ou pa resevwa li? Revoye',
 	differentEmail: 'Itilize yon lòt imèl',
 
-	passkeyCreating: 'N ap kreye yon passkey pou ou',
+	passkeyTitle: 'Ajoute yon passkey?',
 	passkeySubtitle: 'pou koneksyon pi rapid, pi fasil, pi sekirize',
 	passkeyAdd: 'Ajoute passkey kounye a',
 	passkeyMaybeLater: 'Petèt pita',

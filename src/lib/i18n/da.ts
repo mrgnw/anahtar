@@ -10,7 +10,7 @@ const da: AuthMessages = {
 	resend: 'Ikke modtaget? Send igen',
 	differentEmail: 'Brug en anden e-mail',
 
-	passkeyCreating: 'Opretter en passkey',
+	passkeyTitle: 'Tilføj en passkey?',
 	passkeySubtitle: 'for hurtigere, nemmere og sikrere login',
 	passkeyAdd: 'Tilføj passkey nu',
 	passkeyMaybeLater: 'Måske senere',

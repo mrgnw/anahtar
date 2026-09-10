@@ -10,7 +10,7 @@ const tk: AuthMessages = {
 	resend: 'Gelmedi? Täzeden iber',
 	differentEmail: 'Başga e-poçta ulan',
 
-	passkeyCreating: 'Passkey döredilýär',
+	passkeyTitle: 'Passkey goşulsynmy?',
 	passkeySubtitle: 'has calt, ansat we howpsuz giris ucin',
 	passkeyAdd: 'Hadzir passkey gos',
 	passkeyMaybeLater: 'Belki soň',

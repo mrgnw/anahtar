@@ -39,6 +39,7 @@ Security review release. Breaking changes are marked.
 - The root entry `@mrgnw/anahtar` is server-only. `guessDeviceName`, `resolveMessages`, `detectLocaleClient` and `locales` moved to `./device` and `./i18n` (still re-exported from `./components`).
 - sqlite and d1 adapters return `createdAt` in milliseconds (was seconds).
 - `PasskeyPrompt` no longer auto-starts registration when its countdown ends, and the `countdownSeconds` prop is gone. WebKit requires transient user activation for `navigator.credentials.create()`, so the timer path failed silently on Safari and iOS. Registration now starts only from a tap on the ring or the "Add passkey now" button; the ring is static.
+- i18n: `passkeyCreating` is renamed `passkeyTitle` and re-worded from a progress line to a question ("Making you a passkey" → "Add a passkey?") in all 88 locales, since nothing is created until the user taps. Custom `AuthMessages` and `resolveMessages` overrides must rename the key.
 - `AuthPill`: the passkey panel is always available (built-in `passkey/list`); sign-out POSTs `logout` itself, then calls `onSignOut`.
 
 ### Added

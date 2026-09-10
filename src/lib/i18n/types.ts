@@ -10,7 +10,7 @@ export interface AuthMessages {
   differentEmail: string;
 
   // Passkey prompt
-  passkeyCreating: string;
+  passkeyTitle: string;
   passkeySubtitle: string;
   passkeyAdd: string;
   passkeyMaybeLater: string;

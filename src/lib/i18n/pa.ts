@@ -10,7 +10,7 @@ const pa: AuthMessages = {
 	resend: 'ਨਹੀਂ ਮਿਲਿਆ? ਦੁਬਾਰਾ ਭੇਜੋ',
 	differentEmail: 'ਵੱਖਰੀ ਈਮੇਲ ਵਰਤੋ',
 
-	passkeyCreating: 'ਤੁਹਾਡੇ ਲਈ passkey ਬਣਾ ਰਹੇ ਹਾਂ',
+	passkeyTitle: 'Passkey ਜੋੜਨੀ ਹੈ?',
 	passkeySubtitle: 'ਤੇਜ਼, ਆਸਾਨ, ਸੁਰੱਖਿਅਤ ਲੌਗਇਨ ਲਈ',
 	passkeyAdd: 'ਹੁਣੇ ਪਾਸਕੀ ਸ਼ਾਮਲ ਕਰੋ',
 	passkeyMaybeLater: 'ਬਾਅਦ ਵਿੱਚ',

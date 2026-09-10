@@ -10,7 +10,7 @@ const km: AuthMessages = {
 	resend: 'មិនទទួលបាន? ផ្ញើម្ដងទៀត',
 	differentEmail: 'ប្រើអ៊ីមែលផ្សេង',
 
-	passkeyCreating: 'កំពុងបង្កើត passkey សម្រាប់អ្នក',
+	passkeyTitle: 'បន្ថែម passkey ទេ?',
 	passkeySubtitle: 'សម្រាប់ការចូលកាន់តែលឿន ងាយស្រួល និងសុវត្ថិភាព',
 	passkeyAdd: 'បន្ថែម passkey ឥឡូវ',
 	passkeyMaybeLater: 'ពេលក្រោយ',

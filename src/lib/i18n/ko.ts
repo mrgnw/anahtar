@@ -9,7 +9,7 @@ const ko: AuthMessages = {
 	resend: '받지 못하셨나요? 다시 보내기',
 	differentEmail: '다른 이메일 사용',
 
-	passkeyCreating: '패스키 생성 중',
+	passkeyTitle: '패스키를 추가할까요?',
 	passkeySubtitle: '더 빠르고, 쉽고, 안전한 로그인을 위해',
 	passkeyAdd: '지금 패스키 추가',
 	passkeyMaybeLater: '나중에',

@@ -9,7 +9,7 @@ const zh: AuthMessages = {
 	resend: '没收到？重新发送',
 	differentEmail: '使用其他邮箱',
 
-	passkeyCreating: '正在创建通行密钥',
+	passkeyTitle: '添加通行密钥？',
 	passkeySubtitle: '更快、更简单、更安全地登录',
 	passkeyAdd: '立即添加通行密钥',
 	passkeyMaybeLater: '以后再说',

@@ -10,7 +10,7 @@ const hy: AuthMessages = {
 	resend: 'Չստացա՞ք։ Նորից ուղարկել',
 	differentEmail: 'Օգտագործել այլ էլ. հասցե',
 
-	passkeyCreating: 'Passkey ենք ստեղծում ձեզ համար',
+	passkeyTitle: 'Passkey ավելացնե՞լ',
 	passkeySubtitle: ' delays avoreli arag, heshtm yev anvtang mtk',
 	passkeyAdd: 'Avelacnel passkey hima',
 	passkeyMaybeLater: 'Գուցե ավելի ուշ',

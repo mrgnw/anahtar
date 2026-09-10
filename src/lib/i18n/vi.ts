@@ -10,7 +10,7 @@ const vi: AuthMessages = {
 	resend: 'Chưa nhận được? Gửi lại',
 	differentEmail: 'Dùng email khác',
 
-	passkeyCreating: 'Đang tạo passkey cho bạn',
+	passkeyTitle: 'Thêm passkey?',
 	passkeySubtitle: 'de dang nhap nhanh hon, de hon va an toan hon',
 	passkeyAdd: 'Them passkey ngay',
 	passkeyMaybeLater: 'Để sau',

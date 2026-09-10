@@ -10,7 +10,7 @@ const ig: AuthMessages = {
 	resend: 'Ị nataghị? Zigara ọzọ',
 	differentEmail: 'Jiri email ọzọ',
 
-	passkeyCreating: 'Anyị na-emepụtara gị passkey',
+	passkeyTitle: 'Tinye passkey?',
 	passkeySubtitle: 'maka nbanye ọsọ, dị mfe, nchekwa karịa',
 	passkeyAdd: 'Tinye passkey ugbu a',
 	passkeyMaybeLater: 'Eleghị anya emechaa',

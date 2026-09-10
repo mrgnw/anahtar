@@ -10,7 +10,7 @@ const pl: AuthMessages = {
 	resend: 'Nie dotarł? Wyślij ponownie',
 	differentEmail: 'Użyj innego emaila',
 
-	passkeyCreating: 'Tworzenie klucza dostępu',
+	passkeyTitle: 'Dodać klucz dostępu?',
 	passkeySubtitle: 'dla szybszego, latwiejszego i bezpieczniejszego logowania',
 	passkeyAdd: 'Dodaj passkey teraz',
 	passkeyMaybeLater: 'Może później',

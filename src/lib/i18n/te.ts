@@ -10,7 +10,7 @@ const te: AuthMessages = {
 	resend: 'రాలేదా? మళ్ళీ పంపు',
 	differentEmail: 'వేరే ఇమెయిల్ వాడు',
 
-	passkeyCreating: 'మీ కోసం passkey తయారు చేస్తోంది',
+	passkeyTitle: 'Passkey జోడించాలా?',
 	passkeySubtitle: 'వేగవంతమైన, సులభమైన, సురక్షితమైన లాగిన్ కోసం',
 	passkeyAdd: 'ఇప్పుడు పాస్‌కీ జోడించండి',
 	passkeyMaybeLater: 'తర్వాత',

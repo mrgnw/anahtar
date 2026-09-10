@@ -10,7 +10,7 @@ const ny: AuthMessages = {
 	resend: 'Simunalandire? Tumizaninso',
 	differentEmail: 'Gwiritsani ntchito imelo ina',
 
-	passkeyCreating: 'Tikukupangirani passkey',
+	passkeyTitle: 'Muwonjezere passkey?',
 	passkeySubtitle: 'kuti mulowe mwachangu, mosavuta, motetezeka',
 	passkeyAdd: 'Onjezani passkey tsopano',
 	passkeyMaybeLater: 'Mwina pambuyo pake',

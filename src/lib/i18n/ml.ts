@@ -10,7 +10,7 @@ const ml: AuthMessages = {
 	resend: 'ലഭിച്ചില്ലേ? വീണ്ടും അയയ്ക്കുക',
 	differentEmail: 'മറ്റൊരു ഇമെയിൽ ഉപയോഗിക്കുക',
 
-	passkeyCreating: 'നിങ്ങൾക്കായി ഒരു passkey ഉണ്ടാക്കുന്നു',
+	passkeyTitle: 'Passkey ചേർക്കണോ?',
 	passkeySubtitle: 'വേഗത്തിലും എളുപ്പത്തിലും സുരക്ഷിതമായും ലോഗിൻ ചെയ്യാൻ',
 	passkeyAdd: 'ഇപ്പോൾ പാസ്‌കീ ചേർക്കുക',
 	passkeyMaybeLater: 'പിന്നീടാകാം',

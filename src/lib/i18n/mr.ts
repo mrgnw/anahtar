@@ -10,7 +10,7 @@ const mr: AuthMessages = {
 	resend: 'मिळाला नाही? पुन्हा पाठवा',
 	differentEmail: 'वेगळा ईमेल वापरा',
 
-	passkeyCreating: 'तुमच्यासाठी passkey तयार करत आहोत',
+	passkeyTitle: 'Passkey जोडायची?',
 	passkeySubtitle: 'जलद, सोपे, सुरक्षित लॉगिनसाठी',
 	passkeyAdd: 'आत्ता पासकी जोडा',
 	passkeyMaybeLater: 'नंतर कदाचित',

@@ -10,7 +10,7 @@ const be: AuthMessages = {
 	resend: 'Не атрымалі? Адправіць зноў',
 	differentEmail: 'Выкарыстаць іншы email',
 
-	passkeyCreating: 'Ствараем вам passkey',
+	passkeyTitle: 'Дадаць passkey?',
 	passkeySubtitle: 'для хутчэйшага, прасцейшага, бяспечнейшага ўваходу',
 	passkeyAdd: 'Дадаць passkey зараз',
 	passkeyMaybeLater: 'Можа, пазней',

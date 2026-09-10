@@ -9,7 +9,7 @@ const tr: AuthMessages = {
 	resend: 'Almadın mı? Tekrar gonder',
 	differentEmail: 'Baska e-posta kullan',
 
-	passkeyCreating: 'Anahtar olusturuluyor',
+	passkeyTitle: 'Passkey eklensin mi?',
 	passkeySubtitle: 'daha hizli, kolay ve guvenli giris icin',
 	passkeyAdd: 'Simdi passkey ekle',
 	passkeyMaybeLater: 'Belki sonra',

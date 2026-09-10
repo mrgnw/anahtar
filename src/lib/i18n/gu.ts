@@ -10,7 +10,7 @@ const gu: AuthMessages = {
 	resend: 'મળ્યો નથી? ફરી મોકલો',
 	differentEmail: 'બીજો ઈમેલ વાપરો',
 
-	passkeyCreating: 'તમારા માટે passkey બનાવી રહ્યા છીએ',
+	passkeyTitle: 'Passkey ઉમેરવી છે?',
 	passkeySubtitle: 'ઝડપી, સરળ, સુરક્ષિત લૉગિન માટે',
 	passkeyAdd: 'હમણાં પાસકી ઉમેરો',
 	passkeyMaybeLater: 'કદાચ પછી',

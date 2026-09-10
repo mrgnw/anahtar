@@ -10,7 +10,7 @@ const fa: AuthMessages = {
 	resend: 'دریافت نکردید؟ ارسال دوباره',
 	differentEmail: 'استفاده از ایمیل دیگر',
 
-	passkeyCreating: 'در حال ساخت passkey',
+	passkeyTitle: 'کلید عبور اضافه شود؟',
 	passkeySubtitle: 'برای ورود سریع‌تر، آسان‌تر و امن‌تر',
 	passkeyAdd: 'اکنون کلید عبور اضافه کنید',
 	passkeyMaybeLater: 'شاید بعداً',

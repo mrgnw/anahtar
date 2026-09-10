@@ -10,7 +10,7 @@ const ug: AuthMessages = {
 	resend: 'كەلمىدىمۇ؟ قايتا ئەۋەتىش',
 	differentEmail: 'باشقا ئېلخەت ئىشلىتىش',
 
-	passkeyCreating: 'passkey ھاسىل قىلىنىۋاتىدۇ',
+	passkeyTitle: 'passkey قوشامسىز؟',
 	passkeySubtitle: 'تېزرەك، ئاسانراق، بىخەتەررەك كىرىش ئۈچۈن',
 	passkeyAdd: 'ھازىر passkey قوشۇڭ',
 	passkeyMaybeLater: 'كېيىن بولسىمۇ بولىدۇ',
