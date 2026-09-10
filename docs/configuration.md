@@ -16,7 +16,19 @@ interface AuthConfig {
   locale?: string;          // server-side error messages — default: Accept-Language
   messages?: Partial<AuthMessages>;
   onSendOTP: (email: string, code: string) => Promise<void>;
+  onError?: (scope: AuthErrorScope, err: unknown, event?: RequestEvent) => void;
 }
+```
+
+## Error reporting
+
+`onError` is called whenever anahtar swallows a failure: `'handle'` (session lookup or
+`db.init()` failed — the request resolves signed out), `'otp-create'`, `'otp-send'` and
+`'passkey-register'`. The default logs to `console.error`; point it at your reporter to keep
+incidents queryable on Workers.
+
+```ts
+onError: (scope, err, event) => reportError(err, { scope, path: event?.url.pathname });
 ```
 
 ## Table prefix
@@ -109,7 +121,7 @@ const profile = db
 
 ## Email providers
 
-You provide `onSendOTP` — anahtar calls it with the email address and the generated code. Throw an error to surface it to the user.
+You provide `onSendOTP` — anahtar calls it with the email address and the generated code. If it throws, the user sees the generic error message and `onError` gets the original.
 
 ### Development
 

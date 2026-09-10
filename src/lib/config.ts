@@ -1,4 +1,4 @@
-import type { AuthConfig, ResolvedConfig } from './types.js';
+import type { AuthConfig, AuthErrorScope, ResolvedConfig } from './types.js';
 
 const DEFAULTS = {
 	cookie: 'session',
@@ -7,6 +7,8 @@ const DEFAULTS = {
 	otpLength: 5,
 	otpMaxAttempts: 5,
 	rpName: 'anahtar',
+	// silence is the worst default: a consumer with no hook still gets the incident in its logs
+	onError: (scope: AuthErrorScope, err: unknown) => console.error(`anahtar ${scope}:`, err),
 } as const;
 
 export function resolveConfig(config: AuthConfig): ResolvedConfig {

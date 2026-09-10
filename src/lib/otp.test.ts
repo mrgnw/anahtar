@@ -12,6 +12,7 @@ function mockConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
 		otpMaxAttempts: 5,
 		rpName: 'test',
 		onSendOTP: vi.fn(),
+		onError: vi.fn(),
 		...overrides,
 	};
 }
