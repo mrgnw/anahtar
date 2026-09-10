@@ -15,7 +15,7 @@ The complete email → OTP → passkey onboarding → success flow:
 <AuthFlow onSuccess={() => goto('/')} />
 ```
 
-AuthFlow handles: email input with conditional WebAuthn (passkey autofill), OTP verification with resend, passkey registration countdown, and success confirmation.
+AuthFlow handles: email input with conditional WebAuthn (passkey autofill), OTP verification with resend, the passkey registration prompt, and success confirmation.
 
 Props:
 
@@ -67,7 +67,7 @@ Props:
 
 ## PasskeyPrompt
 
-Standalone passkey registration prompt with animated countdown ring:
+Standalone passkey registration prompt:
 
 ```svelte
 <script>
@@ -86,10 +86,9 @@ Standalone passkey registration prompt with animated countdown ring:
 />
 ```
 
-- 5-second countdown with radial progress ring, then auto-triggers registration
-- Click the ring to register immediately (skips timer)
-- Falls back to manual "Add passkey" / "Maybe later" on failure
-- `countdownSeconds` prop to customize timing
+- Registration only starts from a tap — the ring, or the "Add passkey now" button
+- Never auto-triggers: Safari and iOS require a user gesture for `navigator.credentials.create()`
+- Buttons re-enable when `onRegister` throws, so the user can retry or pick "Maybe later"
 
 ## OtpInput
 
