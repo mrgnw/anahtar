@@ -21,6 +21,8 @@ interface PasskeyInfo {
 interface Props {
 	apiBase?: string;
 	user?: { email: string } | null;
+	session?: { expiresAt: number } | null;
+	renewBefore?: number;
 	compact?: boolean;
 	locale?: string;
 	messages?: Partial<AuthMessages>;
@@ -38,6 +40,8 @@ interface Props {
 let {
 	apiBase = '/api/auth',
 	user = null,
+	session = null,
+	renewBefore = 10 * 24 * 60 * 60 * 1000,
 	compact = false,
 	locale,
 	messages: messageOverrides,
@@ -71,6 +75,7 @@ let passkeyRefresh = $state(0);
 let passkeyOnboarding = $state(false);
 
 const isAuthenticated = $derived(!!user);
+const renewalDue = $derived(isAuthenticated && !!session && session.expiresAt - Date.now() < renewBefore);
 
 function shortDate(ts?: number): string {
 	if (!ts) return '';
@@ -188,6 +193,17 @@ async function handlePasskeySkip() {
 	}
 }
 
+async function renewSession() {
+	if (!user) return;
+	loading = true;
+	error = '';
+	try {
+		if (await api.passkeyLogin({ email: user.email })) await onSuccess?.();
+	} finally {
+		loading = false;
+	}
+}
+
 async function addPasskey() {
 	loading = true;
 	error = '';
@@ -217,6 +233,17 @@ async function removePasskey(id: string) {
 }
 </script>
 
+{#snippet renewChip()}
+	{#if renewalDue && passkeyPromise}
+		{#await passkeyPromise then keys}
+			{#if keys.length > 0}
+				{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
+				<button class="anahtar-pill-chip" onclick={renewSession} disabled={loading}>{m.staySignedIn}</button>
+			{/if}
+		{/await}
+	{/if}
+{/snippet}
+
 <div class="anahtar-pill-island" class:anahtar-pill-loading={loading}>
 	<div class="anahtar-pill">
 		{#if isAuthenticated && compact && !expanded}
@@ -225,8 +252,10 @@ async function removePasskey(id: string) {
 					<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>
 				</svg>
 			</button>
+			{@render renewChip()}
 		{:else if isAuthenticated}
 			<span class="anahtar-pill-email">{user?.email}</span>
+			{@render renewChip()}
 			{#if separators}<span class="anahtar-pill-sep">&middot;</span>{/if}
 			<button
 				class="anahtar-pill-icon"
@@ -411,6 +440,22 @@ async function removePasskey(id: string) {
 	.anahtar-pill-icon:disabled { opacity: 0.4; cursor: not-allowed; }
 	.anahtar-pill-icon-active { color: var(--anahtar-primary, #3730a3); }
 	.anahtar-pill-signout:hover:not(:disabled) { color: var(--anahtar-error, #ef4444); }
+
+	.anahtar-pill-chip {
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--anahtar-primary, #3730a3);
+		background: color-mix(in srgb, var(--anahtar-primary, #3730a3) 10%, transparent);
+		border: none;
+		border-radius: 9999px;
+		padding: 0.15rem 0.55rem;
+		cursor: pointer;
+		white-space: nowrap;
+		line-height: 1.4;
+		transition: opacity 0.15s;
+	}
+	.anahtar-pill-chip:hover:not(:disabled) { opacity: 0.75; }
+	.anahtar-pill-chip:disabled { opacity: 0.4; cursor: not-allowed; }
 
 	/* Sign-in form */
 	.anahtar-pill-form {

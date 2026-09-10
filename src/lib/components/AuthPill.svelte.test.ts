@@ -130,4 +130,50 @@ describe('AuthPill', () => {
 		);
 		expect(startCalled).toBe(false);
 	});
+
+	describe('session renewal', () => {
+		const user = { email: 'test@example.com' };
+		const DAY = 24 * 60 * 60 * 1000;
+
+		function renderRenewal(expiresIn: number, passkeys: { id: string }[]) {
+			globalThis.fetch = mockFetch({
+				'/passkey/list': { ok: true, body: passkeys },
+				'/passkey/check-email': { ok: true, body: { allowCredentials: [{ id: 'abc' }] } },
+				'/passkey/login-finish': { ok: true, body: { user: { id: '1', email: user.email } } },
+			});
+			const onSuccess = vi.fn();
+			render(AuthPill, { props: { user, session: { expiresAt: Date.now() + expiresIn }, onSuccess } });
+			return onSuccess;
+		}
+
+		it('offers one-tap renewal inside the window when the user has a passkey', async () => {
+			mockStartAuthentication.mockResolvedValue({ id: 'cred', response: {} });
+			const onSuccess = renderRenewal(3 * DAY, [{ id: 'k1' }]);
+
+			const chip = await screen.findByRole('button', { name: 'Stay signed in' });
+			await fireEvent.click(chip);
+
+			await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce());
+			expect(mockStartAuthentication).toHaveBeenCalledOnce();
+		});
+
+		it('hides renewal outside the window', async () => {
+			renderRenewal(20 * DAY, [{ id: 'k1' }]);
+			await new Promise((r) => setTimeout(r, 10));
+			expect(screen.queryByRole('button', { name: 'Stay signed in' })).toBeNull();
+		});
+
+		it('hides renewal when the user has no passkey', async () => {
+			renderRenewal(3 * DAY, []);
+			await new Promise((r) => setTimeout(r, 10));
+			expect(screen.queryByRole('button', { name: 'Stay signed in' })).toBeNull();
+		});
+
+		it('hides renewal without a session prop', async () => {
+			globalThis.fetch = mockFetch({ '/passkey/list': { ok: true, body: [{ id: 'k1' }] } });
+			render(AuthPill, { props: { user } });
+			await new Promise((r) => setTimeout(r, 10));
+			expect(screen.queryByRole('button', { name: 'Stay signed in' })).toBeNull();
+		});
+	});
 });
