@@ -3,54 +3,20 @@ import type { AuthMessages } from '../i18n/types.js';
 
 interface Props {
 	m: AuthMessages;
-	countdownSeconds?: number;
 	onRegister: () => Promise<void>;
 	onSkip: () => void;
 }
 
-let { m, countdownSeconds = 5, onRegister, onSkip }: Props = $props();
+let { m, onRegister, onSkip }: Props = $props();
 
-let countdown = $state(countdownSeconds);
-let failed = $state(false);
 let registering = $state(false);
 
-let interval: ReturnType<typeof setInterval> | null = null;
-
-$effect(() => {
-	interval = setInterval(() => {
-		countdown -= 1;
-		if (countdown <= 0) {
-			clearInterval(interval!);
-			interval = null;
-			triggerRegistration();
-		}
-	}, 1000);
-
-	return () => {
-		if (interval) clearInterval(interval);
-	};
-});
-
-async function triggerRegistration() {
+async function registerNow() {
 	if (registering) return;
 	registering = true;
-	try {
-		await onRegister();
-	} catch {
-		failed = true;
-		countdown = countdownSeconds;
-	} finally {
-		registering = false;
-	}
+	await onRegister().catch(() => {});
+	registering = false;
 }
-
-function registerNow() {
-	if (interval) { clearInterval(interval); interval = null; }
-	triggerRegistration();
-}
-
-let circumference = 2 * Math.PI * 40;
-let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 </script>
 
 <div class="anahtar-passkey-prompt">
@@ -61,17 +27,7 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 		title="Set up now"
 	>
 		<svg viewBox="0 0 100 100" class="anahtar-passkey-ring-svg">
-			<circle cx="50" cy="50" r="40" fill="none" stroke="var(--anahtar-border, #d1d5db)" stroke-width="4" />
-			<circle
-				cx="50" cy="50" r="40"
-				fill="none"
-				stroke="var(--anahtar-primary, #3b82f6)"
-				stroke-width="4"
-				stroke-linecap="round"
-				stroke-dasharray={circumference}
-				stroke-dashoffset={dashOffset}
-				class="anahtar-passkey-progress"
-			/>
+			<circle cx="50" cy="50" r="40" fill="none" stroke="var(--anahtar-primary, #3b82f6)" stroke-width="4" />
 		</svg>
 		<div class="anahtar-passkey-icon">
 			<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="anahtar-key-pulse">
@@ -121,11 +77,6 @@ let dashOffset = $derived(circumference * (1 - countdown / countdownSeconds));
 	.anahtar-passkey-ring-svg {
 		width: 100%;
 		height: 100%;
-		transform: rotate(-90deg);
-	}
-
-	.anahtar-passkey-progress {
-		transition: stroke-dashoffset 1s linear;
 	}
 
 	.anahtar-passkey-icon {
