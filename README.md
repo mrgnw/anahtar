@@ -87,10 +87,13 @@ Optional UI components:
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/state';
   let user = $derived(page.data.user);
+  let session = $derived(page.data.session);
 </script>
 
-<AuthPill {user} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
+<AuthPill {user} {session} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
 ```
+
+Pass `session` (`locals.session`) and the pill offers a one-tap "Stay signed in" passkey renewal near expiry.
 
 All components auto-detect locale (88 languages). Override with `locale="fr"` or `messages={{ continue: 'Go' }}`.
 

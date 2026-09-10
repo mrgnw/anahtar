@@ -37,12 +37,15 @@ A pill-shaped component for headers, floating islands, or inline placement. Hand
   import { page } from '$app/state';
 
   let user = $derived(page.data.user);
+  let session = $derived(page.data.session);
 </script>
 
-<AuthPill {user} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
+<AuthPill {user} {session} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
 ```
 
 Signed in, the pill shows the email, a passkey panel (list, add, remove, backed by the built-in `passkey/list` route) and sign-out. Sign-out POSTs `{apiBase}/logout` itself, then calls `onSignOut`.
+
+Pass `session` (`locals.session`, exposed through your layout load) and the pill offers one-tap renewal: inside the last `renewBefore` ms of the session, a user with a passkey sees a "Stay signed in" chip. Tapping it runs a passkey login, which replaces the session with a fresh full-length one, then calls `onSuccess` so you can `invalidateAll()`. Without a passkey there is no chip; the session lapses and the normal sign-in is the renewal.
 
 The OTP step sizes itself from the `otpLength` the `/start` response carries, so `otpLength: 6` server-side needs no client change. If `/start` returns a `devCode` field (a dev-only wrapper can add one), the pill submits it immediately.
 
@@ -52,6 +55,8 @@ Props:
 | ------------------ | ------------------------------ | ------------- | ------------------------------------------------------- |
 | `apiBase`          | `string`                       | `'/api/auth'` | Base path for auth API routes                           |
 | `user`             | `{ email: string } \| null`    | `null`        | Current user — controls signed-in vs signed-out state   |
+| `session`          | `{ expiresAt: number } \| null` | `null`        | `locals.session`; enables the "Stay signed in" chip     |
+| `renewBefore`      | `number`                       | 10 days (ms)  | Show the renewal chip when less than this remains       |
 | `locale`           | `string`                       | auto-detected | Language code (e.g. `'es'`, `'de'`)                     |
 | `messages`         | `Partial<AuthMessages>`        | —             | Override specific UI strings                            |
 | `onSuccess`        | `() => void`                   | —             | Called after successful sign-in                         |
@@ -228,7 +233,7 @@ const locale = detectLocaleServer(event.request); // reads Accept-Language heade
 localeCodes; // ['af', 'ak', 'am', 'ar', ..., 'zh', 'zu']
 ```
 
-The `AuthMessages` type defines all translatable strings — see `src/lib/i18n/types.ts`. The same helpers are also exported from `@mrgnw/anahtar/i18n`. The root `@mrgnw/anahtar` entry is server-only (it pulls in `node:crypto`); import client helpers from `/components`, `/i18n` or `/device`.
+The `AuthMessages` type defines all translatable strings — see `src/lib/i18n/types.ts`. Locale files are `Partial<AuthMessages>` merged over English, so a string without a translation falls back to English. The same helpers are also exported from `@mrgnw/anahtar/i18n`. The root `@mrgnw/anahtar` entry is server-only (it pulls in `node:crypto`); import client helpers from `/components`, `/i18n` or `/device`.
 
 ---
 
