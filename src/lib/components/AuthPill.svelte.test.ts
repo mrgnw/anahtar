@@ -15,8 +15,15 @@ vi.mock('@simplewebauthn/browser', () => ({
 
 import AuthPill from './AuthPill.svelte';
 
+function requestUrl(input: RequestInfo | URL): string {
+	if (typeof input === 'string') return input;
+	if (input instanceof URL) return input.href;
+	return input.url;
+}
+
 function mockFetch(responses: Record<string, { ok: boolean; body?: unknown; status?: number }>) {
-	return vi.fn(async (url: string) => {
+	return vi.fn(async (input: RequestInfo | URL): Promise<Response> => {
+		const url = requestUrl(input);
 		const key = Object.keys(responses).find((k) => url.endsWith(k));
 		const resp = key ? responses[key] : { ok: false, status: 404, body: { error: 'Not found' } };
 		return {

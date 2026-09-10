@@ -2,8 +2,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import AuthFlow from './AuthFlow.svelte';
 
+function requestUrl(input: RequestInfo | URL): string {
+	if (typeof input === 'string') return input;
+	if (input instanceof URL) return input.href;
+	return input.url;
+}
+
 function mockFetch(responses: Record<string, { ok: boolean; body?: unknown; status?: number }>) {
-	return vi.fn(async (url: string, init?: RequestInit) => {
+	return vi.fn(async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+		const url = requestUrl(input);
+		void init;
 		const key = Object.keys(responses).find((k) => url.endsWith(k));
 		const resp = key ? responses[key] : { ok: false, status: 404, body: { error: 'Not found' } };
 		return {
@@ -159,15 +167,15 @@ describe('AuthFlow', () => {
 			expect(screen.getByText("Didn't get it? Resend")).toBeInTheDocument();
 		});
 
-		const startCallsBefore = fetchMock.mock.calls.filter(
-			([url]: [string]) => typeof url === 'string' && url.endsWith('/start'),
+		const startCallsBefore = fetchMock.mock.calls.filter(([input]) =>
+			requestUrl(input).endsWith('/start'),
 		).length;
 
 		await fireEvent.click(screen.getByText("Didn't get it? Resend"));
 
 		await waitFor(() => {
-			const startCallsAfter = fetchMock.mock.calls.filter(
-				([url]: [string]) => typeof url === 'string' && url.endsWith('/start'),
+			const startCallsAfter = fetchMock.mock.calls.filter(([input]) =>
+				requestUrl(input).endsWith('/start'),
 			).length;
 			expect(startCallsAfter).toBe(startCallsBefore + 1);
 		});
