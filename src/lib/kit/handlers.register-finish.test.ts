@@ -33,7 +33,9 @@ beforeEach(() => {
 });
 
 function fakeEvent(path: string, cookies: Map<string, string>, body: unknown) {
-	const set = vi.fn((name: string, value: string) => cookies.set(name, value));
+	const set = vi.fn((name: string, value: string, _opts: { maxAge: number }) => {
+		cookies.set(name, value);
+	});
 	const event = {
 		params: { path },
 		url: new URL('https://example.test/api/auth/' + path),
@@ -69,7 +71,7 @@ describe('passkey/register-finish', () => {
 		expect(res.status).toBe(200);
 
 		expect(set).toHaveBeenCalledOnce();
-		const [name, token, opts] = set.mock.calls[0] as [string, string, { maxAge: number }];
+		const [name, token, opts] = set.mock.calls[0];
 		expect(name).toBe(config.cookie);
 		expect(token).not.toBe(otp.sessionToken);
 		expect(opts.maxAge).toBe(PASSKEY_DURATION / 1000);
