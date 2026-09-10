@@ -73,20 +73,6 @@ export function createHandlers(
     );
   }
 
-  async function extendCurrentSession(
-    event: RequestEvent,
-    method: SessionMethod,
-  ) {
-    const token = event.cookies.get(config.cookie);
-    const current = event.locals.session;
-    if (!token || !current) return;
-    const duration = config.sessionDuration(method);
-    const expiresAt = Date.now() + duration;
-    if (expiresAt <= current.expiresAt) return;
-    await config.db.updateSessionExpiry(current.id, expiresAt);
-    event.cookies.set(config.cookie, token, cookieOpts(event, duration));
-  }
-
   const routes: Record<
     string,
     { method: "GET" | "POST"; handler: RouteHandler }
@@ -276,7 +262,7 @@ export function createHandlers(
           return json({ error: m.errorPasskeyRegFailed }, { status: 400 });
         }
 
-        await extendCurrentSession(event, "passkey");
+        await startSession(event, user.id, "passkey");
         return json({ success: true });
       },
     },
