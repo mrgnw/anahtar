@@ -47,4 +47,39 @@ describe('createAuth', () => {
 		});
 		await expect(auth.ready).rejects.toThrow('boom');
 	});
+
+	it('retries init on the next request after a failure', async () => {
+		let calls = 0;
+		const init = vi.fn(() => {
+			calls += 1;
+			if (calls === 1) throw new Error('D1_ERROR: D1 DB is overloaded');
+		});
+		const auth = createAuth({ db: dbWith(init), onSendOTP: vi.fn(), onError: vi.fn() });
+		const resolve = vi.fn(async () => new Response('ok'));
+
+		await auth.handle({ event: fakeEvent(), resolve });
+		const second = await auth.handle({ event: fakeEvent(), resolve });
+
+		expect(init).toHaveBeenCalledTimes(2);
+		expect(await second.text()).toBe('ok');
+	});
+
+	it('resolves signed out when the db throws', async () => {
+		const onError = vi.fn();
+		const auth = createAuth({
+			db: dbWith(() => {
+				throw new Error('boom');
+			}),
+			onSendOTP: vi.fn(),
+			onError,
+		});
+		const event = fakeEvent();
+
+		const response = await auth.handle({ event, resolve: async () => new Response('ok') });
+
+		expect(await response.text()).toBe('ok');
+		expect(event.locals.user).toBeNull();
+		expect(event.locals.session).toBeNull();
+		expect(onError).toHaveBeenCalledWith('handle', expect.any(Error), event);
+	});
 });
