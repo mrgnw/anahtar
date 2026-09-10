@@ -1,6 +1,6 @@
 import type { AuthMessages } from './types.js';
 
-const zh: AuthMessages = {
+const zh: Partial<AuthMessages> = {
 	emailPlaceholder: 'you@example.cn',
 	continue: '继续',
 

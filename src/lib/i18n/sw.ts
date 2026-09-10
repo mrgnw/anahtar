@@ -1,7 +1,7 @@
 // Initial translation — review for accuracy
 import type { AuthMessages } from './types.js';
 
-const sw: AuthMessages = {
+const sw: Partial<AuthMessages> = {
 	emailPlaceholder: 'wewe@mfano.co.tz',
 	continue: 'Endelea',
 

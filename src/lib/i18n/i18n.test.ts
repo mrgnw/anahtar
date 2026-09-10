@@ -23,6 +23,10 @@ describe('i18n', () => {
 		expect(resolveMessages('de', { continue: 'Anmelden' }).continue).toBe('Anmelden');
 	});
 
+	it('fills untranslated keys of a partial locale from en', async () => {
+		expect((await loadMessages('de')).staySignedIn).toBe(en.staySignedIn);
+	});
+
 	it('lists 88 locales', () => {
 		expect(localeCodes).toHaveLength(88);
 		expect(localeCodes).toContain('en');

@@ -1,7 +1,7 @@
 // Initial translation — review for accuracy
 import type { AuthMessages } from './types.js';
 
-const pa: AuthMessages = {
+const pa: Partial<AuthMessages> = {
 	emailPlaceholder: 'you@example.in',
 	continue: 'ਅੱਗੇ ਵਧੋ',
 

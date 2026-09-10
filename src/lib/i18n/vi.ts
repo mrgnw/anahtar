@@ -1,7 +1,7 @@
 // Initial translation — review for accuracy
 import type { AuthMessages } from './types.js';
 
-const vi: AuthMessages = {
+const vi: Partial<AuthMessages> = {
 	emailPlaceholder: 'ban@example.vn',
 	continue: 'Tiếp tục',
 
