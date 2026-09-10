@@ -175,7 +175,7 @@ declare global {
 export {};
 ```
 
-`session.expiresAt` is what a "stay signed in" prompt needs; the handle already read it while validating the cookie.
+Return `locals.session` from your layout load and pass it to `AuthPill` as `session`; the pill shows a "Stay signed in" chip near expiry (see [components.md](./components.md#authpill)).
 
 ---
 

@@ -123,7 +123,7 @@ Timestamps (`createdAt`, `expiresAt`) are milliseconds.
 
 ## Design: session renewal (0.2.0)
 
-Status: design for review, not yet implemented.
+Status: shipped in 0.2.0.
 
 Sessions keep a fixed lifetime and expire. Renewal is explicit and one tap:
 a "Stay signed in" chip in AuthPill runs a passkey ceremony, which mints a
@@ -201,10 +201,10 @@ The `fresh-pineapple` branch of [anani](https://github.com/mrgnw/anani) contains
 
 ## Testing
 
-109 tests: 83 unit + 26 component.
+114 tests: 84 unit + 30 component.
 
 ```sh
-pnpm test:unit     # otp, session, sqlite adapter — node env
+pnpm test:unit     # otp, session, handlers, sqlite adapter — node env
 pnpm test:browser  # AuthFlow, OtpInput, PasskeyPrompt — happy-dom
 pnpm test          # both
 ```

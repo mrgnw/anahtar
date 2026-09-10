@@ -61,7 +61,7 @@ const DAY = 24 * 60 * 60 * 1000;
 sessionDuration: (method) => (method === 'passkey' ? 60 * DAY : 30 * DAY),
 ```
 
-`otp` is an email-code sign-in, `passkey` a WebAuthn assertion. Registering a passkey on an existing session extends it to the `passkey` duration when that is later than its current expiry. `event.locals.session.expiresAt` exposes the result.
+`otp` is an email-code sign-in, `passkey` a WebAuthn assertion. Registering a passkey on an existing session replaces it with a `passkey`-duration session (the token rotates). `event.locals.session.expiresAt` exposes the result; pass it to `AuthPill` as `session` for one-tap renewal near expiry.
 
 ## WebAuthn origin
 
