@@ -140,7 +140,7 @@ describe('AuthPill', () => {
 				'/passkey/list': { ok: true, body: passkeys },
 				'/passkey/check-email': { ok: true, body: { allowCredentials: [{ id: 'abc' }] } },
 				'/passkey/login-finish': { ok: true, body: { user: { id: '1', email: user.email } } },
-			});
+			}) as unknown as typeof fetch;
 			const onSuccess = vi.fn();
 			render(AuthPill, { props: { user, session: { expiresAt: Date.now() + expiresIn }, onSuccess } });
 			return onSuccess;
@@ -170,7 +170,7 @@ describe('AuthPill', () => {
 		});
 
 		it('hides renewal without a session prop', async () => {
-			globalThis.fetch = mockFetch({ '/passkey/list': { ok: true, body: [{ id: 'k1' }] } });
+			globalThis.fetch = mockFetch({ '/passkey/list': { ok: true, body: [{ id: 'k1' }] } }) as unknown as typeof fetch;
 			render(AuthPill, { props: { user } });
 			await new Promise((r) => setTimeout(r, 10));
 			expect(screen.queryByRole('button', { name: 'Stay signed in' })).toBeNull();
