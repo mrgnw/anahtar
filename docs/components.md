@@ -180,7 +180,9 @@ Map your app's design tokens to anahtar's properties:
 
 ## Localization
 
-Components auto-detect the browser locale. 88 locales bundled (every language with 5M+ speakers).
+Components auto-detect the browser locale. 88 locales available (every language with 5M+ speakers).
+
+Only `en` ships in the initial chunk; the detected locale is fetched as a ~1 KB chunk on mount. Server-rendered markup is English until that lands — pass `messages` if the first paint must already be translated.
 
 Override per component:
 
@@ -201,10 +203,19 @@ Override specific strings:
 ### Using i18n in your own UI
 
 ```ts
-import { resolveMessages, detectLocaleClient, locales } from '@mrgnw/anahtar/components';
+import {
+  resolveMessages,
+  loadMessages,
+  detectLocaleClient,
+  localeCodes,
+} from '@mrgnw/anahtar/components';
 
+// Sync: en, plus any locale already loaded
 const m = resolveMessages(detectLocaleClient());
 // → m.continue, m.emailPlaceholder, m.errorInvalidCode, etc.
+
+// Async: fetches the locale chunk, then resolveMessages serves it synchronously
+const localized = await loadMessages(detectLocaleClient());
 
 // With overrides
 const m = resolveMessages('de', { continue: 'Anmelden' });
@@ -214,7 +225,7 @@ import { detectLocaleServer } from '@mrgnw/anahtar';
 const locale = detectLocaleServer(event.request); // reads Accept-Language header
 
 // All available locale codes
-Object.keys(locales); // ['af', 'ak', 'am', 'ar', ..., 'zh', 'zu']
+localeCodes; // ['af', 'ak', 'am', 'ar', ..., 'zh', 'zu']
 ```
 
 The `AuthMessages` type defines all translatable strings — see `src/lib/i18n/types.ts`. The same helpers are also exported from `@mrgnw/anahtar/i18n`. The root `@mrgnw/anahtar` entry is server-only (it pulls in `node:crypto`); import client helpers from `/components`, `/i18n` or `/device`.
