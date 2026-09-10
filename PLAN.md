@@ -121,82 +121,60 @@ interface AuthDB {
 
 Timestamps (`createdAt`, `expiresAt`) are milliseconds.
 
-## Design: sliding session renewal (0.2.0)
+## Design: session renewal (0.2.0)
 
 Status: design for review, not yet implemented.
 
-Sessions renew themselves on use. Anahtar becomes the single owner of session
-lifetime; anani deletes its "Stay signed in" chip and passkey re-ceremony.
+Sessions keep a fixed lifetime and expire. Renewal is explicit and one tap:
+a "Stay signed in" chip in AuthPill runs a passkey ceremony, which mints a
+fresh full-length session. This is anani's chip made native; anani deletes
+its `AuthPillWrapper` renewal code, `RENEWAL_WINDOW_MS`, and layout wiring.
+
+Rejected alternative: silent sliding renewal in `handle` (extend past the
+halfway point). Dropped in review — active sessions would never expire, and
+it required a breaking `method` column on the sessions table. Explicit
+renewal re-proves possession and needs no schema change.
 
 ### Principle
 
-One renewal mechanism, at the one point every authenticated request passes
-through: session validation in `handle`. No renewal endpoints, no UI, no
-consumer code.
+Renewal is not a new mechanism — it is a passkey login. `passkey/login-finish`
+already rotates the session via `startSession(event, userId, 'passkey')` with
+a full `sessionDuration('passkey')`. The feature is exposing *when* to offer
+it. No schema change, no adapter change, no new endpoints, no version-breaking
+migration.
 
-### Schema (breaking → 0.2.0)
+### Changes
 
-`sessions` gains `method TEXT NOT NULL DEFAULT 'otp'` (`'otp' | 'passkey'`).
-
-- `init()` auto-migrates existing tables: `ALTER TABLE … ADD COLUMN` guarded
-  per adapter (postgres `IF NOT EXISTS`; sqlite/d1 catch duplicate-column).
-- Pre-migration rows default to `'otp'` — the conservative duration; the next
-  passkey login rotates them into a `'passkey'` session.
-
-### Adapter interface (breaking)
-
-```ts
-createSession(tokenHash: string, userId: string, expiresAt: number, method: SessionMethod): MaybePromise<void>;
-getSession(tokenHash: string): MaybePromise<(SessionRecord & { email: string }) | null>;
-// SessionRecord gains: method: SessionMethod
-```
-
-`updateSessionExpiry` unchanged. No new methods. Custom adapters: add the
-column and the param; built-in sqlite/postgres/d1 adapters handle it
-(anani uses `d1Adapter`, unaffected).
-
-### Renewal rule
-
-In `handle`, after `validateSession` succeeds:
-
-```
-remaining = expiresAt - now
-if remaining < sessionDuration(method) / 2:
-    expiresAt = now + sessionDuration(method)
-    db.updateSessionExpiry(...)
-    re-set cookie with full maxAge
-```
-
-- Renewal always extends: threshold fires only when `remaining < duration/2`,
-  so `now + duration > expiresAt`. Asserted.
-- Write cost bounded: ≤ 1 DB write per session per half-duration, regardless
-  of request rate. All other requests are read-only, same as today.
-- Always on, no config. Consequence: sessions have no absolute lifetime — an
-  active user stays signed in indefinitely. Matches the passkey/OTP model
-  (possession-based re-auth, nothing to expire toward). Noted in
-  docs/security.md.
-
-### Deletions
-
-- `extendCurrentSession` in `kit/handlers.ts` is removed. Passkey
-  register-finish instead calls the existing `startSession(event, userId,
-  'passkey')` — the session token rotates on method upgrade, which is
-  strictly stronger than extending the old token.
-- `locals.session` gains `method` so consumers can display it; no other
-  surface changes.
+1. **AuthPill** gains:
+   - `session?: { expiresAt: number } | null` — pass `locals.session`
+     through, same pattern as the existing `user` prop.
+   - `renewBefore?: number` — window in ms, default 10 days (anani's
+     `RENEWAL_WINDOW_MS`).
+   - Chip renders when authenticated, `expiresAt - now < renewBefore`, and
+     the user has ≥1 passkey (already known from `passkeyList`). Click →
+     `api.passkeyLogin()` → `onSuccess` (consumer invalidates, fresh
+     `expiresAt` flows back in). No passkey → no chip; the session lapses
+     and the normal sign-in flow is the renewal.
+2. **`kit/handlers.ts`**: `extendCurrentSession` is deleted. Passkey
+   register-finish calls the existing `startSession(event, user.id,
+   'passkey')` instead — same extension UX, but the token rotates on
+   method upgrade, strictly stronger than extending the old token.
+3. Docs: `docs/security.md` gets a "session lifetime & renewal" note;
+   integration docs show passing `session` to AuthPill.
 
 ### Tests
 
-- All three adapters: `createSession`/`getSession` round-trips `method`;
-  `init()` on a pre-0.2.0 schema adds the column.
-- Renewal: fires past halfway, skips before halfway, cookie re-set, expiry
-  extended by full duration.
-- Register-finish rotates the token (old session invalid, new one `passkey`).
+- Component (AuthPill): chip visible inside window with passkey; hidden
+  outside window, without passkey, and signed out; click calls
+  `passkeyLogin` and fires `onSuccess`.
+- Unit (handlers): register-finish rotates — old token invalid afterward,
+  new session gets passkey duration.
+- Adapters: untouched, no new adapter tests needed.
 
 ### Not in this change
 
-Logout-everywhere, account deletion, expired-row sweep — separate candidates,
-same 0.2.0 window if picked up.
+Logout-everywhere, account deletion, expired-row sweep — separate candidates.
+With no adapter break here, they no longer need to ride the same version.
 
 Built-in adapters:
 
