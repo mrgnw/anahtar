@@ -39,7 +39,8 @@ src/lib/
     ├── AuthFlow.svelte       # Full email→OTP→passkey flow
     ├── AuthPill.svelte       # Compact pill: sign-in, OTP, passkeys, sign-out
     ├── OtpInput.svelte       # n-digit OTP input
-    └── PasskeyPrompt.svelte
+    ├── PasskeyPrompt.svelte
+    └── SessionRenew.svelte   # "Stay signed in" chip (used by AuthPill, also standalone)
 ```
 
 ## Dependencies
@@ -155,6 +156,10 @@ migration.
      `api.passkeyLogin()` → `onSuccess` (consumer invalidates, fresh
      `expiresAt` flows back in). No passkey → no chip; the session lapses
      and the normal sign-in flow is the renewal.
+   - The chip is its own component, `SessionRenew`, because anani only
+     mounts `AuthPill` when signed out and draws its own signed-in row.
+     `AuthPill` renders `SessionRenew`; consumers with a custom header
+     mount it directly.
 2. **`kit/handlers.ts`**: `extendCurrentSession` is deleted. Passkey
    register-finish calls the existing `startSession(event, user.id,
    'passkey')` instead — same extension UX, but the token rotates on
@@ -201,7 +206,7 @@ The `fresh-pineapple` branch of [anani](https://github.com/mrgnw/anani) contains
 
 ## Testing
 
-114 tests: 84 unit + 30 component.
+117 tests: 84 unit + 33 component.
 
 ```sh
 pnpm test:unit     # otp, session, handlers, sqlite adapter — node env

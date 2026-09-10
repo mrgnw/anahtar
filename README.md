@@ -93,7 +93,7 @@ Optional UI components:
 <AuthPill {user} {session} onSuccess={() => invalidateAll()} onSignOut={() => invalidateAll()} />
 ```
 
-Pass `session` (`locals.session`) and the pill offers a one-tap "Stay signed in" passkey renewal near expiry.
+Pass `session` (`locals.session`) and the pill offers a one-tap "Stay signed in" passkey renewal near expiry. The chip is also exported on its own as `SessionRenew` for apps with their own signed-in header.
 
 All components auto-detect locale (88 languages). Override with `locale="fr"` or `messages={{ continue: 'Go' }}`.
 
