@@ -37,10 +37,15 @@ Security review release. Breaking changes are marked.
 - `AuthDB`: `updateOTPAttempts(id, n)` is replaced by `incrementOTPAttempts(id): number | null`; new `updateSessionExpiry(tokenHash, expiresAt)`. Custom adapters must implement both.
 - `AuthConfig.tablePrefix` removed (it never did anything); pass `{ tablePrefix }` to the adapter.
 - The root entry `@mrgnw/anahtar` is server-only. `guessDeviceName`, `resolveMessages`, `detectLocaleClient` and `locales` moved to `./device` and `./i18n` (still re-exported from `./components`).
+- `locales` (the eager `Record<string, AuthMessages>`) is gone from `./i18n` and `./components`; use `localeCodes: string[]` for the list and `loadMessages(locale)` to fetch one. The full table still exists server-side in `./dist/i18n/server.js`.
 - sqlite and d1 adapters return `createdAt` in milliseconds (was seconds).
 - `PasskeyPrompt` no longer auto-starts registration when its countdown ends, and the `countdownSeconds` prop is gone. WebKit requires transient user activation for `navigator.credentials.create()`, so the timer path failed silently on Safari and iOS. Registration now starts only from a tap on the ring or the "Add passkey now" button; the ring is static.
 - i18n: `passkeyCreating` is renamed `passkeyTitle` and re-worded from a progress line to a question ("Making you a passkey" → "Add a passkey?") in all 88 locales, since nothing is created until the user taps. Custom `AuthMessages` and `resolveMessages` overrides must rename the key.
 - `AuthPill`: the passkey panel is always available (built-in `passkey/list`); sign-out POSTs `logout` itself, then calls `onSignOut`.
+
+### Performance
+
+- Locales load on demand. A page rendering `AuthPill` used to ship 139,971 raw / 46,636 gzipped bytes of client JS; it now ships 34,055 / 12,013 — 34.6 KB gzipped less. `en` stays in the initial chunk, the detected locale arrives as a ~1 KB (0.5 KB gzipped) chunk on mount, so first paint is English until it lands.
 
 ### Added
 
