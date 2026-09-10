@@ -59,6 +59,8 @@ export type OtpResult =
 
 export type MaybePromise<T> = T | Promise<T>;
 
+export type AuthErrorScope = 'handle' | 'otp-create' | 'otp-send' | 'passkey-register';
+
 export interface AuthDB {
 	init(): MaybePromise<void>;
 
@@ -99,6 +101,11 @@ export interface AuthConfig {
 	locale?: string;
 	messages?: Partial<import('./i18n/types.js').AuthMessages>;
 	onSendOTP: (email: string, code: string) => Promise<void>;
+	onError?: (
+		scope: AuthErrorScope,
+		err: unknown,
+		event?: import('@sveltejs/kit').RequestEvent
+	) => void;
 }
 
 export interface ResolvedConfig
