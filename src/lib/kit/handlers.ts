@@ -14,11 +14,8 @@ import {
   invalidateSession,
   validateSession,
 } from "../session.js";
-import {
-  resolveMessages,
-  detectLocaleServer,
-  type AuthMessages,
-} from "../i18n/index.js";
+import { resolveMessages, detectLocaleServer } from "../i18n/server.js";
+import type { AuthMessages } from "../i18n/types.js";
 import type { ResolvedConfig, SessionMethod } from "../types.js";
 import { parseEmail } from "../email.js";
 
