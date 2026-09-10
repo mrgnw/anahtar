@@ -10,7 +10,7 @@ const el: AuthMessages = {
 	resend: 'Δεν το έλαβες; Επανάληψη αποστολής',
 	differentEmail: 'Χρήση διαφορετικού email',
 
-	passkeyCreating: 'Δημιουργία passkey',
+	passkeyTitle: 'Να προσθέσουμε passkey;',
 	passkeySubtitle: 'για γρηγοτερη, ευκολοτερη, ασφαλεστερη συνδεση',
 	passkeyAdd: 'Προσθηκη passkey τωρα',
 	passkeyMaybeLater: 'Ίσως αργότερα',

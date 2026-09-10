@@ -9,7 +9,7 @@ const ar: AuthMessages = {
 	resend: 'لم يصلك؟ إعادة الإرسال',
 	differentEmail: 'استخدام بريد إلكتروني آخر',
 
-	passkeyCreating: 'جارٍ إنشاء مفتاح المرور',
+	passkeyTitle: 'إضافة مفتاح مرور؟',
 	passkeySubtitle: 'لتسجيل دخول اسرع واسهل واكثر امانا',
 	passkeyAdd: 'اضف مفتاح مرور الان',
 	passkeyMaybeLater: 'ربما لاحقًا',

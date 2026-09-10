@@ -10,7 +10,7 @@ const sr: AuthMessages = {
 	resend: 'Нисте добили? Пошаљи поново',
 	differentEmail: 'Користи другу е-пошту',
 
-	passkeyCreating: 'Правимо вам passkey',
+	passkeyTitle: 'Додати passkey?',
 	passkeySubtitle: 'za brze, lakse i bezbednije prijavljivanje',
 	passkeyAdd: 'Dodaj passkey sada',
 	passkeyMaybeLater: 'Можда касније',

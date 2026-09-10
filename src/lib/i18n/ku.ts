@@ -10,7 +10,7 @@ const ku: AuthMessages = {
 	resend: 'Negihîşt? Ji nû ve bişîne',
 	differentEmail: 'E-nameyek din bi kar bîne',
 
-	passkeyCreating: 'Em ji te re passkey çêdikin',
+	passkeyTitle: 'Passkey zêde bikî?',
 	passkeySubtitle: 'bo chunine xweratir, asantir u ewletir',
 	passkeyAdd: 'Niha passkey zede bike',
 	passkeyMaybeLater: 'Belkî paşê',

@@ -10,7 +10,7 @@ const yo: AuthMessages = {
 	resend: 'Kò dé? Tún fi ránṣẹ́',
 	differentEmail: 'Lo àdírẹ́sì ímeèlì mìíràn',
 
-	passkeyCreating: 'A ń ṣe passkey fún ẹ',
+	passkeyTitle: 'Ṣé kí a fi passkey kún?',
 	passkeySubtitle: 'fun wiwọle yiyara, irọrun, ati ailewu',
 	passkeyAdd: 'Fi passkey kun bayi',
 	passkeyMaybeLater: 'Bóyá nígbàmíì',

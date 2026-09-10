@@ -10,7 +10,7 @@ const rw: AuthMessages = {
 	resend: 'Ntiwayibonye? Ongera wohereze',
 	differentEmail: 'Koresha imeyili itandukanye',
 
-	passkeyCreating: 'Tugukoresha passkey',
+	passkeyTitle: 'Wongeraho passkey?',
 	passkeySubtitle: 'kugira kwinjira byihuse, byoroshye, byizewe',
 	passkeyAdd: 'Ongeramo passkey ubu',
 	passkeyMaybeLater: 'Birashoboka nyuma',

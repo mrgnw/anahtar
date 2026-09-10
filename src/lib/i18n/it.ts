@@ -10,7 +10,7 @@ const it: AuthMessages = {
 	resend: 'Non ricevuto? Invia di nuovo',
 	differentEmail: "Usa un'altra email",
 
-	passkeyCreating: 'Creazione della passkey',
+	passkeyTitle: 'Aggiungere una passkey?',
 	passkeySubtitle: 'per un accesso piu veloce, facile e sicuro',
 	passkeyAdd: 'Aggiungi passkey ora',
 	passkeyMaybeLater: 'Forse più tardi',

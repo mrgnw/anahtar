@@ -10,7 +10,7 @@ const hu: AuthMessages = {
 	resend: 'Nem kaptad meg? Újraküldés',
 	differentEmail: 'Másik e-mail használata',
 
-	passkeyCreating: 'Passkey létrehozása',
+	passkeyTitle: 'Hozzáadsz egy passkey-t?',
 	passkeySubtitle: 'gyorsabb, konnyebb es biztonsagosabb belepes',
 	passkeyAdd: 'Passkey hozzaadasa most',
 	passkeyMaybeLater: 'Talán később',

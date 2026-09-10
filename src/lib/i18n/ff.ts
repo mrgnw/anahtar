@@ -10,7 +10,7 @@ const ff: AuthMessages = {
 	resend: 'Heɓaani? Neldu kadi',
 	differentEmail: 'Huutoro email goɗɗo',
 
-	passkeyCreating: 'Miɗen waɗana passkey',
+	passkeyTitle: 'Ɓeydu passkey?',
 	passkeySubtitle: 'ngam seŗtaade ɓurɗo, newaare, ɓurɗo hisde',
 	passkeyAdd: 'Ɓeydu passkey jooni',
 	passkeyMaybeLater: 'Batte hande',

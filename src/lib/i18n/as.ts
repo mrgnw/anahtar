@@ -10,7 +10,7 @@ const assamese: AuthMessages = {
 	resend: 'পোৱা নাই? পুনৰ পঠাওক',
 	differentEmail: 'বেলেগ ইমেইল ব্যৱহাৰ কৰক',
 
-	passkeyCreating: 'Passkey তৈয়াৰ কৰি আছে',
+	passkeyTitle: 'Passkey যোগ কৰিবনে?',
 	passkeySubtitle: 'দ্ৰুত, সহজ, নিৰাপদ লগইনৰ বাবে',
 	passkeyAdd: 'এতিয়াই পাছকি যোগ কৰক',
 	passkeyMaybeLater: 'পিছত হ\'ব',

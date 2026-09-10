@@ -10,7 +10,7 @@ const ps: AuthMessages = {
 	resend: 'نه مو ترلاسه کړ؟ بیا واستوئ',
 	differentEmail: 'بل بریښنالیک وکاروئ',
 
-	passkeyCreating: 'ستاسو لپاره passkey جوړیږي',
+	passkeyTitle: 'passkey اضافه کړو؟',
 	passkeySubtitle: 'د ګړندي، اسانه، خوندي ننوتلو لپاره',
 	passkeyAdd: 'اوس پاسکي اضافه کړئ',
 	passkeyMaybeLater: 'شاید وروسته',

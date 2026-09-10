@@ -10,7 +10,7 @@ const th: AuthMessages = {
 	resend: 'ไม่ได้รับ? ส่งอีกครั้ง',
 	differentEmail: 'ใช้อีเมลอื่น',
 
-	passkeyCreating: 'กำลังสร้าง passkey',
+	passkeyTitle: 'เพิ่ม passkey ไหม?',
 	passkeySubtitle: 'สำหรับการเข้าสู่ระบบที่เร็ว ง่าย และปลอดภัยยิ่งขึ้น',
 	passkeyAdd: 'เพิ่ม passkey ตอนนี้',
 	passkeyMaybeLater: 'ไว้ทีหลัง',

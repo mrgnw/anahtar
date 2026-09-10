@@ -10,7 +10,7 @@ const fil: AuthMessages = {
 	resend: 'Hindi natanggap? Ipadala ulit',
 	differentEmail: 'Gumamit ng ibang email',
 
-	passkeyCreating: 'Gumagawa ng passkey para sa iyo',
+	passkeyTitle: 'Magdagdag ng passkey?',
 	passkeySubtitle: 'para sa mas mabilis, madali, at ligtas na pag-login',
 	passkeyAdd: 'Magdagdag ng passkey ngayon',
 	passkeyMaybeLater: 'Mamaya na lang',

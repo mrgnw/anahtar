@@ -10,7 +10,7 @@ const zu: AuthMessages = {
 	resend: 'Awuyitholanga? Thumela futhi',
 	differentEmail: 'Sebenzisa enye i-imeyili',
 
-	passkeyCreating: 'Sikwenzela passkey',
+	passkeyTitle: 'Ufuna ukwengeza passkey?',
 	passkeySubtitle: 'ukungena ngokushesha, okulula nokulondekile',
 	passkeyAdd: 'Engeza passkey manje',
 	passkeyMaybeLater: 'Mhlawumbe kamuva',

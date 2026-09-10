@@ -10,7 +10,7 @@ const ca: AuthMessages = {
 	resend: 'No l\'has rebut? Reenvia',
 	differentEmail: 'Usa un altre correu',
 
-	passkeyCreating: 'Creant el teu passkey',
+	passkeyTitle: 'Vols afegir un passkey?',
 	passkeySubtitle: 'per a un inici de sessio mes rapid, facil i segur',
 	passkeyAdd: 'Afegeix passkey ara',
 	passkeyMaybeLater: 'Potser més tard',

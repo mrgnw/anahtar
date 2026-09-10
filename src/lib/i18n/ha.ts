@@ -10,7 +10,7 @@ const ha: AuthMessages = {
 	resend: 'Ba ka samu ba? Sake aikawa',
 	differentEmail: 'Yi amfani da wani imel',
 
-	passkeyCreating: 'Ana samar maka da passkey',
+	passkeyTitle: 'A ƙara passkey?',
 	passkeySubtitle: 'don shiga da sauri, sauƙi, da aminci',
 	passkeyAdd: 'Ƙara passkey yanzu',
 	passkeyMaybeLater: 'Watakila daga baya',

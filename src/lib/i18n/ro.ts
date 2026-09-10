@@ -10,7 +10,7 @@ const ro: AuthMessages = {
 	resend: 'Nu l-ai primit? Retrimite',
 	differentEmail: 'Folosește alt email',
 
-	passkeyCreating: 'Se creează un passkey',
+	passkeyTitle: 'Adaugi un passkey?',
 	passkeySubtitle: 'pentru autentificare mai rapida, usoara si sigura',
 	passkeyAdd: 'Adauga passkey acum',
 	passkeyMaybeLater: 'Poate mai târziu',

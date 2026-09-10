@@ -10,7 +10,7 @@ const ru: AuthMessages = {
 	resend: 'Не пришёл? Отправить ещё раз',
 	differentEmail: 'Использовать другой email',
 
-	passkeyCreating: 'Создаём passkey',
+	passkeyTitle: 'Добавить passkey?',
 	passkeySubtitle: 'для более быстрого, простого и безопасного входа',
 	passkeyAdd: 'Добавить passkey сейчас',
 	passkeyMaybeLater: 'Позже',

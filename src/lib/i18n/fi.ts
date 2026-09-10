@@ -10,7 +10,7 @@ const fi: AuthMessages = {
 	resend: 'Etkö saanut? Lähetä uudelleen',
 	differentEmail: 'Käytä toista sähköpostia',
 
-	passkeyCreating: 'Luodaan sinulle passkey',
+	passkeyTitle: 'Lisätäänkö passkey?',
 	passkeySubtitle: 'nopeampaan, helpompaan ja turvallisempaan kirjautumiseen',
 	passkeyAdd: 'Lisaa passkey nyt',
 	passkeyMaybeLater: 'Ehkä myöhemmin',

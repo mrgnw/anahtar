@@ -10,7 +10,7 @@ const uz: AuthMessages = {
   resend: "Kelmadimi? Qayta yuborish",
   differentEmail: "Boshqa email ishlatish",
 
-  passkeyCreating: "Sizga passkey yaratilmoqda",
+  passkeyTitle: "Passkey qo'shilsinmi?",
   passkeySubtitle: "tezroq, osonroq va xavfsizroq kirish uchun",
   passkeyAdd: "Hozir passkey qo'shing",
   passkeyMaybeLater: "Keyinroq",

@@ -9,7 +9,7 @@ const de: AuthMessages = {
 	resend: 'Nicht erhalten? Erneut senden',
 	differentEmail: 'Andere E-Mail verwenden',
 
-	passkeyCreating: 'Passkey wird erstellt',
+	passkeyTitle: 'Passkey hinzufügen?',
 	passkeySubtitle: 'fur schnelleres, einfacheres, sichereres Anmelden',
 	passkeyAdd: 'Passkey jetzt hinzufugen',
 	passkeyMaybeLater: 'Vielleicht spater',

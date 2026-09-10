@@ -10,7 +10,7 @@ const or: AuthMessages = {
 	resend: 'ପାଇନାହାନ୍ତି? ପୁଣି ପଠାନ୍ତୁ',
 	differentEmail: 'ଅନ୍ୟ ଇମେଲ୍ ବ୍ୟବହାର କରନ୍ତୁ',
 
-	passkeyCreating: 'ଆପଣଙ୍କ ପାଇଁ passkey ତିଆରି ହେଉଛି',
+	passkeyTitle: 'Passkey ଯୋଡ଼ିବେ?',
 	passkeySubtitle: 'ଦ୍ରୁତ, ସହଜ, ନିରାପଦ ଲଗଇନ ପାଇଁ',
 	passkeyAdd: 'ବର୍ତ୍ତମାନ ପାସକି ଯୋଡନ୍ତୁ',
 	passkeyMaybeLater: 'ପରେ ହୋଇପାରେ',

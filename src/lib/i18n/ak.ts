@@ -10,7 +10,7 @@ const ak: AuthMessages = {
 	resend: 'Woanya? San brɛ',
 	differentEmail: 'Fa email foforɔ',
 
-	passkeyCreating: 'Yɛreyɛ wo passkey',
+	passkeyTitle: 'Fa passkey ka ho?',
 	passkeySubtitle: 'fun ntemi, mmer, ahobammoden mu log in',
 	passkeyAdd: 'Fa passkey afiri seisei',
 	passkeyMaybeLater: 'Ebia akyire yi',

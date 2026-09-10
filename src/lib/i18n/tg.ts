@@ -10,7 +10,7 @@ const tg: AuthMessages = {
 	resend: 'Нагирифтед? Аз нав фиристед',
 	differentEmail: 'Почтаи дигар истифода баред',
 
-	passkeyCreating: 'Passkey сохта истодааст',
+	passkeyTitle: 'Passkey илова кунем?',
 	passkeySubtitle: 'барои воридшавии тезтар, осонтар ва бехатартар',
 	passkeyAdd: 'Ҳозир passkey илова кунед',
 	passkeyMaybeLater: 'Шояд баъдтар',

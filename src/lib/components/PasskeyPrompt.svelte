@@ -39,7 +39,7 @@ async function registerNow() {
 		</div>
 	</button>
 
-	<p class="anahtar-passkey-title">{m.passkeyCreating}</p>
+	<p class="anahtar-passkey-title">{m.passkeyTitle}</p>
 	<p class="anahtar-passkey-subtitle">{m.passkeySubtitle}</p>
 	<button onclick={registerNow} class="anahtar-passkey-add" disabled={registering}>
 		{m.passkeyAdd}

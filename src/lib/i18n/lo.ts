@@ -10,7 +10,7 @@ const lo: AuthMessages = {
 	resend: 'ບໍ່ໄດ້ຮັບບໍ? ສົ່ງໃໝ່',
 	differentEmail: 'ໃຊ້ອີເມວອື່ນ',
 
-	passkeyCreating: 'ກຳລັງສ້າງ passkey ໃຫ້ທ່ານ',
+	passkeyTitle: 'ເພີ່ມ passkey ບໍ?',
 	passkeySubtitle: 'ສຳລັບການເຂົ້າສູ່ລະບົບທີ່ໄວ, ງ່າຍ, ປອດໄພກວ່າ',
 	passkeyAdd: 'ເພີ່ມ passkey ດຽວນີ້',
 	passkeyMaybeLater: 'ໄວ້ທີຫຼັງ',

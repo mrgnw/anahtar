@@ -10,7 +10,7 @@ const tt: AuthMessages = {
 	resend: 'Килмәдеме? Яңадан җибәрү',
 	differentEmail: 'Башка эл. почта кулланыгыз',
 
-	passkeyCreating: 'Сезгә passkey ясыйбыз',
+	passkeyTitle: 'Passkey өстәргәме?',
 	passkeySubtitle: 'тизрәк, җиңелрәк, куркынычсызрак керү өчен',
 	passkeyAdd: 'Хәзер passkey өстә',
 	passkeyMaybeLater: 'Соңрак булыр',

@@ -10,7 +10,7 @@ const sw: AuthMessages = {
 	resend: 'Hujapata? Tuma tena',
 	differentEmail: 'Tumia barua pepe nyingine',
 
-	passkeyCreating: 'Tunakutengenezea passkey',
+	passkeyTitle: 'Uongeze passkey?',
 	passkeySubtitle: 'kwa kuingia kwa haraka, rahisi na salama zaidi',
 	passkeyAdd: 'Ongeza passkey sasa',
 	passkeyMaybeLater: 'Labda baadaye',

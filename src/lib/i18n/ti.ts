@@ -10,7 +10,7 @@ const ti: AuthMessages = {
 	resend: 'ኣይበጽሓካን? ደጊምካ ስደድ',
 	differentEmail: 'ካልእ ኢመይል ተጠቐም',
 
-	passkeyCreating: 'Passkey ንሰርሓልካ ኣለና',
+	passkeyTitle: 'Passkey ንወስኽ?',
 	passkeySubtitle: 'ንቕልጡፍ፣ ቀሊል፣ ውሑስ ምእታው',
 	passkeyAdd: 'ሕጂ passkey ወስኹ',
 	passkeyMaybeLater: 'ድሒሩ ይኸውን',

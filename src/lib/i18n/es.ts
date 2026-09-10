@@ -9,7 +9,7 @@ const es: AuthMessages = {
 	resend: 'No lo recibiste? Reenviar',
 	differentEmail: 'Usar otro correo',
 
-	passkeyCreating: 'Creando tu passkey',
+	passkeyTitle: '¿Añadir un passkey?',
 	passkeySubtitle: 'para iniciar sesion mas rapido, facil y seguro',
 	passkeyAdd: 'Agregar passkey ahora',
 	passkeyMaybeLater: 'Quiza despues',

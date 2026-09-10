@@ -10,7 +10,7 @@ const sq: AuthMessages = {
 	resend: 'Nuk e more? Ridërgo',
 	differentEmail: 'Përdor një email tjetër',
 
-	passkeyCreating: 'Po krijojmë një passkey për ty',
+	passkeyTitle: 'Të shtojmë një passkey?',
 	passkeySubtitle: 'per hyrje me te shpejte, me te lehte dhe me te sigurt',
 	passkeyAdd: 'Shto passkey tani',
 	passkeyMaybeLater: 'Ndoshta më vonë',

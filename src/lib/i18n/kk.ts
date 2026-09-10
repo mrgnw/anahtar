@@ -10,7 +10,7 @@ const kk: AuthMessages = {
 	resend: 'Алмадыңыз ба? Қайта жіберу',
 	differentEmail: 'Басқа электрондық пошта',
 
-	passkeyCreating: 'Passkey жасалуда',
+	passkeyTitle: 'Passkey қосасыз ба?',
 	passkeySubtitle: 'тезірек, оңайырақ, қауіпсіздеу кіру үшін',
 	passkeyAdd: 'Қазір passkey қосу',
 	passkeyMaybeLater: 'Кейінірек',

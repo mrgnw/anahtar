@@ -10,7 +10,7 @@ const so: AuthMessages = {
 	resend: 'Ma helin? Dib u dir',
 	differentEmail: 'Isticmaal iimeel kale',
 
-	passkeyCreating: 'Passkey baan kuu samaynayaa',
+	passkeyTitle: 'Passkey ma ku darnaa?',
 	passkeySubtitle: 'gelitaanka degdegga ah, fududda, amaanka',
 	passkeyAdd: 'Ku dar passkey hadda',
 	passkeyMaybeLater: 'Waqti dambe',

@@ -10,7 +10,7 @@ const uk: AuthMessages = {
 	resend: 'Не отримали? Надіслати знову',
 	differentEmail: 'Використати іншу пошту',
 
-	passkeyCreating: 'Створюємо passkey',
+	passkeyTitle: 'Додати passkey?',
 	passkeySubtitle: 'для швидшого, легшого та безпечнішого входу',
 	passkeyAdd: 'Додати passkey зараз',
 	passkeyMaybeLater: 'Можливо, пізніше',

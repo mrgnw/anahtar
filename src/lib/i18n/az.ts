@@ -10,7 +10,7 @@ const az: AuthMessages = {
 	resend: 'Almadınız? Yenidən göndər',
 	differentEmail: 'Başqa email istifadə et',
 
-	passkeyCreating: 'Sizin üçün passkey yaradılır',
+	passkeyTitle: 'Passkey əlavə edilsin?',
 	passkeySubtitle: 'daha sureli, asan ve tehlukesiz giris ucun',
 	passkeyAdd: 'Indi passkey elave et',
 	passkeyMaybeLater: 'Bəlkə sonra',

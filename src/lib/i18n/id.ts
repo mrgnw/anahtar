@@ -10,7 +10,7 @@ const id: AuthMessages = {
 	resend: 'Belum dapat? Kirim ulang',
 	differentEmail: 'Gunakan email lain',
 
-	passkeyCreating: 'Membuat passkey untuk Anda',
+	passkeyTitle: 'Tambahkan passkey?',
 	passkeySubtitle: 'untuk login lebih cepat, mudah, dan aman',
 	passkeyAdd: 'Tambahkan passkey sekarang',
 	passkeyMaybeLater: 'Nanti saja',

@@ -10,7 +10,7 @@ const sv: AuthMessages = {
 	resend: 'Inte fått den? Skicka igen',
 	differentEmail: 'Använd en annan e-post',
 
-	passkeyCreating: 'Skapar en passkey',
+	passkeyTitle: 'Lägga till en passkey?',
 	passkeySubtitle: 'for snabbare, enklare och sakrare inloggning',
 	passkeyAdd: 'Lagg till passkey nu',
 	passkeyMaybeLater: 'Kanske senare',

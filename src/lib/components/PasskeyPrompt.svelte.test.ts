@@ -4,11 +4,11 @@ import PasskeyPrompt from './PasskeyPrompt.svelte';
 import en from '../i18n/en.js';
 
 describe('PasskeyPrompt', () => {
-	it('shows "Making you a passkey" initially', () => {
+	it('shows "Add a passkey?" initially', () => {
 		const onRegister = vi.fn().mockResolvedValue(undefined);
 		const onSkip = vi.fn();
 		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
-		expect(screen.getByText('Making you a passkey')).toBeInTheDocument();
+		expect(screen.getByText('Add a passkey?')).toBeInTheDocument();
 		expect(screen.getByText('for faster, easier, safer login')).toBeInTheDocument();
 	});
 

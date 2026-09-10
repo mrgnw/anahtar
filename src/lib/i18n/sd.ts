@@ -10,7 +10,7 @@ const sd: AuthMessages = {
 	resend: 'نه مليو؟ ٻيهر موڪليو',
 	differentEmail: 'ٻيو اي ميل استعمال ڪريو',
 
-	passkeyCreating: 'توهان لاءِ passkey ٺاهي رهيا آهيون',
+	passkeyTitle: 'passkey شامل ڪجي؟',
 	passkeySubtitle: 'تيز، آسان، محفوظ لاگ ان لاءِ',
 	passkeyAdd: 'هاڻي پاسڪي شامل ڪريو',
 	passkeyMaybeLater: 'ٿي سگهي ٿو بعد ۾',

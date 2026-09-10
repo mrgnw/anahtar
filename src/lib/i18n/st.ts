@@ -10,7 +10,7 @@ const st: AuthMessages = {
 	resend: 'Ha u e fumana? Romela hape',
 	differentEmail: 'Sebelisa imeile e fapaneng',
 
-	passkeyCreating: 'Re o etsetsa passkey',
+	passkeyTitle: 'Kenya passkey?',
 	passkeySubtitle: 'bakeng sa ho kena ka potlako, bonolo le polokeho',
 	passkeyAdd: 'Kenya passkey hona joale',
 	passkeyMaybeLater: 'Mohlomong hamorao',
