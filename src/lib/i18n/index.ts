@@ -4,7 +4,7 @@ import en from './en.js';
 export type { AuthMessages } from './types.js';
 export { default as en } from './en.js';
 
-const loaders: Record<string, () => Promise<{ default: AuthMessages }>> = {
+const loaders: Record<string, () => Promise<{ default: Partial<AuthMessages> }>> = {
 	af: () => import('./af.js'),
 	ak: () => import('./ak.js'),
 	am: () => import('./am.js'),
@@ -121,7 +121,7 @@ export async function loadMessages(
 ): Promise<AuthMessages> {
 	const lang = locale?.split('-')[0]?.toLowerCase();
 	if (lang && !Object.hasOwn(loaded, lang) && Object.hasOwn(loaders, lang)) {
-		loaded[lang] = (await loaders[lang]!()).default;
+		loaded[lang] = { ...en, ...(await loaders[lang]!()).default };
 	}
 	return pick(loaded, locale, overrides);
 }

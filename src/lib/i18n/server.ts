@@ -91,7 +91,7 @@ import zu from './zu.js';
 
 export { detectLocaleServer } from './index.js';
 
-export const locales: Record<string, AuthMessages> = {
+const partials: Record<string, Partial<AuthMessages>> = {
 	af,
 	ak,
 	am,
@@ -181,6 +181,10 @@ export const locales: Record<string, AuthMessages> = {
 	zh,
 	zu,
 };
+
+export const locales: Record<string, AuthMessages> = Object.fromEntries(
+	Object.entries(partials).map(([lang, messages]) => [lang, { ...en, ...messages }]),
+);
 
 export function resolveMessages(
 	locale?: string,

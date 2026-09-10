@@ -15,6 +15,8 @@ const en: AuthMessages = {
   passkeyMaybeLater: "Maybe later",
   passkeySuccess: "You've got a passkey!",
 
+  staySignedIn: "Stay signed in",
+
   errorInvalidEmail: "Please enter a valid email address.",
   errorGeneric: "Something went wrong. Please try again.",
   errorResendFailed: "Failed to resend code.",

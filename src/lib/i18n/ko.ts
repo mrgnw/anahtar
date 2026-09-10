@@ -1,6 +1,6 @@
 import type { AuthMessages } from './types.js';
 
-const ko: AuthMessages = {
+const ko: Partial<AuthMessages> = {
 	emailPlaceholder: 'you@example.co.kr',
 	continue: '계속',
 

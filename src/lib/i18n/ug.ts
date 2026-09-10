@@ -1,7 +1,7 @@
 // Initial translation — review for accuracy
 import type { AuthMessages } from './types.js';
 
-const ug: AuthMessages = {
+const ug: Partial<AuthMessages> = {
 	emailPlaceholder: 'you@example.cn',
 	continue: 'داۋاملاشتۇرۇش',
 

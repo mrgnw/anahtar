@@ -16,6 +16,9 @@ export interface AuthMessages {
   passkeyMaybeLater: string;
   passkeySuccess: string;
 
+  // Session renewal
+  staySignedIn: string;
+
   // Errors (shown in UI and/or returned from server)
   errorInvalidEmail: string;
   errorGeneric: string;
