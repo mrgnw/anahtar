@@ -13,6 +13,7 @@ Session renewal, locales on demand, PasskeyPrompt on tap. No adapter changes; cu
 ### Added
 
 - `AuthPill`: `session` (`{ expiresAt }`, pass `locals.session`) and `renewBefore` (ms, default 10 days) props. Inside the window, a user with a passkey sees a "Stay signed in" chip; one tap runs a passkey login, which mints a fresh full-length session and calls `onSuccess`. No passkey, no chip: the session lapses and the normal sign-in is the renewal.
+- `SessionRenew` component: the same chip on its own, for apps that render their own signed-in header. `AuthPill` uses it internally.
 - `AuthMessages.staySignedIn`. Locale files are `Partial<AuthMessages>` merged over English, so a string without a translation falls back instead of failing to type-check.
 
 ### Changed

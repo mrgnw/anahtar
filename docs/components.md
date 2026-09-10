@@ -45,7 +45,7 @@ A pill-shaped component for headers, floating islands, or inline placement. Hand
 
 Signed in, the pill shows the email, a passkey panel (list, add, remove, backed by the built-in `passkey/list` route) and sign-out. Sign-out POSTs `{apiBase}/logout` itself, then calls `onSignOut`.
 
-Pass `session` (`locals.session`, exposed through your layout load) and the pill offers one-tap renewal: inside the last `renewBefore` ms of the session, a user with a passkey sees a "Stay signed in" chip. Tapping it runs a passkey login, which replaces the session with a fresh full-length one, then calls `onSuccess` so you can `invalidateAll()`. Without a passkey there is no chip; the session lapses and the normal sign-in is the renewal.
+Pass `session` (`locals.session`, exposed through your layout load) and the pill offers one-tap renewal: inside the last `renewBefore` ms of the session, a user with a passkey sees a "Stay signed in" chip. Tapping it runs a passkey login, which replaces the session with a fresh full-length one, then calls `onSuccess` so you can `invalidateAll()`. Without a passkey there is no chip; the session lapses and the normal sign-in is the renewal. The chip is the standalone [`SessionRenew`](#sessionrenew) component; use it directly if you render your own signed-in UI.
 
 The OTP step sizes itself from the `otpLength` the `/start` response carries, so `otpLength: 6` server-side needs no client change. If `/start` returns a `devCode` field (a dev-only wrapper can add one), the pill submits it immediately.
 
@@ -69,6 +69,24 @@ Props:
 | `actions`          | `Snippet`                      | —             | Extra inline icons before the sign-out button           |
 
 `PasskeyInfo` shape: `{ id: string; credentialId?: string; name?: string | null; createdAt?: number }`
+
+## SessionRenew
+
+The "Stay signed in" chip on its own, for apps that draw their own signed-in header and only use `AuthPill` (or nothing) for sign-in:
+
+```svelte
+<script>
+  import { SessionRenew } from '@mrgnw/anahtar/components';
+  import { invalidateAll } from '$app/navigation';
+  import { page } from '$app/state';
+</script>
+
+<SessionRenew user={page.data.user} session={page.data.session} onSuccess={() => invalidateAll()} />
+```
+
+Renders a single `<button>` when `user` and `session` are set, less than `renewBefore` ms remain, and the user has at least one passkey; otherwise renders nothing. Clicking runs a passkey login for `user.email`, which replaces the session, then calls `onSuccess`. Style it through `--anahtar-primary` or target `.anahtar-renew`.
+
+Props: `apiBase`, `user`, `session`, `renewBefore` (default 10 days), `getPasskeys` (default `GET {apiBase}/passkey/list`), `onSuccess`, `locale`, `messages`.
 
 ## PasskeyPrompt
 
