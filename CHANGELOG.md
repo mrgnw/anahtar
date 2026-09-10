@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.1
+
+Survive a transient database failure. No breaking changes.
+
+### Fixed
+
+- `db.init()` is retried on the next request instead of poisoning the isolate. In 0.1.0 one rejection left `ready` rejected for the life of the module, and since `handle` awaits it on every request, a single transient DB error 500'd every page until the isolate recycled.
+- `handle` no longer takes the page down when the database is unavailable: it sets `locals.user`/`locals.session` to `null`, reports through `onError`, and resolves the request signed out.
+- `/start` catches a failing `generateOTP` (it sat outside the only `try`, so a DB error threw straight into the consumer's `handleError`) and returns the localized generic message with status 500.
+- `onSendOTP` errors return the localized `errorGeneric` instead of `err.message`, which `AuthPill` rendered verbatim in front of the user.
+
+### Added
+
+- `AuthConfig.onError(scope, err, event?)`, called for the `'handle'`, `'otp-create'`, `'otp-send'` and `'passkey-register'` failures. Defaults to `console.error`; the `AuthErrorScope` type is exported.
+
 ## 0.1.0
 
 Security review release. Breaking changes are marked.
