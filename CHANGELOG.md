@@ -1,12 +1,23 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
+
+Session renewal, locales on demand, PasskeyPrompt on tap. No adapter changes; custom `AuthDB` implementations need nothing.
 
 ### Breaking
 
 - `locales` (the eager `Record<string, AuthMessages>`) is gone from `./i18n` and `./components`; use `localeCodes: string[]` for the list and `loadMessages(locale)` to fetch one. The full table still exists server-side in `./dist/i18n/server.js`.
 - `PasskeyPrompt` no longer auto-starts registration when its countdown ends, and the `countdownSeconds` prop is gone. WebKit requires transient user activation for `navigator.credentials.create()`, so the timer path failed silently on Safari and iOS. Registration now starts only from a tap on the ring or the "Add passkey now" button; the ring is static.
 - i18n: `passkeyCreating` is renamed `passkeyTitle` and re-worded from a progress line to a question ("Making you a passkey" → "Add a passkey?") in all 88 locales, since nothing is created until the user taps. Custom `AuthMessages` and `resolveMessages` overrides must rename the key.
+
+### Added
+
+- `AuthPill`: `session` (`{ expiresAt }`, pass `locals.session`) and `renewBefore` (ms, default 10 days) props. Inside the window, a user with a passkey sees a "Stay signed in" chip; one tap runs a passkey login, which mints a fresh full-length session and calls `onSuccess`. No passkey, no chip: the session lapses and the normal sign-in is the renewal.
+- `AuthMessages.staySignedIn`. Locale files are `Partial<AuthMessages>` merged over English, so a string without a translation falls back instead of failing to type-check.
+
+### Changed
+
+- Registering a passkey on an existing session replaces it with a passkey-length session instead of extending it in place: the token rotates and the cookie is re-set in the same response.
 
 ### Performance
 
