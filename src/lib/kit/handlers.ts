@@ -43,7 +43,7 @@ function requireAuth(
 
 export function createHandlers(
   config: ResolvedConfig,
-  ready: Promise<void>,
+  ensureReady: () => Promise<void>,
 ): {
   GET: RouteHandler;
   POST: RouteHandler;
@@ -104,14 +104,20 @@ export function createHandlers(
           return json({ error: m.errorInvalidEmail }, { status: 400 });
         }
 
-        const { code } = await generateOTP(config.db, email, config);
+        let code: string;
+        try {
+          ({ code } = await generateOTP(config.db, email, config));
+        } catch (err) {
+          config.onError("otp-create", err, event);
+          return json({ error: m.errorGeneric }, { status: 500 });
+        }
 
         try {
           await config.onSendOTP(email, code);
         } catch (err) {
-          const message =
-            err instanceof Error ? err.message : m.errorGeneric;
-          return json({ error: message }, { status: 400 });
+          // whatever the consumer's mail path throws is internal: the user gets the generic text
+          config.onError("otp-send", err, event);
+          return json({ error: m.errorGeneric }, { status: 400 });
         }
 
         return json({ success: true, otpLength: config.otpLength });
@@ -269,7 +275,7 @@ export function createHandlers(
           config,
         );
         if (!result.ok) {
-          console.error("register-finish failed:", result.reason);
+          config.onError("passkey-register", result.reason, event);
           return json({ error: m.errorPasskeyRegFailed }, { status: 400 });
         }
 
@@ -346,11 +352,11 @@ export function createHandlers(
 
   return {
     GET: async (event) => {
-      await ready;
+      await ensureReady();
       return getRoute(event, "GET")?.(event) ?? notFound(event);
     },
     POST: async (event) => {
-      await ready;
+      await ensureReady();
       return getRoute(event, "POST")?.(event) ?? notFound(event);
     },
   };

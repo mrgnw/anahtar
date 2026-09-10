@@ -54,4 +54,4 @@ Covered by `SameSite=Lax` on the cookie and SvelteKit's origin check for form-en
 
 ## `onSendOTP` errors
 
-If `onSendOTP` throws, the `Error` message is returned to the client verbatim as `error` with status 400. Throw messages meant for users; log provider details server-side.
+If `onSendOTP` throws, the client gets the localized `errorGeneric` message with status 400 — the thrown message stays server-side. Wire `onError` to see it.

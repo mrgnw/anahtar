@@ -7,6 +7,7 @@ export { resolveConfig } from './config.js';
 export type {
 	AuthConfig,
 	AuthDB,
+	AuthErrorScope,
 	AuthLocals,
 	AuthUser,
 	FullPasskeyRecord,
@@ -26,16 +27,25 @@ export type Auth = ReturnType<typeof createAuth>;
 
 export function createAuth(config: AuthConfig) {
 	const resolved = resolveConfig(config);
-	const ready = Promise.resolve().then(() => config.db.init());
+	let ready: Promise<void> | undefined;
+	const ensureReady = () =>
+		(ready ??= Promise.resolve()
+			.then(() => config.db.init())
+			.catch((err) => {
+				ready = undefined; // next request retries instead of inheriting the failure
+				throw err;
+			}));
 
 	return {
-		handle: createHandle(resolved, ready),
-		handlers: createHandlers(resolved, ready),
+		handle: createHandle(resolved, ensureReady),
+		handlers: createHandlers(resolved, ensureReady),
 		listPasskeys: async (userId: string) => {
-			await ready;
+			await ensureReady();
 			return config.db.getUserPasskeys(userId);
 		},
-		ready,
+		get ready() {
+			return ensureReady();
+		},
 		config: resolved
 	};
 }
