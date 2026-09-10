@@ -4,4 +4,9 @@ export { default as AuthPill } from "./AuthPill.svelte";
 export { default as OtpInput } from "./OtpInput.svelte";
 export { default as PasskeyPrompt } from "./PasskeyPrompt.svelte";
 export type { AuthMessages } from "../i18n/types.js";
-export { resolveMessages, detectLocaleClient, locales } from "../i18n/index.js";
+export {
+  resolveMessages,
+  loadMessages,
+  detectLocaleClient,
+  localeCodes,
+} from "../i18n/index.js";

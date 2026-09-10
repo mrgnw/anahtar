@@ -1,6 +1,11 @@
 <script lang="ts">
 import { AuthError, createAuthClient } from '../client.js';
-import { resolveMessages, detectLocaleClient, type AuthMessages } from '../i18n/index.js';
+import {
+	resolveMessages,
+	loadMessages,
+	detectLocaleClient,
+	type AuthMessages,
+} from '../i18n/index.js';
 import OtpInput from './OtpInput.svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
 import { onMount, type Snippet } from 'svelte';
@@ -47,7 +52,9 @@ let {
 
 let expanded = $state(false);
 
-let m = $derived(resolveMessages(locale ?? detectLocaleClient(), messageOverrides));
+let lang = $derived(locale ?? detectLocaleClient());
+let localeMessages = $state<AuthMessages | null>(null);
+let m = $derived({ ...(localeMessages ?? resolveMessages(lang)), ...messageOverrides });
 const api = $derived(createAuthClient(apiBase));
 
 let email = $state('');
@@ -77,6 +84,7 @@ const passkeyPromise = $derived(
 );
 
 onMount(() => {
+	loadMessages(lang).then((messages) => (localeMessages = messages));
 	isTouch = matchMedia('(pointer: coarse)').matches;
 	if (!isAuthenticated) tryConditionalWebAuthn();
 	return () => api.passkeyCancel();

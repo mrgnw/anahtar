@@ -1,194 +1,129 @@
 import type { AuthMessages } from './types.js';
 import en from './en.js';
-import af from './af.js';
-import ak from './ak.js';
-import am from './am.js';
-import ar from './ar.js';
-import assamese from './as.js';
-import az from './az.js';
-import be from './be.js';
-import bg from './bg.js';
-import bn from './bn.js';
-import ca from './ca.js';
-import cs from './cs.js';
-import da from './da.js';
-import de from './de.js';
-import el from './el.js';
-import es from './es.js';
-import fa from './fa.js';
-import ff from './ff.js';
-import fi from './fi.js';
-import fil from './fil.js';
-import fr from './fr.js';
-import gu from './gu.js';
-import ha from './ha.js';
-import he from './he.js';
-import hi from './hi.js';
-import hr from './hr.js';
-import ht from './ht.js';
-import hu from './hu.js';
-import hy from './hy.js';
-import id from './id.js';
-import ig from './ig.js';
-import it from './it.js';
-import ja from './ja.js';
-import jv from './jv.js';
-import kk from './kk.js';
-import km from './km.js';
-import kn from './kn.js';
-import ko from './ko.js';
-import ku from './ku.js';
-import ln from './ln.js';
-import lo from './lo.js';
-import mg from './mg.js';
-import ml from './ml.js';
-import mn from './mn.js';
-import mr from './mr.js';
-import ms from './ms.js';
-import my from './my.js';
-import ne from './ne.js';
-import nl from './nl.js';
-import no from './no.js';
-import ny from './ny.js';
-import om from './om.js';
-import or_ from './or.js';
-import pa from './pa.js';
-import pl from './pl.js';
-import ps from './ps.js';
-import pt from './pt.js';
-import rn from './rn.js';
-import ro from './ro.js';
-import ru from './ru.js';
-import rw from './rw.js';
-import sd from './sd.js';
-import si from './si.js';
-import sk from './sk.js';
-import so from './so.js';
-import sq from './sq.js';
-import sr from './sr.js';
-import st from './st.js';
-import su from './su.js';
-import sv from './sv.js';
-import sw from './sw.js';
-import ta from './ta.js';
-import te from './te.js';
-import tg from './tg.js';
-import th from './th.js';
-import ti from './ti.js';
-import tk from './tk.js';
-import tr from './tr.js';
-import ts from './ts.js';
-import tt from './tt.js';
-import ug from './ug.js';
-import uk from './uk.js';
-import ur from './ur.js';
-import uz from './uz.js';
-import vi from './vi.js';
-import yo from './yo.js';
-import zh from './zh.js';
-import zu from './zu.js';
 
 export type { AuthMessages } from './types.js';
 export { default as en } from './en.js';
 
-export const locales: Record<string, AuthMessages> = {
-	af,
-	ak,
-	am,
-	ar,
-	as: assamese,
-	az,
-	be,
-	bg,
-	bn,
-	ca,
-	cs,
-	da,
-	de,
-	el,
-	en,
-	es,
-	fa,
-	ff,
-	fi,
-	fil,
-	fr,
-	gu,
-	ha,
-	he,
-	hi,
-	hr,
-	ht,
-	hu,
-	hy,
-	id,
-	ig,
-	it,
-	ja,
-	jv,
-	kk,
-	km,
-	kn,
-	ko,
-	ku,
-	ln,
-	lo,
-	mg,
-	ml,
-	mn,
-	mr,
-	ms,
-	my,
-	ne,
-	nl,
-	no,
-	ny,
-	om,
-	or: or_,
-	pa,
-	pl,
-	ps,
-	pt,
-	rn,
-	ro,
-	ru,
-	rw,
-	sd,
-	si,
-	sk,
-	so,
-	sq,
-	sr,
-	st,
-	su,
-	sv,
-	sw,
-	ta,
-	te,
-	tg,
-	th,
-	ti,
-	tk,
-	tr,
-	ts,
-	tt,
-	ug,
-	uk,
-	ur,
-	uz,
-	vi,
-	yo,
-	zh,
-	zu,
+const loaders: Record<string, () => Promise<{ default: AuthMessages }>> = {
+	af: () => import('./af.js'),
+	ak: () => import('./ak.js'),
+	am: () => import('./am.js'),
+	ar: () => import('./ar.js'),
+	as: () => import('./as.js'),
+	az: () => import('./az.js'),
+	be: () => import('./be.js'),
+	bg: () => import('./bg.js'),
+	bn: () => import('./bn.js'),
+	ca: () => import('./ca.js'),
+	cs: () => import('./cs.js'),
+	da: () => import('./da.js'),
+	de: () => import('./de.js'),
+	el: () => import('./el.js'),
+	es: () => import('./es.js'),
+	fa: () => import('./fa.js'),
+	ff: () => import('./ff.js'),
+	fi: () => import('./fi.js'),
+	fil: () => import('./fil.js'),
+	fr: () => import('./fr.js'),
+	gu: () => import('./gu.js'),
+	ha: () => import('./ha.js'),
+	he: () => import('./he.js'),
+	hi: () => import('./hi.js'),
+	hr: () => import('./hr.js'),
+	ht: () => import('./ht.js'),
+	hu: () => import('./hu.js'),
+	hy: () => import('./hy.js'),
+	id: () => import('./id.js'),
+	ig: () => import('./ig.js'),
+	it: () => import('./it.js'),
+	ja: () => import('./ja.js'),
+	jv: () => import('./jv.js'),
+	kk: () => import('./kk.js'),
+	km: () => import('./km.js'),
+	kn: () => import('./kn.js'),
+	ko: () => import('./ko.js'),
+	ku: () => import('./ku.js'),
+	ln: () => import('./ln.js'),
+	lo: () => import('./lo.js'),
+	mg: () => import('./mg.js'),
+	ml: () => import('./ml.js'),
+	mn: () => import('./mn.js'),
+	mr: () => import('./mr.js'),
+	ms: () => import('./ms.js'),
+	my: () => import('./my.js'),
+	ne: () => import('./ne.js'),
+	nl: () => import('./nl.js'),
+	no: () => import('./no.js'),
+	ny: () => import('./ny.js'),
+	om: () => import('./om.js'),
+	or: () => import('./or.js'),
+	pa: () => import('./pa.js'),
+	pl: () => import('./pl.js'),
+	ps: () => import('./ps.js'),
+	pt: () => import('./pt.js'),
+	rn: () => import('./rn.js'),
+	ro: () => import('./ro.js'),
+	ru: () => import('./ru.js'),
+	rw: () => import('./rw.js'),
+	sd: () => import('./sd.js'),
+	si: () => import('./si.js'),
+	sk: () => import('./sk.js'),
+	so: () => import('./so.js'),
+	sq: () => import('./sq.js'),
+	sr: () => import('./sr.js'),
+	st: () => import('./st.js'),
+	su: () => import('./su.js'),
+	sv: () => import('./sv.js'),
+	sw: () => import('./sw.js'),
+	ta: () => import('./ta.js'),
+	te: () => import('./te.js'),
+	tg: () => import('./tg.js'),
+	th: () => import('./th.js'),
+	ti: () => import('./ti.js'),
+	tk: () => import('./tk.js'),
+	tr: () => import('./tr.js'),
+	ts: () => import('./ts.js'),
+	tt: () => import('./tt.js'),
+	ug: () => import('./ug.js'),
+	uk: () => import('./uk.js'),
+	ur: () => import('./ur.js'),
+	uz: () => import('./uz.js'),
+	vi: () => import('./vi.js'),
+	yo: () => import('./yo.js'),
+	zh: () => import('./zh.js'),
+	zu: () => import('./zu.js'),
 };
+
+export const localeCodes: string[] = ['en', ...Object.keys(loaders)].sort();
+
+const loaded: Record<string, AuthMessages> = { en };
+
+export function pick(
+	table: Record<string, AuthMessages>,
+	locale?: string,
+	overrides?: Partial<AuthMessages>,
+): AuthMessages {
+	const lang = locale?.split('-')[0]?.toLowerCase();
+	const base = lang && Object.hasOwn(table, lang) ? table[lang]! : en;
+	return overrides ? { ...base, ...overrides } : base;
+}
 
 export function resolveMessages(
 	locale?: string,
 	overrides?: Partial<AuthMessages>,
 ): AuthMessages {
+	return pick(loaded, locale, overrides);
+}
+
+export async function loadMessages(
+	locale?: string,
+	overrides?: Partial<AuthMessages>,
+): Promise<AuthMessages> {
 	const lang = locale?.split('-')[0]?.toLowerCase();
-	const base = lang && Object.hasOwn(locales, lang) ? locales[lang] : en;
-	return overrides ? { ...base, ...overrides } : base;
+	if (lang && !Object.hasOwn(loaded, lang) && Object.hasOwn(loaders, lang)) {
+		loaded[lang] = (await loaders[lang]!()).default;
+	}
+	return pick(loaded, locale, overrides);
 }
 
 export function detectLocaleClient(): string {

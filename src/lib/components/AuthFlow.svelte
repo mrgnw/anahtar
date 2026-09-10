@@ -1,7 +1,12 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { AuthError, createAuthClient } from '../client.js';
-import { resolveMessages, detectLocaleClient, type AuthMessages } from '../i18n/index.js';
+import {
+	resolveMessages,
+	loadMessages,
+	detectLocaleClient,
+	type AuthMessages,
+} from '../i18n/index.js';
 import OtpInput from './OtpInput.svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
 
@@ -14,7 +19,9 @@ interface Props {
 
 let { apiBase = '/api/auth', locale, messages: messageOverrides, onSuccess }: Props = $props();
 
-let m = $derived(resolveMessages(locale ?? detectLocaleClient(), messageOverrides));
+let lang = $derived(locale ?? detectLocaleClient());
+let localeMessages = $state<AuthMessages | null>(null);
+let m = $derived({ ...(localeMessages ?? resolveMessages(lang)), ...messageOverrides });
 const api = $derived(createAuthClient(apiBase));
 
 let step = $state<1 | 2 | 3 | 4>(1);
@@ -26,6 +33,7 @@ let otpInput = $state<{ clear: () => void; focus: () => void }>();
 let otpLength = $state(5);
 
 onMount(() => {
+	loadMessages(lang).then((messages) => (localeMessages = messages));
 	tryConditionalWebAuthn();
 	return () => {
 		api.passkeyCancel();
