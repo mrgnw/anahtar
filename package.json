@@ -1,6 +1,6 @@
 {
   "name": "@mrgnw/anahtar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Opinionated, reusable auth for SvelteKit. Email+OTP + passkeys.",
   "license": "MIT",
   "type": "module",
