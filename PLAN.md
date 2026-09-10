@@ -121,6 +121,83 @@ interface AuthDB {
 
 Timestamps (`createdAt`, `expiresAt`) are milliseconds.
 
+## Design: sliding session renewal (0.2.0)
+
+Status: design for review, not yet implemented.
+
+Sessions renew themselves on use. Anahtar becomes the single owner of session
+lifetime; anani deletes its "Stay signed in" chip and passkey re-ceremony.
+
+### Principle
+
+One renewal mechanism, at the one point every authenticated request passes
+through: session validation in `handle`. No renewal endpoints, no UI, no
+consumer code.
+
+### Schema (breaking → 0.2.0)
+
+`sessions` gains `method TEXT NOT NULL DEFAULT 'otp'` (`'otp' | 'passkey'`).
+
+- `init()` auto-migrates existing tables: `ALTER TABLE … ADD COLUMN` guarded
+  per adapter (postgres `IF NOT EXISTS`; sqlite/d1 catch duplicate-column).
+- Pre-migration rows default to `'otp'` — the conservative duration; the next
+  passkey login rotates them into a `'passkey'` session.
+
+### Adapter interface (breaking)
+
+```ts
+createSession(tokenHash: string, userId: string, expiresAt: number, method: SessionMethod): MaybePromise<void>;
+getSession(tokenHash: string): MaybePromise<(SessionRecord & { email: string }) | null>;
+// SessionRecord gains: method: SessionMethod
+```
+
+`updateSessionExpiry` unchanged. No new methods. Custom adapters: add the
+column and the param; built-in sqlite/postgres/d1 adapters handle it
+(anani uses `d1Adapter`, unaffected).
+
+### Renewal rule
+
+In `handle`, after `validateSession` succeeds:
+
+```
+remaining = expiresAt - now
+if remaining < sessionDuration(method) / 2:
+    expiresAt = now + sessionDuration(method)
+    db.updateSessionExpiry(...)
+    re-set cookie with full maxAge
+```
+
+- Renewal always extends: threshold fires only when `remaining < duration/2`,
+  so `now + duration > expiresAt`. Asserted.
+- Write cost bounded: ≤ 1 DB write per session per half-duration, regardless
+  of request rate. All other requests are read-only, same as today.
+- Always on, no config. Consequence: sessions have no absolute lifetime — an
+  active user stays signed in indefinitely. Matches the passkey/OTP model
+  (possession-based re-auth, nothing to expire toward). Noted in
+  docs/security.md.
+
+### Deletions
+
+- `extendCurrentSession` in `kit/handlers.ts` is removed. Passkey
+  register-finish instead calls the existing `startSession(event, userId,
+  'passkey')` — the session token rotates on method upgrade, which is
+  strictly stronger than extending the old token.
+- `locals.session` gains `method` so consumers can display it; no other
+  surface changes.
+
+### Tests
+
+- All three adapters: `createSession`/`getSession` round-trips `method`;
+  `init()` on a pre-0.2.0 schema adds the column.
+- Renewal: fires past halfway, skips before halfway, cookie re-set, expiry
+  extended by full duration.
+- Register-finish rotates the token (old session invalid, new one `passkey`).
+
+### Not in this change
+
+Logout-everywhere, account deletion, expired-row sweep — separate candidates,
+same 0.2.0 window if picked up.
+
 Built-in adapters:
 
 - `sqliteAdapter(db: Database)` — from `@mrgnw/anahtar/sqlite`
