@@ -1,17 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import PasskeyPrompt from './PasskeyPrompt.svelte';
 import en from '../i18n/en.js';
 
 describe('PasskeyPrompt', () => {
-	beforeEach(() => {
-		vi.useFakeTimers();
-	});
-
-	afterEach(() => {
-		vi.useRealTimers();
-	});
-
 	it('shows "Making you a passkey" initially', () => {
 		const onRegister = vi.fn().mockResolvedValue(undefined);
 		const onSkip = vi.fn();
@@ -35,23 +27,44 @@ describe('PasskeyPrompt', () => {
 		expect(onSkip).toHaveBeenCalledOnce();
 	});
 
-	it('calls onRegister after countdown expires', async () => {
+	it('never calls onRegister without a click', async () => {
+		vi.useFakeTimers();
+		try {
+			const onRegister = vi.fn().mockResolvedValue(undefined);
+			const onSkip = vi.fn();
+			render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
+
+			await vi.advanceTimersByTimeAsync(30000);
+			expect(onRegister).not.toHaveBeenCalled();
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+
+	it('calls onRegister when "Add passkey now" clicked', async () => {
 		const onRegister = vi.fn().mockResolvedValue(undefined);
 		const onSkip = vi.fn();
-		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip, countdownSeconds: 2 } });
+		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
 
-		expect(onRegister).not.toHaveBeenCalled();
+		await fireEvent.click(screen.getByText('Add passkey now'));
+		expect(onRegister).toHaveBeenCalledOnce();
+	});
 
-		await vi.advanceTimersByTimeAsync(2000);
+	it('calls onRegister when the ring is clicked', async () => {
+		const onRegister = vi.fn().mockResolvedValue(undefined);
+		const onSkip = vi.fn();
+		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
+
+		await fireEvent.click(screen.getByTitle('Set up now'));
 		expect(onRegister).toHaveBeenCalledOnce();
 	});
 
 	it('re-enables the manual buttons when onRegister throws', async () => {
 		const onRegister = vi.fn().mockRejectedValue(new Error('fail'));
 		const onSkip = vi.fn();
-		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip, countdownSeconds: 1 } });
+		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
 
-		await vi.advanceTimersByTimeAsync(1000);
+		await fireEvent.click(screen.getByText('Add passkey now'));
 
 		await vi.waitFor(() => {
 			expect(onRegister).toHaveBeenCalledOnce();
@@ -63,11 +76,11 @@ describe('PasskeyPrompt', () => {
 	it('calls onSkip when "Maybe later" clicked in failed state', async () => {
 		const onRegister = vi.fn().mockRejectedValue(new Error('fail'));
 		const onSkip = vi.fn();
-		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip, countdownSeconds: 1 } });
+		render(PasskeyPrompt, { props: { m: en, onRegister, onSkip } });
 
-		await vi.advanceTimersByTimeAsync(1000);
+		await fireEvent.click(screen.getByText('Add passkey now'));
 		await vi.waitFor(() => {
-			expect(screen.getByText('Maybe later')).toBeInTheDocument();
+			expect(screen.getByText('Add passkey now')).not.toBeDisabled();
 		});
 
 		await fireEvent.click(screen.getByText('Maybe later'));
