@@ -66,7 +66,7 @@ describe('passkey/register-finish', () => {
 		event.locals.user = current!.user;
 		event.locals.session = current!.session;
 
-		const handlers = createHandlers(config, Promise.resolve());
+		const handlers = createHandlers(config, () => Promise.resolve());
 		const res = await handlers.POST(event as never);
 		expect(res.status).toBe(200);
 
