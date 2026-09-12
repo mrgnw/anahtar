@@ -1,9 +1,8 @@
 # Priority and rationale
 
-Items 1–4 of the 2026-09-03 security + API review have shipped, plus db-failure resilience
-(0.1.1, tag `v0.1.1`) and session renewal (0.2.0, tag `v0.2.0`). Neither is on npm yet:
-publish 0.2.0 from `main`. anani stays pinned to 0.0.30 until then; anani #380 waits on it.
-anani-side follow-ups live in `~/dev/anani/todos/`.
+The 2026-09-03 security + API review is fully shipped, through db-failure resilience
+(0.1.1) and session renewal (0.2.0, tag `v0.2.0`). 0.2.0 is published and anani is pinned
+to it. anani-side follow-ups live in `~/dev/anani/todos/`.
 
 | # | todo | who | size | why here |
 |-|-|-|-|-|
