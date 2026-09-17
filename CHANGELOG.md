@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1
+
+SvelteKit 3 consumers. No breaking changes.
+
+### Changed
+
+- Peer range is `@sveltejs/kit@^2.0.0 || ^3.0.0-next.0`, so Kit 3 prereleases install without a warning.
+- Handlers return `Response.json(...)` instead of Kit's `json()`, which Kit 3 deprecates.
+- `createHandle` is typed structurally from `RequestEvent` and `resolve`, since `Handle` lives in `@sveltejs/kit` on Kit 2 and `@sveltejs/kit/hooks` on Kit 3. The return value is assignable to both.
+
 ## 0.2.0
 
 Session renewal, locales on demand, PasskeyPrompt on tap. No adapter changes; custom `AuthDB` implementations need nothing.
