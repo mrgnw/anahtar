@@ -1,7 +1,7 @@
 # Priority and rationale
 
 The 2026-09-03 security + API review is fully shipped, through db-failure resilience
-(0.1.1) and session renewal (0.2.0, tag `v0.2.0`). 0.2.0 is published and anani is pinned
+(0.1.1), session renewal (0.2.0) and SvelteKit 3 support (0.2.1, tag `v0.2.1`, PR #14). 0.2.1 is published and anani is pinned
 to it. anani-side follow-ups live in `~/dev/anani/todos/`.
 
 | # | todo | who | size | why here |
