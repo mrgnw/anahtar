@@ -1,8 +1,16 @@
-import type { Handle } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
 import type { ResolvedConfig } from '../types.js';
 import { validateSession } from '../session.js';
 
-export function createHandle(config: ResolvedConfig, ensureReady: () => Promise<void>): Handle {
+type HandleInput = {
+	event: RequestEvent;
+	resolve: (event: RequestEvent) => Response | Promise<Response>;
+};
+
+export function createHandle(
+	config: ResolvedConfig,
+	ensureReady: () => Promise<void>,
+): (input: HandleInput) => Promise<Response> {
 	return async ({ event, resolve }) => {
 		try {
 			await ensureReady();

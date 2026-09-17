@@ -1,5 +1,4 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import { json } from "@sveltejs/kit";
 import { generateOTP, verifyOTP } from "../otp.js";
 import {
   generateAuthenticationChallenge,
@@ -34,7 +33,7 @@ function requireAuth(
   m: AuthMessages,
 ): { id: string; email: string } | Response {
   const user = event.locals.user;
-  if (!user) return json({ error: m.errorNotAuthenticated }, { status: 401 });
+  if (!user) return Response.json({ error: m.errorNotAuthenticated }, { status: 401 });
   return user;
 }
 
@@ -84,7 +83,7 @@ export function createHandlers(
         const body = await event.request.json().catch(() => null);
         const email = parseEmail(body?.email);
         if (!email) {
-          return json({ error: m.errorInvalidEmail }, { status: 400 });
+          return Response.json({ error: m.errorInvalidEmail }, { status: 400 });
         }
 
         let code: string;
@@ -92,7 +91,7 @@ export function createHandlers(
           ({ code } = await generateOTP(config.db, email, config));
         } catch (err) {
           config.onError("otp-create", err, event);
-          return json({ error: m.errorGeneric }, { status: 500 });
+          return Response.json({ error: m.errorGeneric }, { status: 500 });
         }
 
         try {
@@ -100,10 +99,10 @@ export function createHandlers(
         } catch (err) {
           // whatever the consumer's mail path throws is internal: the user gets the generic text
           config.onError("otp-send", err, event);
-          return json({ error: m.errorGeneric }, { status: 400 });
+          return Response.json({ error: m.errorGeneric }, { status: 400 });
         }
 
-        return json({ success: true, otpLength: config.otpLength });
+        return Response.json({ success: true, otpLength: config.otpLength });
       },
     },
 
@@ -114,7 +113,7 @@ export function createHandlers(
         const body = await event.request.json().catch(() => null);
         const email = parseEmail(body?.email);
         if (!email || typeof body.code !== "string") {
-          return json({ error: m.errorInvalidInput }, { status: 400 });
+          return Response.json({ error: m.errorInvalidInput }, { status: 400 });
         }
 
         const otp = await verifyOTP(config.db, email, body.code, config);
@@ -124,7 +123,7 @@ export function createHandlers(
             expired: m.errorCodeExpired,
             rate_limited: m.errorTooManyAttempts,
           };
-          return json(
+          return Response.json(
             { error: messages[otp.error] },
             { status: otp.error === "rate_limited" ? 429 : 400 },
           );
@@ -139,7 +138,7 @@ export function createHandlers(
 
         const passkeys = await config.db.getUserPasskeys(user.id);
 
-        return json({
+        return Response.json({
           user: { id: user.id, email: user.email },
           hasPasskey: passkeys.length > 0,
           skipPasskeyPrompt: user.skipPasskeyPrompt,
@@ -158,7 +157,7 @@ export function createHandlers(
           }
           event.cookies.delete(config.cookie, { path: "/" });
         }
-        return json({ ok: true });
+        return Response.json({ ok: true });
       },
     },
 
@@ -170,7 +169,7 @@ export function createHandlers(
           event.url,
           config,
         );
-        return json(options);
+        return Response.json(options);
       },
     },
 
@@ -179,14 +178,14 @@ export function createHandlers(
       handler: async (event) => {
         const body = await event.request.json().catch(() => null);
         const email = parseEmail(body?.email);
-        if (!email) return json({ allowCredentials: [] });
+        if (!email) return Response.json({ allowCredentials: [] });
         const options = await generateAuthenticationChallengeForUser(
           config.db,
           email,
           event.url,
           config,
         );
-        return json(options);
+        return Response.json(options);
       },
     },
 
@@ -199,7 +198,7 @@ export function createHandlers(
           typeof body?.id !== "string" ||
           typeof body.response?.clientDataJSON !== "string"
         ) {
-          return json({ error: m.errorInvalidInput }, { status: 400 });
+          return Response.json({ error: m.errorInvalidInput }, { status: 400 });
         }
 
         const result = await verifyAuthenticationResponse(
@@ -208,11 +207,11 @@ export function createHandlers(
           event.url,
           config,
         );
-        if (!result) return json({ error: m.errorAuthFailed }, { status: 401 });
+        if (!result) return Response.json({ error: m.errorAuthFailed }, { status: 401 });
 
         await startSession(event, result.user.id, "passkey");
 
-        return json({ user: result.user });
+        return Response.json({ user: result.user });
       },
     },
 
@@ -229,7 +228,7 @@ export function createHandlers(
           event.url,
           config,
         );
-        return json(options);
+        return Response.json(options);
       },
     },
 
@@ -242,7 +241,7 @@ export function createHandlers(
 
         const body = await event.request.json().catch(() => null);
         if (typeof body?.response?.clientDataJSON !== "string") {
-          return json({ error: m.errorInvalidInput }, { status: 400 });
+          return Response.json({ error: m.errorInvalidInput }, { status: 400 });
         }
 
         const { name, ...response } = body;
@@ -259,11 +258,11 @@ export function createHandlers(
         );
         if (!result.ok) {
           config.onError("passkey-register", result.reason, event);
-          return json({ error: m.errorPasskeyRegFailed }, { status: 400 });
+          return Response.json({ error: m.errorPasskeyRegFailed }, { status: 400 });
         }
 
         await startSession(event, user.id, "passkey");
-        return json({ success: true });
+        return Response.json({ success: true });
       },
     },
 
@@ -276,14 +275,14 @@ export function createHandlers(
 
         const body = await event.request.json().catch(() => null);
         if (!body || typeof body.passkeyId !== "string") {
-          return json({ error: m.errorInvalidInput }, { status: 400 });
+          return Response.json({ error: m.errorInvalidInput }, { status: 400 });
         }
 
         const success = await removePasskey(config.db, body.passkeyId, user.id);
         if (!success)
-          return json({ error: m.errorPasskeyNotFound }, { status: 404 });
+          return Response.json({ error: m.errorPasskeyNotFound }, { status: 404 });
 
-        return json({ success: true });
+        return Response.json({ success: true });
       },
     },
 
@@ -295,7 +294,7 @@ export function createHandlers(
         if (user instanceof Response) return user;
 
         const passkeys = await config.db.getUserPasskeys(user.id);
-        return json(
+        return Response.json(
           passkeys.map((p) => ({
             id: p.id,
             credentialId: p.credentialId,
@@ -314,7 +313,7 @@ export function createHandlers(
         if (user instanceof Response) return user;
 
         await config.db.setSkipPasskeyPrompt(user.id, true);
-        return json({ success: true });
+        return Response.json({ success: true });
       },
     },
   };
@@ -330,7 +329,7 @@ export function createHandlers(
   }
 
   function notFound(event: RequestEvent) {
-    return json({ error: getMessages(event, config).errorNotFound }, { status: 404 });
+    return Response.json({ error: getMessages(event, config).errorNotFound }, { status: 404 });
   }
 
   return {
