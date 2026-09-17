@@ -141,6 +141,7 @@ This provides these routes:
 | POST   | `/api/auth/start`                   | Send OTP                        |
 | POST   | `/api/auth/verify`                  | Verify OTP, create session      |
 | POST   | `/api/auth/logout`                  | Destroy session                 |
+| POST   | `/api/auth/logout-all`              | Destroy every session of the user |
 | POST   | `/api/auth/passkey/check-email`     | Check if email has passkeys     |
 | GET    | `/api/auth/passkey/login-start`     | Begin passkey login             |
 | POST   | `/api/auth/passkey/login-finish`    | Complete passkey login          |

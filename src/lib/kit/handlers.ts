@@ -161,6 +161,19 @@ export function createHandlers(
       },
     },
 
+    "logout-all": {
+      method: "POST",
+      handler: async (event) => {
+        const m = getMessages(event, config);
+        const user = requireAuth(event, m);
+        if (user instanceof Response) return user;
+
+        await config.db.deleteSessionsForUser(user.id);
+        event.cookies.delete(config.cookie, { path: "/" });
+        return Response.json({ ok: true });
+      },
+    },
+
     "passkey/login-start": {
       method: "GET",
       handler: async (event) => {

@@ -43,6 +43,14 @@ export function createAuth(config: AuthConfig) {
 			await ensureReady();
 			return config.db.getUserPasskeys(userId);
 		},
+		invalidateUserSessions: async (userId: string) => {
+			await ensureReady();
+			await config.db.deleteSessionsForUser(userId);
+		},
+		sweep: async (now = Date.now()) => {
+			await ensureReady();
+			await config.db.deleteExpired(now);
+		},
 		get ready() {
 			return ensureReady();
 		},
