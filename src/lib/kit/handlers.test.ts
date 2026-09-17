@@ -58,3 +58,39 @@ describe('/start', () => {
 		expect(onError).toHaveBeenCalledWith('otp-send', expect.any(Error), expect.anything());
 	});
 });
+
+function logoutAllEvent(user: { id: string; email: string } | null): RequestEvent {
+	return {
+		params: { path: 'logout-all' },
+		request: new Request('http://localhost/auth/logout-all', { method: 'POST' }),
+		url: new URL('http://localhost/auth/logout-all'),
+		cookies: { get: () => 'token', set: vi.fn(), delete: vi.fn() },
+		locals: { user, session: null },
+	} as unknown as RequestEvent;
+}
+
+describe('/logout-all', () => {
+	it('returns 401 without a session', async () => {
+		const deleteSessionsForUser = vi.fn();
+		const auth = createAuth({ db: dbWith({ deleteSessionsForUser }), onSendOTP: vi.fn() });
+
+		const response = await auth.handlers.POST(logoutAllEvent(null));
+
+		expect(response.status).toBe(401);
+		expect(await response.json()).toEqual({ error: en.errorNotAuthenticated });
+		expect(deleteSessionsForUser).not.toHaveBeenCalled();
+	});
+
+	it('deletes every session of the user and clears the cookie', async () => {
+		const deleteSessionsForUser = vi.fn();
+		const auth = createAuth({ db: dbWith({ deleteSessionsForUser }), onSendOTP: vi.fn() });
+		const event = logoutAllEvent({ id: 'user-1', email: 'user@example.com' });
+
+		const response = await auth.handlers.POST(event);
+
+		expect(response.status).toBe(200);
+		expect(await response.json()).toEqual({ ok: true });
+		expect(deleteSessionsForUser).toHaveBeenCalledWith('user-1');
+		expect(event.cookies.delete).toHaveBeenCalledWith(auth.config.cookie, { path: '/' });
+	});
+});
