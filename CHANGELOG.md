@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0
+
+Logout everywhere and expired-row sweep.
+
+### Breaking
+
+- `AuthDB` gains `deleteSessionsForUser(userId)` and `deleteExpired(now)`. Custom adapters must implement both. Built-in adapters (`sqlite`, `postgres`, `d1`) need no migration.
+
+### Added
+
+- `auth.invalidateUserSessions(userId)`: deletes every session of a user.
+- `auth.sweep(now = Date.now())`: deletes expired sessions, OTP codes and challenges. Call it from a cron; `docs/security.md` no longer asks you to write the `DELETE` yourself.
+- `POST /api/auth/logout-all`: requires a valid session, deletes every session of that user including the current one, clears the cookie, returns `{ ok: true }`.
+
 ## 0.2.1
 
 SvelteKit 3 consumers. No breaking changes.

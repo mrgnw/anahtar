@@ -47,7 +47,8 @@ location /api/auth/ {
 - 32 random bytes per session; only the SHA-256 hash is stored. Cookie: `httpOnly`, `SameSite=Lax`, `Secure` on https, `path=/`.
 - A new sign-in invalidates the session held in the existing cookie. Registering a passkey does the same: the session is replaced by a passkey-length one and the token rotates.
 - Sessions do not renew on use. Lifetime is fixed at creation (`sessionDuration(method)`); renewal is a fresh passkey login, which `AuthPill` offers as a "Stay signed in" chip near expiry. Cookie possession alone never extends a session.
-- Expired rows are deleted when presented, not swept. Run `DELETE FROM auth_sessions WHERE expires_at < <now in ms>` periodically if table size matters.
+- Expired rows are deleted when presented, not on a timer. Call `auth.sweep()` from a cron (daily is plenty) to drop expired sessions, OTP codes and challenges.
+- `POST /api/auth/logout-all` and `auth.invalidateUserSessions(userId)` delete every session of a user, including the current one. The endpoint requires a valid session, not a passkey re-auth: a stolen cookie can at worst sign itself out.
 
 ## CSRF
 

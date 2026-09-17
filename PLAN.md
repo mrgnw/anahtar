@@ -270,10 +270,10 @@ The `fresh-pineapple` branch of [anani](https://github.com/mrgnw/anani) contains
 
 ## Testing
 
-117 tests: 84 unit + 33 component.
+137 tests: 102 unit + 35 component.
 
 ```sh
-pnpm test:unit     # otp, session, handlers, sqlite adapter — node env
+pnpm test:unit     # otp, session, handlers, sqlite + d1 adapters — node env
 pnpm test:browser  # AuthFlow, OtpInput, PasskeyPrompt — happy-dom
 pnpm test          # both
 ```
