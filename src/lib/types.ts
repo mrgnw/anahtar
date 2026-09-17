@@ -72,6 +72,7 @@ export interface AuthDB {
 	getSession(tokenHash: string): MaybePromise<(SessionRecord & { email: string }) | null>;
 	deleteSession(tokenHash: string): MaybePromise<void>;
 	updateSessionExpiry(tokenHash: string, expiresAt: number): MaybePromise<void>;
+	deleteSessionsForUser(userId: string): MaybePromise<void>;
 
 	storeOTP(email: string, id: string, code: string, expiresAt: number): MaybePromise<void>;
 	getLatestOTP(email: string): MaybePromise<OTPRecord | null>;
@@ -86,6 +87,8 @@ export interface AuthDB {
 	storePasskey(passkey: NewPasskey): MaybePromise<void>;
 	updatePasskeyCounter(id: string, counter: number): MaybePromise<void>;
 	deletePasskey(id: string, userId: string): MaybePromise<boolean>;
+
+	deleteExpired(now: number): MaybePromise<void>;
 }
 
 export interface AuthConfig {

@@ -143,6 +143,10 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 			await pool.query(`UPDATE ${t.sessions} SET expires_at = $1 WHERE id = $2`, [expiresAt, tokenHash]);
 		},
 
+		async deleteSessionsForUser(userId: string) {
+			await pool.query(`DELETE FROM ${t.sessions} WHERE user_id = $1`, [userId]);
+		},
+
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			await pool.query(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES ($1, $2, $3, $4)`, [
 				id,
@@ -279,6 +283,12 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 		async deletePasskey(id: string, userId: string): Promise<boolean> {
 			const result = await pool.query(`DELETE FROM ${t.passkeys} WHERE id = $1 AND user_id = $2`, [id, userId]);
 			return (result.rowCount ?? 0) > 0;
+		},
+
+		async deleteExpired(now: number) {
+			await pool.query(`DELETE FROM ${t.sessions} WHERE expires_at < $1`, [now]);
+			await pool.query(`DELETE FROM ${t.otpCodes} WHERE expires_at < $1`, [now]);
+			await pool.query(`DELETE FROM ${t.challenges} WHERE expires_at < $1`, [now]);
 		}
 	};
 }
