@@ -139,6 +139,10 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 			await db.prepare(`UPDATE ${t.sessions} SET expires_at = ? WHERE id = ?`).bind(expiresAt, tokenHash).run();
 		},
 
+		async deleteSessionsForUser(userId: string) {
+			await db.prepare(`DELETE FROM ${t.sessions} WHERE user_id = ?`).bind(userId).run();
+		},
+
 		async storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			await db
 				.prepare(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES (?, ?, ?, ?)`)
@@ -280,6 +284,12 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 		async deletePasskey(id: string, userId: string): Promise<boolean> {
 			const result = await db.prepare(`DELETE FROM ${t.passkeys} WHERE id = ? AND user_id = ?`).bind(id, userId).run();
 			return result.meta.changes > 0;
+		},
+
+		async deleteExpired(now: number) {
+			await db.prepare(`DELETE FROM ${t.sessions} WHERE expires_at < ?`).bind(now).run();
+			await db.prepare(`DELETE FROM ${t.otpCodes} WHERE expires_at < ?`).bind(now).run();
+			await db.prepare(`DELETE FROM ${t.challenges} WHERE expires_at < ?`).bind(now).run();
 		}
 	};
 }

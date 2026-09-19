@@ -132,6 +132,10 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 			db.prepare(`UPDATE ${t.sessions} SET expires_at = ? WHERE id = ?`).run(expiresAt, tokenHash);
 		},
 
+		deleteSessionsForUser(userId: string) {
+			db.prepare(`DELETE FROM ${t.sessions} WHERE user_id = ?`).run(userId);
+		},
+
 		storeOTP(email: string, id: string, code: string, expiresAt: number) {
 			db.prepare(`INSERT INTO ${t.otpCodes} (id, email, code, expires_at) VALUES (?, ?, ?, ?)`).run(
 				id,
@@ -270,6 +274,12 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 		deletePasskey(id: string, userId: string): boolean {
 			const result = db.prepare(`DELETE FROM ${t.passkeys} WHERE id = ? AND user_id = ?`).run(id, userId);
 			return result.changes > 0;
+		},
+
+		deleteExpired(now: number) {
+			db.prepare(`DELETE FROM ${t.sessions} WHERE expires_at < ?`).run(now);
+			db.prepare(`DELETE FROM ${t.otpCodes} WHERE expires_at < ?`).run(now);
+			db.prepare(`DELETE FROM ${t.challenges} WHERE expires_at < ?`).run(now);
 		}
 	};
 }

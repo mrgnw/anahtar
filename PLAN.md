@@ -101,6 +101,7 @@ interface AuthDB {
   getSession(tokenHash: string): MaybePromise<(SessionRecord & { email: string }) | null>;
   deleteSession(tokenHash: string): MaybePromise<void>;
   updateSessionExpiry(tokenHash: string, expiresAt: number): MaybePromise<void>;
+  deleteSessionsForUser(userId: string): MaybePromise<void>;
 
   // OTP
   storeOTP(email: string, id: string, code: string, expiresAt: number): MaybePromise<void>;
@@ -117,6 +118,9 @@ interface AuthDB {
   storePasskey(passkey: NewPasskey): MaybePromise<void>;
   updatePasskeyCounter(id: string, counter: number): MaybePromise<void>;
   deletePasskey(id: string, userId: string): MaybePromise<boolean>;
+
+  // Maintenance
+  deleteExpired(now: number): MaybePromise<void>; // sessions, OTPs, challenges
 }
 ```
 
@@ -181,6 +185,66 @@ migration.
 Logout-everywhere, account deletion, expired-row sweep — separate candidates.
 With no adapter break here, they no longer need to ride the same version.
 
+## Design: logout everywhere and expired-row sweep (0.3.0)
+
+Status: in progress on `feat/logout-all-sweep`.
+
+Two of the three session candidates left over from 0.2.0. Each adds one
+`AuthDB` method, so they ship together as a single breaking minor.
+
+Problem: `logout` only deletes the session named in the caller's cookie, so
+a user who suspects a leaked cookie cannot end sessions on other devices.
+And expired rows are deleted when presented, never swept, so the sessions,
+OTP and challenge tables grow with every sign-in until the consumer runs
+its own `DELETE`.
+
+### Changes
+
+1. **`AuthDB`** gains two required methods:
+
+   ```ts
+   deleteSessionsForUser(userId: string): MaybePromise<void>;
+   deleteExpired(now: number): MaybePromise<void>;
+   ```
+
+   Required, not optional: an optional `deleteExpired` would make `sweep()`
+   a silent no-op on a custom adapter, and an optional
+   `deleteSessionsForUser` would make logout-all a silent partial. A
+   type-check failure on upgrade is the right outcome, the same call as
+   0.1.0. SQL: `DELETE FROM <sessions> WHERE user_id = ?`, and three
+   `DELETE ... WHERE expires_at < ?` over sessions, OTP codes and
+   challenges. No `LIMIT` (Postgres has no `DELETE ... LIMIT`; daily
+   volume is bounded by sign-ins), no counts returned. D1 runs the three
+   deletes sequentially. Built-in adapters need no migration.
+2. **`createAuth`** exposes `auth.invalidateUserSessions(userId)` and
+   `auth.sweep(now = Date.now())`, both behind `ensureReady()`, next to
+   `listPasskeys`.
+3. **`POST /api/auth/logout-all`**: `requireAuth` (401 without a valid
+   session), deletes every session of that user including the current
+   one, clears the cookie, returns `{ ok: true }`. No passkey re-auth: the
+   caller already holds a valid session, and the worst a stolen cookie can
+   do here is sign itself out.
+4. Docs: `docs/security.md` points at `auth.sweep()` from a cron instead of
+   a hand-written `DELETE`. `AuthPill` is unchanged; consumers wire the
+   endpoint themselves.
+
+### Tests
+
+- sqlite adapter: per-user delete leaves other users' sessions; sweep
+  removes only expired rows across all three tables.
+- d1 adapter: the same cases through a test-only shim that maps
+  better-sqlite3 onto the D1 `prepare().bind().run()/first()/all()`
+  surface.
+- Handlers: `logout-all` returns 401 unauthenticated; authenticated, it
+  calls `deleteSessionsForUser` with the user id and deletes the cookie.
+- Postgres: no test harness exists; untested.
+
+### Not in this change
+
+Account deletion (`AuthDB.deleteUser`). No schema has `ON DELETE CASCADE`,
+so it needs a per-adapter delete order plus a contract for the consumer's
+own rows, and no consumer has asked for it yet.
+
 Built-in adapters:
 
 - `sqliteAdapter(db: Database)` — from `@mrgnw/anahtar/sqlite`
@@ -206,10 +270,10 @@ The `fresh-pineapple` branch of [anani](https://github.com/mrgnw/anani) contains
 
 ## Testing
 
-117 tests: 84 unit + 33 component.
+137 tests: 102 unit + 35 component.
 
 ```sh
-pnpm test:unit     # otp, session, handlers, sqlite adapter — node env
+pnpm test:unit     # otp, session, handlers, sqlite + d1 adapters — node env
 pnpm test:browser  # AuthFlow, OtpInput, PasskeyPrompt — happy-dom
 pnpm test          # both
 ```

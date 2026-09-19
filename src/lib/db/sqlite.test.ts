@@ -131,6 +131,38 @@ describe('sessions', () => {
 		db.updateSessionExpiry('hash-ext', 5000);
 		expect(db.getSession('hash-ext')!.expiresAt).toBe(5000);
 	});
+
+	it('deleteSessionsForUser removes only that user\'s sessions', () => {
+		const alice = db.createUser('alice@example.com');
+		const bob = db.createUser('bob@example.com');
+		db.createSession('a1', alice.id, Date.now() + 60000);
+		db.createSession('a2', alice.id, Date.now() + 60000);
+		db.createSession('b1', bob.id, Date.now() + 60000);
+		db.deleteSessionsForUser(alice.id);
+		expect(db.getSession('a1')).toBeNull();
+		expect(db.getSession('a2')).toBeNull();
+		expect(db.getSession('b1')).not.toBeNull();
+	});
+});
+
+describe('deleteExpired', () => {
+	it('removes only expired rows across sessions, OTPs and challenges', () => {
+		const user = db.createUser('sweep@example.com');
+		const now = Date.now();
+		db.createSession('old', user.id, now - 1000);
+		db.createSession('live', user.id, now + 60000);
+		db.storeOTP('sweep@example.com', 'otp-old', '11111', now - 1000);
+		db.storeOTP('sweep@example.com', 'otp-live', '22222', now + 60000);
+		db.storeChallenge('ch-live', user.id, now + 60000);
+		db.storeChallenge('ch-old', user.id, now - 1000);
+
+		db.deleteExpired(now);
+
+		expect(db.getSession('old')).toBeNull();
+		expect(db.getSession('live')).not.toBeNull();
+		expect(rawDb.prepare('SELECT id FROM auth_otp_codes').pluck().all()).toEqual(['otp-live']);
+		expect(rawDb.prepare('SELECT challenge FROM auth_challenges').pluck().all()).toEqual(['ch-live']);
+	});
 });
 
 describe('OTP', () => {

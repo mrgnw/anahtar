@@ -26,6 +26,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		createSession: vi.fn(),
 		getSession: vi.fn(),
 		deleteSession: vi.fn(),
+		deleteSessionsForUser: vi.fn(),
 		updateSessionExpiry: vi.fn(),
 		storeOTP: vi.fn(),
 		getLatestOTP: vi.fn(),
@@ -39,6 +40,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		storePasskey: vi.fn(),
 		updatePasskeyCounter: vi.fn(),
 		deletePasskey: vi.fn(),
+		deleteExpired: vi.fn(),
 		...overrides,
 	};
 }
