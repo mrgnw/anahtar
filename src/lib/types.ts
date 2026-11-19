@@ -9,7 +9,7 @@ export type SessionMethod = 'otp' | 'passkey';
 
 export interface AuthLocals {
 	user: { id: string; email: string } | null;
-	session: { id: string; expiresAt: number } | null;
+	session: { id: string; expiresAt: number; verifiedAt?: number } | null;
 }
 
 export interface SessionRecord {

@@ -1,6 +1,9 @@
+import { createHash } from 'node:crypto';
 import { describe, it, expect, vi } from 'vitest';
 import { createSession, validateSession, invalidateSession } from './session.js';
 import type { AuthDB, ResolvedConfig } from './types.js';
+
+const VERIFIED_AT = Date.UTC(2026, 0, 1);
 
 function mockConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
 	return {
@@ -46,27 +49,28 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 }
 
 describe('createSession', () => {
-	it('returns a 64-char hex session token', async () => {
+	it('returns a token with a 32-byte nonce and verification timestamp', async () => {
 		const db = mockDB();
 		const config = mockConfig();
-		const result = await createSession(db, 'user-1', config, 'otp');
-		expect(result.sessionToken).toMatch(/^[0-9a-f]{64}$/);
+		const result = await createSession(db, 'user-1', config, 'otp', VERIFIED_AT);
+		const [nonce, verifiedAt] = result.sessionToken.split('.');
+		expect(nonce).toMatch(/^[0-9a-f]{64}$/);
+		expect(verifiedAt).toBe(String(VERIFIED_AT));
 	});
 
-	it('stores a hashed token, not the raw token', async () => {
+	it('hashes the entire token, including its timestamp', async () => {
 		const db = mockDB();
 		const config = mockConfig();
-		const result = await createSession(db, 'user-1', config, 'otp');
+		const result = await createSession(db, 'user-1', config, 'otp', VERIFIED_AT);
 		const [storedHash] = (db.createSession as ReturnType<typeof vi.fn>).mock.calls[0];
-		expect(storedHash).not.toBe(result.sessionToken);
-		expect(storedHash).toMatch(/^[0-9a-f]{64}$/);
+		expect(storedHash).toBe(createHash('sha256').update(result.sessionToken).digest('hex'));
 	});
 
 	it('stores correct userId and future expiresAt', async () => {
 		const db = mockDB();
 		const config = mockConfig();
 		const before = Date.now();
-		await createSession(db, 'user-1', config, 'otp');
+		await createSession(db, 'user-1', config, 'otp', VERIFIED_AT);
 		const [, userId, expiresAt] = (db.createSession as ReturnType<typeof vi.fn>).mock.calls[0];
 		expect(userId).toBe('user-1');
 		expect(expiresAt).toBeGreaterThan(before);
@@ -77,7 +81,7 @@ describe('createSession', () => {
 		const db = mockDB();
 		const config = mockConfig({ sessionDuration: (m) => (m === 'passkey' ? 2000 : 1000) });
 		const before = Date.now();
-		const { expiresAt } = await createSession(db, 'user-1', config, 'passkey');
+		const { expiresAt } = await createSession(db, 'user-1', config, 'passkey', VERIFIED_AT);
 		expect(expiresAt).toBeGreaterThanOrEqual(before + 2000);
 		expect(expiresAt).toBeLessThanOrEqual(before + 2100);
 	});
@@ -124,7 +128,7 @@ describe('validateSession', () => {
 		const db = mockDB();
 		const config = mockConfig();
 
-		const { sessionToken } = await createSession(db, 'user-1', config, 'otp');
+		const { sessionToken } = await createSession(db, 'user-1', config, 'otp', VERIFIED_AT);
 
 		const [storedHash, storedUserId, storedExpiry] = (db.createSession as ReturnType<typeof vi.fn>).mock.calls[0];
 
@@ -140,6 +144,7 @@ describe('validateSession', () => {
 		expect(result!.user).toEqual({ id: 'user-1', email: 'test@example.com' });
 		expect(result!.session.id).toBe(storedHash);
 		expect(result!.session.expiresAt).toBe(storedExpiry);
+		expect(result!.session.verifiedAt).toBe(VERIFIED_AT);
 	});
 });
 

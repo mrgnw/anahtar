@@ -1,6 +1,6 @@
 import type { AuthMessages } from "./types.js";
 
-const en: AuthMessages = {
+const en = {
   emailPlaceholder: "you@example.com",
   continue: "Continue",
 
@@ -28,7 +28,8 @@ const en: AuthMessages = {
   errorNotFound: "Not found",
   errorAuthFailed: "Authentication failed",
   errorPasskeyRegFailed: "Passkey registration failed",
+	errorPasskeyReauthRequired: 'Sign in again with an email code or an existing passkey to add a passkey.',
   errorPasskeyNotFound: "Passkey not found",
-};
+} satisfies AuthMessages;
 
 export default en;
