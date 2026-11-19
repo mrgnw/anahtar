@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0
+
+- Adding a passkey requires an email-code or passkey sign-in within the last five minutes. First-time setup after email sign-in still works. Existing sessions remain signed in and can sign in again before adding a passkey.
+- Deploy 0.4.0 everywhere before upgrading to 0.5.0. This release issues the new cookie format. If you roll back after the switch, use 0.4.0 or another version that reads both formats.
+
 ## 0.4.0
 
 - Node.js deployments require Node.js 22 or later.
