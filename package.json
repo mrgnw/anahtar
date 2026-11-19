@@ -79,8 +79,6 @@
     }
   },
   "dependencies": {
-    "@oslojs/crypto": "^1.0.1",
-    "@oslojs/encoding": "^1.1.0",
     "@simplewebauthn/server": "^14.1.0"
   },
   "devDependencies": {
