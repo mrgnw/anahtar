@@ -1,17 +1,20 @@
+import Database from 'better-sqlite3';
 import { describe, expect, it, vi } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
+import { sqliteAdapter } from '../db/sqlite.js';
 import { createAuth } from '../index.js';
 import en from '../i18n/en.js';
+import { generateOTP } from '../otp.js';
 import type { AuthDB } from '../types.js';
 
-function startEvent(): RequestEvent {
+function otpEvent(path: 'start' | 'verify', code?: string): RequestEvent {
 	return {
-		params: { path: 'start' },
-		request: new Request('http://localhost/auth/start', {
+		params: { path },
+		request: new Request(`http://localhost/auth/${path}`, {
 			method: 'POST',
-			body: JSON.stringify({ email: 'user@example.com' }),
+			body: JSON.stringify({ email: 'user@example.com', code }),
 		}),
-		url: new URL('http://localhost/auth/start'),
+		url: new URL(`http://localhost/auth/${path}`),
 		cookies: { get: () => undefined, set: vi.fn(), delete: vi.fn() },
 		locals: {},
 	} as unknown as RequestEvent;
@@ -34,7 +37,7 @@ describe('/start', () => {
 			onError,
 		});
 
-		const response = await auth.handlers.POST(startEvent());
+		const response = await auth.handlers.POST(otpEvent('start'));
 
 		expect(response.status).toBe(500);
 		expect(await response.json()).toEqual({ error: en.errorGeneric });
@@ -51,11 +54,57 @@ describe('/start', () => {
 			onError,
 		});
 
-		const response = await auth.handlers.POST(startEvent());
+		const response = await auth.handlers.POST(otpEvent('start'));
 
 		expect(response.status).toBe(400);
 		expect(await response.json()).toEqual({ error: en.errorGeneric });
 		expect(onError).toHaveBeenCalledWith('otp-send', expect.any(Error), expect.anything());
+	});
+});
+
+describe('/verify', () => {
+	it('issues only one session for an eligible code', async () => {
+		const db = sqliteAdapter(new Database(':memory:'));
+		const auth = createAuth({ db, onSendOTP: vi.fn() });
+		await auth.ready;
+		const createSession = vi.spyOn(db, 'createSession');
+		const { code } = await generateOTP(db, 'user@example.com', auth.config);
+		const events = [otpEvent('verify', code), otpEvent('verify', code)];
+
+		const responses = await Promise.all(events.map((event) => auth.handlers.POST(event)));
+
+		expect(responses.map(({ status }) => status).sort()).toEqual([200, 400]);
+		expect(createSession).toHaveBeenCalledOnce();
+		for (const [index, response] of responses.entries()) {
+			expect(events[index].cookies.set).toHaveBeenCalledTimes(response.ok ? 1 : 0);
+		}
+	});
+
+	it('rejects a verification invalidated by fresh issuance and preserves the new code', async () => {
+		const email = 'user@example.com';
+		const db = sqliteAdapter(new Database(':memory:'));
+		const auth = createAuth({ db, onSendOTP: vi.fn() });
+		await auth.ready;
+		const createSession = vi.spyOn(db, 'createSession');
+		const { code } = await generateOTP(db, email, auth.config);
+		const consumeOTP = db.consumeOTP;
+		const issueFreshOTP = vi.fn(() => generateOTP(db, email, auth.config));
+		vi.spyOn(db, 'consumeOTP').mockImplementationOnce(async (id, maxAttempts) => {
+			await issueFreshOTP();
+			return consumeOTP(id, maxAttempts);
+		});
+		const event = otpEvent('verify', code);
+
+		const response = await auth.handlers.POST(event);
+
+		expect(response.status).toBe(400);
+		expect(await response.json()).toEqual({ error: en.errorInvalidCode });
+		expect(createSession).not.toHaveBeenCalled();
+		expect(event.cookies.set).not.toHaveBeenCalled();
+		expect(issueFreshOTP).toHaveBeenCalledOnce();
+		const fresh = await issueFreshOTP.mock.results[0].value;
+		expect(db.getLatestOTP(email)).toMatchObject({ id: fresh.id, attempts: 0 });
+		expect((await auth.handlers.POST(otpEvent('verify', fresh.code))).status).toBe(200);
 	});
 });
 

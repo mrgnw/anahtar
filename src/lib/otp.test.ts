@@ -31,6 +31,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		storeOTP: vi.fn(),
 		getLatestOTP: vi.fn(),
 		incrementOTPAttempts: vi.fn().mockReturnValue(1),
+		consumeOTP: vi.fn().mockReturnValue(true),
 		deleteOTP: vi.fn(),
 		deleteOTPsForEmail: vi.fn(),
 		storeChallenge: vi.fn(),
@@ -194,7 +195,7 @@ describe('verifyOTP', () => {
 		expect(limited).toHaveLength(46);
 	});
 
-	it('returns ok and deletes OTP on correct code', async () => {
+	it('returns ok after consuming the matching OTP', async () => {
 		const db = mockDB({
 			getLatestOTP: vi.fn().mockReturnValue({
 				id: 'otp-1',
@@ -207,6 +208,19 @@ describe('verifyOTP', () => {
 		const config = mockConfig();
 		const result = await verifyOTP(db, 'test@example.com', '12345', config);
 		expect(result).toEqual({ ok: true });
-		expect(db.deleteOTP).toHaveBeenCalledWith('otp-1');
+		expect(db.consumeOTP).toHaveBeenCalledWith('otp-1', config.otpMaxAttempts);
+		expect(db.deleteOTP).not.toHaveBeenCalled();
+	});
+
+	it('rejects a matching code when consumption does not succeed', async () => {
+		const db = mockDB({
+			getLatestOTP: vi.fn().mockReturnValue(validRow()),
+			consumeOTP: vi.fn().mockReturnValue(false),
+		});
+		expect(await verifyOTP(db, 'test@example.com', '12345', mockConfig())).toEqual({
+			ok: false,
+			error: 'invalid',
+		});
+		expect(db.deleteOTP).not.toHaveBeenCalled();
 	});
 });

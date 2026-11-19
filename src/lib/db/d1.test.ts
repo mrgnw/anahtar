@@ -55,6 +55,28 @@ describe('d1Adapter through the better-sqlite3 shim', () => {
 		expect(session).toEqual({ id: 'hash-abc', userId: user.id, expiresAt, email: 'sess@example.com' });
 	});
 
+	it('consumes an eligible OTP only once', async () => {
+		await db.storeOTP('otp@example.com', 'otp-1', '12345', Date.now() + 60000);
+		expect(await db.incrementOTPAttempts('otp-1')).toBe(1);
+
+		const results = await Promise.all([db.consumeOTP('otp-1', 1), db.consumeOTP('otp-1', 1)]);
+
+		expect(results).toEqual([true, false]);
+		expect(await db.getLatestOTP('otp@example.com')).toBeNull();
+	});
+
+	it.each([
+		['expired', -1000, 1],
+		['over budget', 60000, 2],
+		['without a counted attempt', 60000, 0]
+	])('leaves an ineligible OTP in place (%s)', async (_reason, expiresIn, attempts) => {
+		await db.storeOTP('otp@example.com', 'otp-1', '12345', Date.now() + expiresIn);
+		for (let attempt = 0; attempt < attempts; attempt++) await db.incrementOTPAttempts('otp-1');
+
+		expect(await db.consumeOTP('otp-1', 1)).toBe(false);
+		expect((await db.getLatestOTP('otp@example.com'))?.attempts).toBe(attempts);
+	});
+
 	it('deleteSessionsForUser removes only that user\'s sessions', async () => {
 		const alice = await db.createUser('alice@example.com');
 		const bob = await db.createUser('bob@example.com');

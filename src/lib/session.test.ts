@@ -31,6 +31,7 @@ function mockDB(overrides: Partial<AuthDB> = {}): AuthDB {
 		storeOTP: vi.fn(),
 		getLatestOTP: vi.fn(),
 		incrementOTPAttempts: vi.fn().mockReturnValue(1),
+		consumeOTP: vi.fn().mockReturnValue(true),
 		deleteOTP: vi.fn(),
 		deleteOTPsForEmail: vi.fn(),
 		storeChallenge: vi.fn(),
