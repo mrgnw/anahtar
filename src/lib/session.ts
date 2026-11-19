@@ -1,7 +1,9 @@
-import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeHexLowerCase } from '@oslojs/encoding';
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import type { AuthDB, ResolvedConfig, SessionMethod } from './types.js';
+
+function hashToken(bytes: Uint8Array): string {
+	return createHash('sha256').update(bytes).digest('hex');
+}
 
 export async function createSession(
 	db: AuthDB,
@@ -10,8 +12,8 @@ export async function createSession(
 	method: SessionMethod,
 ): Promise<{ sessionToken: string; expiresAt: number }> {
 	const tokenBytes = randomBytes(32);
-	const sessionToken = encodeHexLowerCase(tokenBytes);
-	const tokenHash = encodeHexLowerCase(sha256(tokenBytes));
+	const sessionToken = tokenBytes.toString('hex');
+	const tokenHash = hashToken(tokenBytes);
 	const expiresAt = Date.now() + config.sessionDuration(method);
 
 	await db.createSession(tokenHash, userId, expiresAt);
@@ -25,10 +27,7 @@ export async function validateSession(
 ): Promise<{ user: { id: string; email: string }; session: { id: string; expiresAt: number } } | null> {
 	if (!token || token.length !== 64 || !/^[0-9a-f]+$/.test(token)) return null;
 
-	const tokenBytes = new Uint8Array(
-		token.match(/.{2}/g)!.map((b) => Number.parseInt(b, 16)),
-	);
-	const sessionId = encodeHexLowerCase(sha256(tokenBytes));
+	const sessionId = hashToken(Buffer.from(token, 'hex'));
 
 	const row = await db.getSession(sessionId);
 	if (!row) return null;
