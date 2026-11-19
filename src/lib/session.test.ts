@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { createHash } from 'node:crypto';
 import { createSession, validateSession, invalidateSession } from './session.js';
 import type { AuthDB, ResolvedConfig } from './types.js';
 
@@ -109,6 +110,18 @@ describe('validateSession', () => {
 	it('accepts a token with a session hash stored before the crypto dependency change', async () => {
 		const token = '00112233445566778899aabbccddeeff'.repeat(2);
 		const id = '4773d12e2371bb935b9a0f5439b4a1c3ad3f2414b86980f8418d1cfabdfadfef';
+		const expiresAt = Date.now() + 60_000;
+		const getSession = vi.fn((hash: string) =>
+			hash === id ? { id, userId: 'user-1', email: 'test@example.com', expiresAt } : null,
+		);
+		const db = mockDB({ getSession });
+
+		expect(await validateSession(db, token)).toMatchObject({ session: { id, expiresAt } });
+	});
+
+	it('accepts a stored session with an enrollment timestamp in its token', async () => {
+		const token = `${'a'.repeat(64)}.1795060000000`;
+		const id = createHash('sha256').update(token).digest('hex');
 		const expiresAt = Date.now() + 60_000;
 		const getSession = vi.fn((hash: string) =>
 			hash === id ? { id, userId: 'user-1', email: 'test@example.com', expiresAt } : null,
