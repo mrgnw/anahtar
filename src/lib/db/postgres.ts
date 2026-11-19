@@ -179,6 +179,17 @@ export function postgresAdapter(pool: PgPool, options: PostgresAdapterOptions = 
 			return row?.attempts ?? null;
 		},
 
+		async consumeOTP(id: string, maxAttempts: number): Promise<boolean> {
+			const row = await queryOne<{ id: string }>(
+				`DELETE FROM ${t.otpCodes}
+				WHERE id = $1 AND attempts BETWEEN 1 AND $2::double precision
+					AND expires_at >= floor(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)
+				RETURNING id`,
+				[id, maxAttempts]
+			);
+			return row !== undefined;
+		},
+
 		async deleteOTP(id: string) {
 			await pool.query(`DELETE FROM ${t.otpCodes} WHERE id = $1`, [id]);
 		},

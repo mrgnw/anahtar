@@ -87,6 +87,20 @@ export const auth = createAuth({
 });
 ```
 
+### Custom adapters
+
+Custom `AuthDB` implementations must add `consumeOTP(id, maxAttempts): boolean | Promise<boolean>`.
+After Anahtar atomically counts an attempt and matches the code, the adapter must delete the row
+in a single conditional write. Use a new ID for each issuance so a pending verification cannot
+consume its replacement. Match the exact issuance ID, require the stored attempt count to be
+between 1 and `maxAttempts` inclusive, and require `expires_at` to be at least the database's
+current Unix time in milliseconds. Return `true` only if the write deleted that row. Return
+`false` for missing or ineligible rows and propagate database errors.
+
+Anahtar issues a session only after this method returns `true`. Keep `incrementOTPAttempts`
+atomic and keep `deleteOTP` for expiry and attempt-limit cleanup. Built-in adapters need no
+schema migration.
+
 ---
 
 ## Wire into SvelteKit

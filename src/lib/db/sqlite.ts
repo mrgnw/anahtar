@@ -168,6 +168,16 @@ export function sqliteAdapter(db: Database.Database, options: SqliteAdapterOptio
 			return row?.attempts ?? null;
 		},
 
+		consumeOTP(id: string, maxAttempts: number): boolean {
+			const row = db.prepare(
+				`DELETE FROM ${t.otpCodes}
+				WHERE id = ? AND attempts BETWEEN 1 AND ?
+					AND expires_at >= unixepoch() * 1000 + CAST(substr(strftime('%f', 'now'), 4) AS INTEGER)
+				RETURNING id`
+			).get(id, maxAttempts);
+			return row !== undefined;
+		},
+
 		deleteOTP(id: string) {
 			db.prepare(`DELETE FROM ${t.otpCodes} WHERE id = ?`).run(id);
 		},

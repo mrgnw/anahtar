@@ -175,6 +175,19 @@ export function d1Adapter(db: D1Database, options: D1AdapterOptions = {}): AuthD
 			return row?.attempts ?? null;
 		},
 
+		async consumeOTP(id: string, maxAttempts: number): Promise<boolean> {
+			const row = await db
+				.prepare(
+					`DELETE FROM ${t.otpCodes}
+					WHERE id = ? AND attempts BETWEEN 1 AND ?
+						AND expires_at >= unixepoch() * 1000 + CAST(substr(strftime('%f', 'now'), 4) AS INTEGER)
+					RETURNING id`
+				)
+				.bind(id, maxAttempts)
+				.first<{ id: string }>();
+			return row !== null;
+		},
+
 		async deleteOTP(id: string) {
 			await db.prepare(`DELETE FROM ${t.otpCodes} WHERE id = ?`).bind(id).run();
 		},
