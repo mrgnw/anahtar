@@ -46,8 +46,10 @@ export async function verifyOTP(
 		return { ok: false, error: 'invalid' };
 	}
 
-	await db.deleteOTP(row.id);
-	return { ok: true };
+	const consumed = await db.consumeOTP(row.id, config.otpMaxAttempts);
+	if (consumed === true) return { ok: true };
+	if (row.expiresAt < Date.now()) return { ok: false, error: 'expired' };
+	return { ok: false, error: 'invalid' };
 }
 
 function codesMatch(expected: string, given: string): boolean {

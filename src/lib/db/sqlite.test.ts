@@ -193,6 +193,27 @@ describe('OTP', () => {
 		expect(db.incrementOTPAttempts('nonexistent')).toBeNull();
 	});
 
+	it('consumes an eligible OTP only once', () => {
+		db.storeOTP('otp@example.com', 'otp-1', '12345', Date.now() + 60000);
+		expect(db.incrementOTPAttempts('otp-1')).toBe(1);
+
+		expect(db.consumeOTP('otp-1', 1)).toBe(true);
+		expect(db.consumeOTP('otp-1', 1)).toBe(false);
+		expect(db.getLatestOTP('otp@example.com')).toBeNull();
+	});
+
+	it.each([
+		['expired', -1000, 1],
+		['over budget', 60000, 2],
+		['without a counted attempt', 60000, 0]
+	])('leaves an ineligible OTP in place (%s)', (_reason, expiresIn, attempts) => {
+		db.storeOTP('otp@example.com', 'otp-1', '12345', Date.now() + expiresIn);
+		for (let attempt = 0; attempt < attempts; attempt++) db.incrementOTPAttempts('otp-1');
+
+		expect(db.consumeOTP('otp-1', 1)).toBe(false);
+		expect(db.getLatestOTP('otp@example.com')?.attempts).toBe(attempts);
+	});
+
 	it('deleteOTP removes a specific OTP', () => {
 		db.storeOTP('d@example.com', 'otp-d', '22222', Date.now() + 60000);
 		db.deleteOTP('otp-d');
