@@ -14,11 +14,14 @@ import {
   validateSession,
 } from "../session.js";
 import { resolveMessages, detectLocaleServer } from "../i18n/server.js";
+import en from '../i18n/en.js';
 import type { AuthMessages } from "../i18n/types.js";
 import type { ResolvedConfig, SessionMethod } from "../types.js";
 import { parseEmail } from "../email.js";
 
 type RouteHandler = (event: RequestEvent) => Promise<Response>;
+
+const PASSKEY_ENROLLMENT_WINDOW_MS = 5 * 60 * 1000;
 
 function getMessages(
   event: RequestEvent,
@@ -35,6 +38,19 @@ function requireAuth(
   const user = event.locals.user;
   if (!user) return Response.json({ error: m.errorNotAuthenticated }, { status: 401 });
   return user;
+}
+
+function requireRecentSignIn(event: RequestEvent, m: AuthMessages): number | Response {
+	const verifiedAt = event.locals.session?.verifiedAt;
+	if (verifiedAt !== undefined) {
+		const age = Date.now() - verifiedAt;
+		if (age >= 0 && age < PASSKEY_ENROLLMENT_WINDOW_MS) return verifiedAt;
+	}
+
+	return Response.json(
+		{ error: m.errorPasskeyReauthRequired ?? en.errorPasskeyReauthRequired },
+		{ status: 403 },
+	);
 }
 
 export function createHandlers(
@@ -58,13 +74,14 @@ export function createHandlers(
     event: RequestEvent,
     userId: string,
     method: SessionMethod,
+	verifiedAt: number,
   ) {
     const previous = event.cookies.get(config.cookie);
     if (previous) {
       const existing = await validateSession(config.db, previous);
       if (existing) await invalidateSession(config.db, existing.session.id);
     }
-    const session = await createSession(config.db, userId, config, method);
+	const session = await createSession(config.db, userId, config, method, verifiedAt);
     event.cookies.set(
       config.cookie,
       session.sessionToken,
@@ -129,12 +146,13 @@ export function createHandlers(
           );
         }
 
+		const verifiedAt = Date.now();
         let user = await config.db.getUserByEmail(email);
         if (!user) {
           user = await config.db.createUser(email);
         }
 
-        await startSession(event, user.id, "otp");
+		await startSession(event, user.id, 'otp', verifiedAt);
 
         const passkeys = await config.db.getUserPasskeys(user.id);
 
@@ -222,7 +240,7 @@ export function createHandlers(
         );
         if (!result) return Response.json({ error: m.errorAuthFailed }, { status: 401 });
 
-        await startSession(event, result.user.id, "passkey");
+		await startSession(event, result.user.id, 'passkey', Date.now());
 
         return Response.json({ user: result.user });
       },
@@ -234,6 +252,9 @@ export function createHandlers(
         const m = getMessages(event, config);
         const user = requireAuth(event, m);
         if (user instanceof Response) return user;
+
+		const verifiedAt = requireRecentSignIn(event, m);
+		if (verifiedAt instanceof Response) return verifiedAt;
 
         const options = await generateRegistrationChallenge(
           config.db,
@@ -253,6 +274,9 @@ export function createHandlers(
         if (user instanceof Response) return user;
 
         const body = await event.request.json().catch(() => null);
+		const verifiedAt = requireRecentSignIn(event, m);
+		if (verifiedAt instanceof Response) return verifiedAt;
+
         if (typeof body?.response?.clientDataJSON !== "string") {
           return Response.json({ error: m.errorInvalidInput }, { status: 400 });
         }
@@ -274,7 +298,7 @@ export function createHandlers(
           return Response.json({ error: m.errorPasskeyRegFailed }, { status: 400 });
         }
 
-        await startSession(event, user.id, "passkey");
+		await startSession(event, user.id, 'passkey', verifiedAt);
         return Response.json({ success: true });
       },
     },

@@ -31,5 +31,6 @@ export interface AuthMessages {
   errorNotFound: string;
   errorAuthFailed: string;
   errorPasskeyRegFailed: string;
+	errorPasskeyReauthRequired?: string;
   errorPasskeyNotFound: string;
 }
