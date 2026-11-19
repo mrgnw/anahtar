@@ -52,6 +52,7 @@ In SvelteKit, wrap the exported `POST` handler from `auth.handlers` in `src/rout
 
 ## Passkeys
 
+- Starting and finishing enrollment requires an email code or existing passkey sign-in to the same account within the last five minutes. If either endpoint returns HTTP 403, sign in again to that account and restart enrollment. Enrollment rotates the session and keeps the original sign-in time.
 - User verification is required for registration and login. A security key without a PIN will be asked to set one. The passkey is the only factor, so presence alone is not enough.
 - `rpID` and `origin` come from the request URL unless you pass `rpId`/`origin` to `createAuth` or set the `ORIGIN` env var. Behind a reverse proxy set `ORIGIN` (adapter-node also reads `PROTOCOL_HEADER`/`HOST_HEADER`); otherwise WebAuthn verification fails and the session cookie loses its `Secure` flag.
 - `POST /api/auth/passkey/check-email` tells anyone whether an address has passkeys and returns its credential IDs (public identifiers). That is what makes the email-first flow work. If enumeration matters to you, rate-limit it or build your UI on `login-start` (discoverable credentials) only.
