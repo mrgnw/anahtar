@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Node.js deployments require Node.js 22 or later.
+- A verified email code is consumed in one database operation before a session is issued. Custom adapters must implement `consumeOTP`. The built-in adapters need no schema migration.
+- The session validator accepts both cookie formats used in the staged passkey enrollment rollout. Deploy this version everywhere before a release that issues the new format. This version can also serve as the rollback target after the switch.
+- The security guide covers rate limits for email codes and passkey challenges.
+
 ## 0.3.0
 
 Logout everywhere and expired-row sweep.
